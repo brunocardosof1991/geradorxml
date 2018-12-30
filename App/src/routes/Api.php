@@ -1,6 +1,7 @@
 <?php
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use App\Model\Xml;
 
 $app = new \Slim\App;
 
@@ -15,9 +16,182 @@ $app->add(function ($req, $res, $next) {
             ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
             ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 });
+    //OBS: Rota api/nf retornará uma <tr><td></td></tr> como resposta
+    // Rotas:Cliente, Produto, Emissor e NF
     // Rota para o grupo API
     $app->group('/api', function () use ($app) 
-    {    
+    {
+        // Rota para o autorizar XML
+        $app->post('/autorizarXml', function(Request $request, Response $response)
+        {        
+            $file1Array = json_decode($request->getParam('json'),true);
+            $produto = json_decode($request->getParam('produto'),true);
+            $xml = new Xml();
+            $xml->dest['ID'] = $file1Array[0]['clientID'];
+            $xml->dest['xNome'] = $file1Array[0]['inputName'];
+            $xml->dest['CNPJ'] = $file1Array[0]['inputRegistro'];
+            $xml->enderDest['xLgr'] = $file1Array[0]['inputEndereco'];
+            $xml->enderDest['nro'] = $file1Array[0]['inputNumero'];
+            $xml->enderDest['xCpl'] = $file1Array[0]['inputComplemento'];
+            $xml->enderDest['xBairro'] = $file1Array[0]['inputBairro'];
+            $xml->enderDest['CEP'] = $file1Array[0]['inputCEP'];
+            $xml->enderDest['fone'] = $file1Array[0]['inputFone'];
+
+            if($file1Array[1]['payment'] == 01 || $file1Array[1]['payment']== 02)
+            {
+                $xml->detPag['tPag'] = $file1Array[1]['payment'];
+                $xml->detPag['vPag'] = $valorTotal = $file1Array[3];//Valor total a ser pago
+            } else 
+            {
+                $xml->detPag['tPag'] = $file1Array[1]['payment'];
+                $xml->detPag['vPag'] = $valorTotal = $file1Array[3]; //Valor total a ser pago
+                $xml->card['tpIntegra'] = $file1Array[1]['intPagamento'];
+                $xml->card['CNPJ'] = $file1Array[1]['credCartao'];
+                $xml->card['tBand'] = $file1Array[1]['bandeira'];
+                $xml->card['cAut'] = $file1Array[0]['codigoSeguranca'];        
+            }
+            $informacoesAdicionais = $file1Array[2];
+            try {
+                $xml->gerarXml($informacoesAdicionais,$produto);
+                echo json_encode($xml);
+            } catch (\Throwable $e) {
+                echo '{"Erro": {"text": '.$e->getMessage().'}';
+            }   
+        });
+        // Rota para o grupo Cliente
+        $app->group('/cliente', function () use ($app) 
+        {        
+            $app->get('/', function(Request $request, Response $response)
+            {
+                $sql = "SELECT * FROM cliente";   
+                try{
+                    // Get DB Object
+                    $db = new db();
+                    // Connect
+                    $db = $db->connect();    
+                    $stmt = $db->query($sql);
+                    $cliente = $stmt->fetchAll(PDO::FETCH_OBJ);
+                    $db = null;
+                    echo json_encode($cliente);
+                } catch(PDOException $e){
+                    echo '{"Erro": {"text": '.$e->getMessage().'}';
+                }
+            });
+                
+            // Consultar uma NF especifica
+            $app->get('/{id}', function(Request $request, Response $response){
+                $id = $request->getAttribute('id');    
+                $sql = "SELECT * FROM cliente WHERE id = $id";    
+                try{
+                    // Get DB Object
+                    $db = new db();
+                    // Connect
+                    $db = $db->connect();
+            
+                    $stmt = $db->query($sql);
+                    $NF = $stmt->fetch(PDO::FETCH_OBJ);
+                    $db = null;
+                    echo json_encode($NF);
+                } catch(PDOException $e){
+                    echo '{"Erro": {"text": '.$e->getMessage().'}';
+                }
+            });    
+            // Adicionar Cliente
+        $app->post('/add', function(Request $request, Response $response){
+            $id = $request->getParam('id');
+            $nome = $request->getParam('nome');
+            $CNPJ = $request->getParam('CNPJ');
+            $endereco = $request->getParam('endereco');
+            $numero = $request->getParam('numero');
+            $complemento = $request->getParam('complemento');
+            $bairro = $request->getParam('bairro');
+            $CEP = $request->getParam('CEP');
+            $celular = $request->getParam('celular');
+            $sql = "INSERT INTO cliente (id,nome,CNPJ,endereco,numero,complemento,bairro,CEP,celular) VALUES
+            (:id,:nome,:CNPJ,:endereco,:numero,:complemento,:bairro,:CEP,:celular)";
+            try{
+                // Get DB Object
+                $db = new db();
+                // Connect
+                $db = $db->connect();
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(':id', $id);
+                $stmt->bindParam(':nome',  $nome);
+                $stmt->bindParam(':CNPJ',      $CNPJ);
+                $stmt->bindParam(':endereco',      $nNenderecoF);
+                $stmt->bindParam(':numero',    $numero);
+                $stmt->bindParam(':complemento',       $complemento);
+                $stmt->bindParam(':bairro',      $bairro);
+                $stmt->bindParam(':CEP',      $CEP);
+                $stmt->bindParam(':celular',      $celular);
+                $stmt->execute();
+                echo '{"Aviso": {"text": "Cliente Adicionada"}';
+            } catch(PDOException $e){
+                echo '{"Erro": {"text": '.$e->getMessage().'}';
+            }
+        });
+        // Atualizar Cliente
+        $app->put('/update/{id}', function(Request $request, Response $response){
+            $id = $request->getParam('id');
+            $nome = $request->getParam('nome');
+            $CNPJ = $request->getParam('CNPJ');
+            $endereco = $request->getParam('endereco');
+            $numero = $request->getParam('numero');
+            $complemento = $request->getParam('complemento');
+            $bairro = $request->getParam('bairro');
+            $CEP = $request->getParam('CEP');
+            $celular = $request->getParam('celular');
+            $sql = "UPDATE cliente SET
+                        id 	= :id,
+                        nome 	= :nome,
+                        CNPJ		= :CNPJ,
+                        endereco		= :endereco,
+                        numero 	= :numero,
+                        complemento 		= :CNPJDestinatario,
+                        bairro		= :bairro,
+                        CEP		= :CEP,
+                        celular		= :celular
+                    WHERE id = $id";
+            try{
+                // Get DB Object
+                $db = new db();
+                // Connect
+                $db = $db->connect();
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(':id', $id);
+                $stmt->bindParam(':nome',  $nome);
+                $stmt->bindParam(':CNPJ',      $CNPJ);
+                $stmt->bindParam(':endereco',      $nNenderecoF);
+                $stmt->bindParam(':numero',    $numero);
+                $stmt->bindParam(':complemento',       $complemento);
+                $stmt->bindParam(':bairro',      $bairro);
+                $stmt->bindParam(':CEP',      $CEP);
+                $stmt->bindParam(':celular',      $celular);
+                $stmt->execute();
+                echo '{"Aviso": {"text": "Cliente Atualizado"}';
+            } catch(PDOException $e){
+                echo '{"Erro": {"text": '.$e->getMessage().'}';
+            }
+        });
+        // Deletar Cliente
+        $app->delete('/delete/{id}', function(Request $request, Response $response){
+            $id = $request->getAttribute('id');
+            $sql = "DELETE FROM cliente WHERE id = $id";
+            try{
+                // Get DB Object
+                $db = new db();
+                // Connect
+                $db = $db->connect();
+                $stmt = $db->prepare($sql);
+                $stmt->execute();
+                $db = null;
+                echo '{"Aviso": {"text": "Cliente Deletado"}';
+            } catch(PDOException $e){
+                echo '{"Erro": {"text": '.$e->getMessage().'}';
+            }
+        });
+        });// END Group /Cliente
+        //**************************************************************************************************/    
         // Rota para o grupo Produto
         $app->group('/produto', function () use ($app) 
         {  
@@ -236,7 +410,8 @@ $app->add(function ($req, $res, $next) {
                     echo '{"Erro": {"text": '.$e->getMessage().'}';
                 }
             });
-        });//END grupo Produto
+        });//END grupo Produto        
+        //**************************************************************************************************/
         // Rota para o grupo Emissor
         $app->group('/emissor', function () use ($app) 
         {   
@@ -414,6 +589,7 @@ $app->add(function ($req, $res, $next) {
                 }
             });
         }); //END grupo emissor
+        //**************************************************************************************************/
         // Rota para o grupo NFC-e
         $app->group('/nf', function () use ($app) 
         {        

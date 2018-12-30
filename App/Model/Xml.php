@@ -1,6 +1,6 @@
 <?php
 namespace App\Model;
-use App\Model\Connection;
+use App\Model\Conexao;
 use App\Model\ICMS;
 use App\Model\PIS;
 use App\Model\COFINS;
@@ -104,7 +104,7 @@ class Xml
     //<ide><idLote></idLote></ide>
     private function getId() 
     {
-        $connection = new Connection();
+        $connection = new Conexao();
         $query = $connection->consultar("SELECT id FROM nf ORDER BY id DESC LIMIT 1");
         $data = $query->fetch_array(MYSQLI_ASSOC);
         $idLote = $data['id'] + 1;
@@ -123,7 +123,7 @@ class Xml
     //<ide><nNF></nNF></ide>
     private function gerarNnf() 
     {
-        $connection = new Connection();
+        $connection = new Conexao();
         $query = $connection->consultar("SELECT nNF FROM nf ORDER BY nNF DESC LIMIT 1");
         $data = $query->fetch_array(MYSQLI_ASSOC);
         $nNF = $data['nNF'] + 1;
@@ -132,7 +132,7 @@ class Xml
     //<ide><cNF></cNF></ide>
     private function gerarCnf() 
     {
-        $connection = new Connection();
+        $connection = new Conexao();
         $query = $connection->consultar("SELECT cNF FROM nf ORDER BY cNF DESC LIMIT 1");
         $data = $query->fetch_array(MYSQLI_ASSOC);
         $cNF = $data['cNF'] + 1;
@@ -174,7 +174,7 @@ class Xml
     }
     private function salvarXml() 
     {
-        $connection = new Connection;
+        $connection = new Conexao();
         $sql = "INSERT INTO nf (id,chave,cNF,nNF,CNPJDestinatario,xNomeDestinatario,dhEmi) 
             VALUES(
                 '" . $this->getId() . "',
@@ -187,7 +187,7 @@ class Xml
                 )";
         $connection->executar($sql);
     }
-    function gerarXml($informacoesAdicionais, $arrayProduto, $arrayProdutoQuantidade) 
+    function gerarXml($informacoesAdicionais, $arrayProduto) 
     {
         $dom = new DOMDocument('1.0', 'utf-8');
         $NFe = $dom->appendChild($dom->createElement('NFe'));
@@ -277,19 +277,19 @@ class Xml
             $indIEDest = $destinatario->appendChild($dom->createElement('indIEDest'));
             $indIEDest->appendChild($dom->createTextNode($this->dest['indIEDest']));
         //Tag <det>
-        if (count($arrayProduto[0]) !== 0 && count($arrayProdutoQuantidade[1]) !== 0) 
+        if (count($arrayProduto) !== 0) 
         {
-            for ($i = 0; $i < count($arrayProduto[0]) && $i < count($arrayProdutoQuantidade[1]); $i++) 
+            for ($i = 0; $i < count($arrayProduto); $i++) 
             {
                 $det = $infNFe->appendChild($dom->createElement('det'));
                 $det->setAttributeNode(new DOMAttr('nItem', 1 + $i));
                     $prod = $det->appendChild($dom->createElement('prod'));
                     $cProd = $prod->appendChild($dom->createElement('cProd'));
-                    $cProd->appendChild($dom->createTextNode($arrayProduto[$i]['cProd']));
+                    $cProd->appendChild($dom->createTextNode($arrayProduto[$i]['id']));
                     $cEAN = $prod->appendChild($dom->createElement('cEAN'));
                     $cEAN->appendChild($dom->createTextNode('SEM GTIN'));
                     $xProd = $prod->appendChild($dom->createElement('xProd'));
-                    $xProd->appendChild($dom->createTextNode($arrayProduto[$i]['xProd']));
+                    $xProd->appendChild($dom->createTextNode($arrayProduto[$i]['produto']));
                     $NCM = $prod->appendChild($dom->createElement('NCM'));
                     $NCM->appendChild($dom->createTextNode($arrayProduto[$i]['NCM']));
                     $CFOP = $prod->appendChild($dom->createElement('CFOP'));
@@ -297,22 +297,21 @@ class Xml
                     $uCom = $prod->appendChild($dom->createElement('uCom'));
                     $uCom->appendChild($dom->createTextNode('UN'));
                     $qCom = $prod->appendChild($dom->createElement('qCom'));
-                    $qCom->appendChild($dom->createTextNode($arrayProdutoQuantidade[1][1 + $i]['Quantidade']));
+                    $qCom->appendChild($dom->createTextNode($arrayProduto[$i]['quantidade']));
                     $vUnCom = $prod->appendChild($dom->createElement('vUnCom'));
-                    $vUnCom->appendChild($dom->createTextNode($arrayProduto[$i]['vProd']));
+                    $vUnCom->appendChild($dom->createTextNode($arrayProduto[$i]['preco']));
                     $vProd = $prod->appendChild($dom->createElement('vProd'));
                     //Calcular valor total do produto - valor * quantidade\\
                     //Permitir somente duas casas depois da vírgula    printf('%.2f', round(1001.8, 2)) \\
-                    //$valorTotal = $arrayProduto[$i]['vProd'] * $arrayProdutoQuantidade[1 + $i]['Quantidade'];
-                    $vProd->appendChild($dom->createTextNode(sprintf('%.2f', round($arrayProduto[$i]['vProd'] * $arrayProdutoQuantidade[1][1 + $i]['Quantidade'],2))));
+                    $vProd->appendChild($dom->createTextNode(sprintf('%.2f', round($arrayProduto[$i]['preco'] * $arrayProduto[$i]['quantidade'],2))));
                     $cEANTrib = $prod->appendChild($dom->createElement('cEANTrib'));
                     $cEANTrib->appendChild($dom->createTextNode('SEM GTIN'));
                     $uTrib = $prod->appendChild($dom->createElement('uTrib'));
                     $uTrib->appendChild($dom->createTextNode('UN'));
                     $qTrib = $prod->appendChild($dom->createElement('qTrib'));
-                    $qTrib->appendChild($dom->createTextNode($arrayProdutoQuantidade[1][1 + $i]['Quantidade']));
+                    $qTrib->appendChild($dom->createTextNode($arrayProduto[$i]['quantidade']));
                     $vUnTrib = $prod->appendChild($dom->createElement('vUnTrib'));
-                    $vUnTrib->appendChild($dom->createTextNode($arrayProduto[$i]['vProd']));
+                    $vUnTrib->appendChild($dom->createTextNode($arrayProduto[$i]['preco']));
                     $indTot = $prod->appendChild($dom->createElement('indTot'));
                     $indTot->appendChild($dom->createTextNode(1));
                 //Tag <imposto>    
@@ -424,7 +423,7 @@ class Xml
         //<infAdic>
         $infAdic = $infNFe->appendChild($dom->createElement('infAdic'));
         $infCpl = $infAdic->appendChild($dom->createElement('infCpl'));
-        $infCpl->appendChild($dom->createTextNode($informacoesAdicionais['infCpl']));
+        $infCpl->appendChild($dom->createTextNode($informacoesAdicionais));
         
         $dom->save($this->gerarChaveDeAcesso() . '-nfe.xml');
         $this->salvarXml();

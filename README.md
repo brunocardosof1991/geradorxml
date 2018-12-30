@@ -1,29 +1,14 @@
-# SlimApp RESTful API
+##Gerador XML
+Esse é um gerador XML para autorizar NFC-e em ambiente de homologação com o sefaz, usando o software UniNFe da Unimake para assinatura.
+Esse projeto esta usando: 
+Arquitetura Restfull Api; 
+Backend PHP; 
+SGBD MySQL; 
+Frontend JavaScript, jQuery
 
-This is a RESTful api built with the SlimPHP framework and uses MySQL for storage.
-
-### Version
+##Versão
 1.0.0
 
-### Usage
+##Instalação
 
-
-### Installation
-
-Create database or import from _sql/slimapp.sql
-
-Edit db/config params
-
-Install SlimPHP and dependencies
-
-```sh
-$ composer
-```
-### API Endpints
-```sh
-$ GET /api/customers
-$ GET /api/customer/{id}
-$ POST /api/customer/add
-$ PUT /api/customer/update/{id}
-$ DELETE /api/customer/delete/{id}
-```
+##API Endpoints

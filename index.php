@@ -43,16 +43,13 @@
 
         <title>Gerador XML</title>
     </head>
-    <body>
-        
+    <body>        
         <?php require_once 'App/View/Menu.php'; ?>
-            <div class="container ">
+            <div class="container-fluid">
                 <div class="row">
                 <h1>Opa</h1>
                 </div> <!-- .row -->
             </div><!-- .container -->
-            
-            
         <?php require_once 'App/View/Footer.php'; ?>
     </body>
 </html>
