@@ -10,7 +10,7 @@
                 Cliente
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
-                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/Cliente/fetch.php">Listar Cliente</a>
+                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/Cliente/fetch.php">Listar Clientes</a>
             </div>
         </li>
         <li class="nav-item dropdown">
@@ -24,10 +24,19 @@
         </li>
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownBlog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                XML
+                Produto                
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
-                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/XML/gerar.php">Gerar XML</a>
+                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/Produto/fetch.php">Listar Produtos</a>
+            </div>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownBlog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Venda                
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
+                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/XML/gerar.php">Vender</a>
+                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/XML/fetch.php">Listar Vendas</a>
             </div>
         </li>
     </ul>

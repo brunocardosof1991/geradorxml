@@ -10,7 +10,7 @@
 
         <!-- table-to-json LIB-->
         <script src="//lightswitch05.github.io/table-to-json/javascripts/jquery.tabletojson.min.js"></script>  
-        <script type="module" src="../../../js/NF/NF.js"></script>
+        <script type="module" src="../../../js/cliente/cliente.js"></script>
 
         <!-- Folha de estilo da página -->
         <link href="../../../css/style.css" type="text/css" rel="stylesheet">
@@ -35,28 +35,28 @@
     </head>
     <body>   
     <?php require_once '../Menu.php'; ?> 
-        <div class="container" id="container">
+    <div class="container" id="container">
             <div class="row" id="rowNF">
                 <div class="col-md-12" id="colNF">
-                <div class="table-responsive-xl">
-                    <table class="table table-hover table-bordered mt-3 mx-auto text-center" id="tableListarNF">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th style="display:none;" scope="col">ID</th>
-                                <th scope="col">Chave De Acesso</th>
-                                <th scope="col">Data de Emissão</th>
-                                <th scope="col">CPF/CNPJ Destinatário</th>
-                                <th scope="col">Compartilhar</th>
-                                <th scope="col">Excluir</th>
-                                <th scope="col">Duplicar</th>
-                                <th scope="col">Cancelar</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div> <!-- END #table-responsive -->
-                </div> <!-- END #colNF -->
-            </div> <!-- END .row -->
-        </div> <!-- END .container -->
+                    <table class="text-center table table-hover table-bordered mt-3" id="tableListarNF">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Nome</th>
+                                    <th scope="col">CNPJ/CPF</th>
+                                    <th scope="col">Endereço</th>
+                                    <th scope="col">Número</th>
+                                    <th scope="col">Complemento</th>
+                                    <th scope="col">Bairro</th>
+                                    <th scope="col">CEP</th>
+                                    <th scope="col">Celular</th>
+                                    <th scope="col">Selecionar</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody"></tbody>
+                        </table>
+                </div>
+            </div>
+        </div>
     </body>
 </html>

@@ -23,7 +23,7 @@ $app->add(function ($req, $res, $next) {
     {
         // Rota para o autorizar XML
         $app->post('/autorizarXml', function(Request $request, Response $response)
-        {        
+        {              
             $file1Array = json_decode($request->getParam('json'),true);
             $produto = json_decode($request->getParam('produto'),true);
             $xml = new Xml();
@@ -36,7 +36,7 @@ $app->add(function ($req, $res, $next) {
             $xml->enderDest['xBairro'] = $file1Array[0]['inputBairro'];
             $xml->enderDest['CEP'] = $file1Array[0]['inputCEP'];
             $xml->enderDest['fone'] = $file1Array[0]['inputFone'];
-
+    
             if($file1Array[1]['payment'] == 01 || $file1Array[1]['payment']== 02)
             {
                 $xml->detPag['tPag'] = $file1Array[1]['payment'];
@@ -52,11 +52,34 @@ $app->add(function ($req, $res, $next) {
             }
             $informacoesAdicionais = $file1Array[2];
             try {
-                $xml->gerarXml($informacoesAdicionais,$produto);
-                echo json_encode($xml);
+                file_put_contents('chaveDeAcesso.txt',$xml->gerarChaveDeAcesso());
+                $xml->autorizarXML($informacoesAdicionais,$produto);
+                echo json_encode('XML Criado Com Sucesso');                
+                echo exec('move c:\xampp\htdocs\geradorXml\App\public\*-nfe.xml c:\Unimake\UniNFe\12291758000105\nfce\Envio > nul');
             } catch (\Throwable $e) {
                 echo '{"Erro": {"text": '.$e->getMessage().'}';
             }   
+        });
+        //Rota para verificar se o xml foi autorizado
+        $app->post('/autorizarXml/true', function(Request $request, Response $response)
+        { 
+            $data = new DateTime('now', new DateTimeZone( 'America/Sao_Paulo'));
+            $YM = substr_replace($data->format('Y-m'), '', -3, -2);
+            $chave = file_get_contents("chaveDeAcesso.txt");
+            $chave .= '-procNFe.xml';
+            $xmlAutorizado = glob("C:/Unimake/UniNFe/12291758000105/nfce/Enviado/Autorizados/$YM/$chave");
+            $xmlAutorizado2 = end($xmlAutorizado);
+            //var_dump($xmlAutorizado2);
+            $xmlAutorizadoToString = print_r($xmlAutorizado2,true);
+            //var_dump($xmlAutorizadoToString);
+            $data = array();
+            if(!empty($xmlAutorizadoToString)) {
+                $data = 'success';
+                echo exec('del /f "chaveDeAcesso.txt"');
+            } else {        
+                $data = 'error';
+            }
+        echo json_encode($data);
         });
         // Rota para o grupo Cliente
         $app->group('/cliente', function () use ($app) 

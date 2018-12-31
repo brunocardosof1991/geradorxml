@@ -1,4 +1,27 @@
-$(document).ready(function(){
+$(document).ready(function(){    
+    //Verificar na pasta /Enviado/Autorizado da UniNFe se foi autorizado a NF
+    function getFile() 
+    {
+        let chaveDeAcesso = true;
+        $.ajax({
+            url: "http://localhost/geradorXml/App/public/api/autorizarXml/true",
+            method: 'post',
+            dataType: 'json',
+            data: {chaveDeAcesso:chaveDeAcesso}
+        }).done((data)=>{         
+            console.log(data);  
+            if(data == 'success')
+            {
+                $("#apiModal .modal-body p").slideUp(700);
+                $("#apiModal .modal-body").append("<p>").text('NFC-e enviada com sucesso!   ').slideDown(700);
+                $("#apiModal .modal-body").append('<i class="fas fa-thumbs-up fa-2x " style="color:#0fe206"></i>').slideDown(700);
+            } 
+            if(data == 'error')
+            {
+                setTimeout( () => { getFile(); }, 1500);
+            }
+        });     
+    }
     // This method iterates over an object and removes all keys with falsy values.
     const removeEmpty = (obj) => {
         let newObj = {};
@@ -79,7 +102,6 @@ $(document).ready(function(){
                     url: 'http://localhost/geradorXml/App/public/api/produto/'+produto,
                     dataType: 'json'
                 }).done((data) => {
-                    console.log(data);
                     if(data === false || data == '') 
                     {
                         alert("Produto não existe");
@@ -189,7 +211,6 @@ $(document).ready(function(){
         array[2] = textArea;
         array[3] = valorTotal;
         let json = JSON.stringify(array);
-        console.log(json);
         // Alimentar o XML para autorização
         $.ajax({
             method:'post',
@@ -198,8 +219,14 @@ $(document).ready(function(){
             data:{json:json, produto:produto}
         }).done((data) =>
         {
-            console.log(data);
-            alert('XML Gerado');
+            $("#apiModal").modal('show');
+            $("#apiModal").on('shown.bs.modal', () => {           
+                $("#apiModal .modal-title").text('Autorização NFC-e');      
+                $("#apiModal .modal-body").append('<p>').text('Enviando NFC-e para Sefaz,\n isso pode levar até 30s....');        
+                $("#apiModal .modal-footer").append('<button class="btn btn-primary">Imprimir NFC-e</button>');  
+                $("#apiModal .modal-footer").append('<button class="btn btn-danger" data-dismiss="modal">Fechar</button>');  
+            }); 
+            getFile();
         });
     });
 });

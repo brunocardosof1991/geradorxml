@@ -3,10 +3,12 @@
     <head> 
         <!-- ======================== META TAGS OBRIGATÓRIAS ================================================== -->
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">       
 
         <!-- JQUERY-->
         <script src="../../../js/external/jquery/jquery.js"></script>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.6/jquery.easypiechart.js"></script>
 
         <!-- table-to-json LIB-->
         <script type="module" src="../../../js/venda/venda.js"></script>
@@ -230,3 +232,4 @@
         </div> <!-- END .container -->
     </body>
 </html>
+<?php require_once '../../Components/Modal.html'; ?>

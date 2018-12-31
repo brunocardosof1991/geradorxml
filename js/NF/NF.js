@@ -4,7 +4,7 @@ $(document).ready(function () {
     {        
         $.ajax({
             method: 'get',
-            url: 'http://localhost/geradorXml/public/api/nf/'
+            url: 'http://localhost/geradorXml/App/public/api/nf/'
         }).done((data) => {
 			$("#container").find('table tbody').html(data);            
         });
@@ -28,7 +28,7 @@ $(document).ready(function () {
         {    
             $.ajax({
                 method:'delete',
-                url: 'http://localhost/geradorXml/public/api/nf/delete/'+id
+                url: 'http://localhost/geradorXml/App/public/api/nf/delete/'+id
             }).done((data) =>{
                 fetchAll();
                 if(data == '{"Aviso": {"text": "NF Deletada"}')
@@ -47,7 +47,7 @@ $(document).ready(function () {
         {
             $.ajax({
                 method:'get',
-                url:'http://localhost/geradorXml/public/api/nf/'+id,
+                url:'http://localhost/geradorXml/App/public/api/nf/'+id,
                 dataType:'json'                
             }).done((data)=>{
                     $('#inputFetchNF_ID').val(data.id).prop('readonly', false);

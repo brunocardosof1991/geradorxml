@@ -187,7 +187,7 @@ class Xml
                 )";
         $connection->executar($sql);
     }
-    function gerarXml($informacoesAdicionais, $arrayProduto) 
+    function autorizarXML($informacoesAdicionais, $arrayProduto) 
     {
         $dom = new DOMDocument('1.0', 'utf-8');
         $NFe = $dom->appendChild($dom->createElement('NFe'));
