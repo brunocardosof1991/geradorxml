@@ -3,14 +3,13 @@
     <head> 
         <!-- ======================== META TAGS OBRIGATÓRIAS ================================================== -->
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">       
 
         <!-- JQUERY-->
-        <script src="../../../js/external/jquery/jquery.js"></script>
+        <script src="../../../js/external/jquery/jquery.js"></script>       
 
-        <!-- table-to-json LIB-->
-        <script src="//lightswitch05.github.io/table-to-json/javascripts/jquery.tabletojson.min.js"></script>  
-        <script type="module" src="../../../js/cliente/cliente.js"></script>
+        <!-- ************** -->
+        <script type="module" src="../../../js/Produto/fetch.js"></script>
 
         <!-- Folha de estilo da página -->
         <link href="../../../css/style.css" type="text/css" rel="stylesheet">
@@ -23,7 +22,6 @@
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
         <!-- ================================================================================================ -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.6/jquery.easypiechart.js"></script>
         <script>
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip();
@@ -33,30 +31,31 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
         <!-- ================================================================================================== -->
     </head>
-    <body>   
+    <body>     
     <?php require_once '../Menu.php'; ?> 
-    <div class="container" id="container">
-            <div class="row" id="rowNF">
-                <div class="col-md-12" id="colNF">
-                    <table class="text-center table table-hover table-bordered mt-3" id="tableListarNF">
+        <div class="container" id="container">
+            <div class="row" id="rowProduto">
+                <div class="col-md-12 mx-auto">
+                    <div class="table-responsive-xl">
+                        <table class="table table-hover table-bordered mt-3 mx-auto text-center" id="tableListarProdutos">
                             <thead class="thead-dark">
                                 <tr>
                                     <th scope="col">ID</th>
-                                    <th scope="col">Nome</th>
-                                    <th scope="col">CNPJ/CPF</th>
-                                    <th scope="col">Endereço</th>
-                                    <th scope="col">Número</th>
-                                    <th scope="col">Complemento</th>
-                                    <th scope="col">Bairro</th>
-                                    <th scope="col">CEP</th>
-                                    <th scope="col">Celular</th>
-                                    <th scope="col">Selecionar</th>
+                                    <th scope="col">Produto</th>
+                                    <th scope="col">NCM</th>
+                                    <th scope="col">Preço</th>
+                                    <th scope="col">CFOP</th>
+                                    <th scope="col">Excluir</th>
+                                    <th scope="col">Editar</th>
                                 </tr>
                             </thead>
-                            <tbody id="tbody"></tbody>
+                            <tbody><tr></tr></tbody>
                         </table>
+                    </div> <!-- END #table-responsive -->
                 </div>
-            </div>
-        </div>
+            </div> <!-- END .row -->
+        </div> <!-- END .container --> 
+        <?php require_once '../../Components/Modal.html'; ?> 
+        <?php require_once '../../Components/FormProduto.html'; ?> 
     </body>
 </html>

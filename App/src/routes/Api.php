@@ -2,6 +2,7 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use App\Model\Xml;
+//use App\src\config\db;
 
 $app = new \Slim\App;
 
@@ -23,7 +24,7 @@ $app->add(function ($req, $res, $next) {
     {
         // Rota para o autorizar XML
         $app->post('/autorizarXml', function(Request $request, Response $response)
-        {              
+        {          
             $file1Array = json_decode($request->getParam('json'),true);
             $produto = json_decode($request->getParam('produto'),true);
             $xml = new Xml();
@@ -54,6 +55,7 @@ $app->add(function ($req, $res, $next) {
             try {
                 file_put_contents('chaveDeAcesso.txt',$xml->gerarChaveDeAcesso());
                 $xml->autorizarXML($informacoesAdicionais,$produto);
+                $xml->saidaProduto($produto);
                 echo json_encode('XML Criado Com Sucesso');                
                 echo exec('move c:\xampp\htdocs\geradorXml\App\public\*-nfe.xml c:\Unimake\UniNFe\12291758000105\nfce\Envio > nul');
             } catch (\Throwable $e) {
@@ -95,13 +97,48 @@ $app->add(function ($req, $res, $next) {
                     $stmt = $db->query($sql);
                     $cliente = $stmt->fetchAll(PDO::FETCH_OBJ);
                     $db = null;
-                    echo json_encode($cliente);
+                    //RETORNAR TABLE HTML
+                    $output = '';
+                    if(count($cliente) > 0)
+                    {
+                        foreach($cliente as $row)
+                        {
+                            $output .= '
+                            <tr>
+                                <td>'.$row->id.'</td>
+                                <td>'.$row->nome.'</td>
+                                <td>'.$row->CNPJ.'</td>
+                                <td>'.$row->endereco.'</td>
+                                <td>'.$row->numero.'</td>
+                                <td>'.$row->complemento.'</td>
+                                <td>'.$row->bairro.'</td>
+                                <td>'.$row->CEP.'</td>
+                                <td>'.$row->fone.'</td>
+                                <td>
+                                    <i class="fas fa-trash fa-2x" id="excluirCliente" title="Excluir" style="cursor:pointer;color:red"></i>
+                                </td>
+                                <td>
+                                    <i class="fas fa-user-edit fa-2x" id="editarCliente" title="Editar" style="cursor:pointer;color:orange"></i>
+                                </td>
+                            </tr>
+                            ';
+                        }
+                    }
+                    else
+                    {
+                    $output .= '
+                    <tr>
+                        <td colspan="11" align="center">Nenhum Cliente Cadastrado</td>
+                    </tr>
+                    ';
+                    }
+                    echo ($output);
                 } catch(PDOException $e){
                     echo '{"Erro": {"text": '.$e->getMessage().'}';
                 }
             });
                 
-            // Consultar uma NF especifica
+            // Consultar um cliente especifico
             $app->get('/{id}', function(Request $request, Response $response){
                 $id = $request->getAttribute('id');    
                 $sql = "SELECT * FROM cliente WHERE id = $id";    
@@ -112,16 +149,15 @@ $app->add(function ($req, $res, $next) {
                     $db = $db->connect();
             
                     $stmt = $db->query($sql);
-                    $NF = $stmt->fetch(PDO::FETCH_OBJ);
+                    $cliente = $stmt->fetch(PDO::FETCH_OBJ);
                     $db = null;
-                    echo json_encode($NF);
+                    echo json_encode($cliente);
                 } catch(PDOException $e){
                     echo '{"Erro": {"text": '.$e->getMessage().'}';
                 }
             });    
             // Adicionar Cliente
         $app->post('/add', function(Request $request, Response $response){
-            $id = $request->getParam('id');
             $nome = $request->getParam('nome');
             $CNPJ = $request->getParam('CNPJ');
             $endereco = $request->getParam('endereco');
@@ -129,26 +165,25 @@ $app->add(function ($req, $res, $next) {
             $complemento = $request->getParam('complemento');
             $bairro = $request->getParam('bairro');
             $CEP = $request->getParam('CEP');
-            $celular = $request->getParam('celular');
-            $sql = "INSERT INTO cliente (id,nome,CNPJ,endereco,numero,complemento,bairro,CEP,celular) VALUES
-            (:id,:nome,:CNPJ,:endereco,:numero,:complemento,:bairro,:CEP,:celular)";
+            $fone = $request->getParam('fone');
+            $sql = "INSERT INTO cliente (nome,CNPJ,endereco,numero,complemento,bairro,CEP,fone) VALUES
+            (:nome,:CNPJ,:endereco,:numero,:complemento,:bairro,:CEP,:fone)";
             try{
                 // Get DB Object
                 $db = new db();
                 // Connect
                 $db = $db->connect();
                 $stmt = $db->prepare($sql);
-                $stmt->bindParam(':id', $id);
                 $stmt->bindParam(':nome',  $nome);
                 $stmt->bindParam(':CNPJ',      $CNPJ);
-                $stmt->bindParam(':endereco',      $nNenderecoF);
+                $stmt->bindParam(':endereco',      $endereco);
                 $stmt->bindParam(':numero',    $numero);
                 $stmt->bindParam(':complemento',       $complemento);
                 $stmt->bindParam(':bairro',      $bairro);
                 $stmt->bindParam(':CEP',      $CEP);
-                $stmt->bindParam(':celular',      $celular);
+                $stmt->bindParam(':fone',      $fone);
                 $stmt->execute();
-                echo '{"Aviso": {"text": "Cliente Adicionada"}';
+                echo json_encode('{"Aviso": {"text": "Cliente Adicionado"}');
             } catch(PDOException $e){
                 echo '{"Erro": {"text": '.$e->getMessage().'}';
             }
@@ -163,17 +198,17 @@ $app->add(function ($req, $res, $next) {
             $complemento = $request->getParam('complemento');
             $bairro = $request->getParam('bairro');
             $CEP = $request->getParam('CEP');
-            $celular = $request->getParam('celular');
+            $fone = $request->getParam('fone');
             $sql = "UPDATE cliente SET
-                        id 	= :id,
-                        nome 	= :nome,
-                        CNPJ		= :CNPJ,
-                        endereco		= :endereco,
+                        id 	 = :id,
+                        nome = :nome,
+                        CNPJ = :CNPJ,
+                        endereco = :endereco,
                         numero 	= :numero,
-                        complemento 		= :CNPJDestinatario,
-                        bairro		= :bairro,
-                        CEP		= :CEP,
-                        celular		= :celular
+                        complemento = :complemento,
+                        bairro = :bairro,
+                        CEP	= :CEP,
+                        fone = :fone
                     WHERE id = $id";
             try{
                 // Get DB Object
@@ -184,14 +219,14 @@ $app->add(function ($req, $res, $next) {
                 $stmt->bindParam(':id', $id);
                 $stmt->bindParam(':nome',  $nome);
                 $stmt->bindParam(':CNPJ',      $CNPJ);
-                $stmt->bindParam(':endereco',      $nNenderecoF);
+                $stmt->bindParam(':endereco',      $endereco);
                 $stmt->bindParam(':numero',    $numero);
                 $stmt->bindParam(':complemento',       $complemento);
                 $stmt->bindParam(':bairro',      $bairro);
                 $stmt->bindParam(':CEP',      $CEP);
-                $stmt->bindParam(':celular',      $celular);
+                $stmt->bindParam(':fone',      $fone);
                 $stmt->execute();
-                echo '{"Aviso": {"text": "Cliente Atualizado"}';
+                echo json_encode('{"Aviso": {"text": "Cliente Atualizado"}');
             } catch(PDOException $e){
                 echo '{"Erro": {"text": '.$e->getMessage().'}';
             }
@@ -229,7 +264,38 @@ $app->add(function ($req, $res, $next) {
                     $stmt = $db->query($sql);
                     $produto = $stmt->fetchAll(PDO::FETCH_OBJ);
                     $db = null;
-                    echo json_encode($produto);
+                    //RETORNAR TABLE HTML
+                    $output = '';
+                    if(count($produto) > 0)
+                    {
+                        foreach($produto as $row)
+                        {
+                            $output .= '
+                            <tr>
+                                <td>'.$row->id.'</td>
+                                <td>'.$row->descricao.'</td>
+                                <td>'.$row->ncm.'</td>
+                                <td>'.$row->preco_custo.'</td>
+                                <td>'.$row->CFOP.'</td>
+                                <td>
+                                    <i class="fas fa-trash fa-2x" id="excluirProduto" title="Excluir" style="cursor:pointer;color:red"></i>
+                                </td>
+                                <td>
+                                    <i class="fas fa-user-edit fa-2x" id="editarProduto" title="Editar" style="cursor:pointer;color:orange"></i>
+                                </td>
+                            </tr>
+                            ';
+                        }
+                    }
+                    else
+                    {
+                    $output .= '
+                    <tr>
+                        <td colspan="7" text-align="center">Nenhum Produto Cadastrado</td>
+                    </tr>
+                    ';
+                    }
+                    echo ($output);
                 } catch(PDOException $e){
                     echo '{"Erro": {"text": '.$e->getMessage().'}';
                 }
@@ -254,73 +320,25 @@ $app->add(function ($req, $res, $next) {
             });    
             // Adicionar Produto
             $app->post('/add', function(Request $request, Response $response){
-                $id = $request->getParam('id');
-                $descricao = $request->getParam('descricao');
-                $embalagem_entrada = $request->getParam('embalagem_entrada');
-                $embalagem_saida = $request->getParam('embalagem_saida');
-                $codigo_barras = $request->getParam('codigo_barras');
-                $situacao_produto = $request->getParam('situacao_produto');
-                $ncm = $request->getParam('ncm');    
-                $estoque_qtd = $request->getParam('estoque_qtd');    
-                $estoque_min = $request->getParam('estoque_min');    
-                $preco_custo = $request->getParam('preco_custo');    
-                $preco_venda = $request->getParam('preco_venda');    
-                $in_tipo_st = $request->getParam('in_tipo_st');    
-                $in_cst = $request->getParam('in_cst');    
-                $in_aliquota_icms = $request->getParam('in_aliquota_icms');    
-                $in_red_trib = $request->getParam('in_red_trib');    
-                $out_tipo_st = $request->getParam('out_tipo_st');    
-                $out_cst = $request->getParam('out_cst');    
-                $out_aliquota_icms = $request->getParam('out_aliquota_icms');    
-                $out_red_trib = $request->getParam('out_red_trib');    
-                $out_dif_aliq_inter = $request->getParam('out_dif_aliq_inter');    
-                $reducao_st = $request->getParam('reducao_st');    
-                $aliq_icms_st = $request->getParam('aliq_icms_st');    
-                $fornecedor = $request->getParam('fornecedor');    
-                $marca = $request->getParam('marca');    
+                $descricao = $request->getParam('produto');
+                $ncm = $request->getParam('NCM');  
+                $preco_custo = $request->getParam('preco');  
                 $CFOP = $request->getParam('CFOP');    
-                $sql = "INSERT INTO produto (id,descricao,embalagem_entrada,embalagem_saida,codigo_barras,
-                situacao_produto,ncm,estoque_qtd,estoque_min,preco_custo,preco_venda,in_tipo_st,in_cst,
-                in_aliquota_icms,in_red_trib,out_tipo_st,out_cst,out_aliquota_icms,out_red_trib,
-                out_dif_aliq_inter,reducao_st,aliq_icms_st,fornecedor,marca,CFOP) 
+                $sql = "INSERT INTO produto (descricao,ncm, preco_custo,CFOP) 
                 VALUES
-                (:id,:descricao,:embalagem_entrada,:embalagem_saida,:codigo_barras,
-                :situacao_produto,:ncm,:estoque_qtd,:estoque_min,:preco_custo,:preco_venda,:in_tipo_st,:in_cst,
-                :in_aliquota_icms,:in_red_trib,:out_tipo_st,:out_cst,:out_aliquota_icms,:out_red_trib,
-                :out_dif_aliq_inter,:reducao_st,:aliq_icms_st,:fornecedor,:marca,:CFOP)";    
+                (:descricao,:ncm,:preco_custo,:CFOP)";    
                 try{
                     // Get DB Object
                     $db = new db();
                     // Connect
                     $db = $db->connect();    
                     $stmt = $db->prepare($sql);    
-                    $stmt->bindParam(':id', $id);
                     $stmt->bindParam(':descricao',  $descricao);
-                    $stmt->bindParam(':embalagem_entrada',      $embalagem_entrada);
-                    $stmt->bindParam(':embalagem_saida',      $embalagem_saida);
-                    $stmt->bindParam(':codigo_barras',    $codigo_barras);
-                    $stmt->bindParam(':situacao_produto',       $situacao_produto);
-                    $stmt->bindParam(':ncm',      $ncm);    
-                    $stmt->bindParam(':estoque_qtd',      $estoque_qtd);    
-                    $stmt->bindParam(':estoque_min',      $estoque_min);    
+                    $stmt->bindParam(':ncm',      $ncm);  
                     $stmt->bindParam(':preco_custo',      $preco_custo);    
-                    $stmt->bindParam(':preco_venda',      $preco_venda);    
-                    $stmt->bindParam(':in_tipo_st',      $in_tipo_st);    
-                    $stmt->bindParam(':in_cst',      $in_cst);    
-                    $stmt->bindParam(':in_aliquota_icms',      $in_aliquota_icms);    
-                    $stmt->bindParam(':in_red_trib',      $in_red_trib);    
-                    $stmt->bindParam(':out_tipo_st',      $out_tipo_st);    
-                    $stmt->bindParam(':out_cst',      $out_cst);    
-                    $stmt->bindParam(':out_aliquota_icms',      $out_aliquota_icms);    
-                    $stmt->bindParam(':out_red_trib',      $out_red_trib);    
-                    $stmt->bindParam(':out_dif_aliq_inter',      $out_dif_aliq_inter);    
-                    $stmt->bindParam(':reducao_st',      $reducao_st);    
-                    $stmt->bindParam(':aliq_icms_st',      $aliq_icms_st);    
-                    $stmt->bindParam(':fornecedor',      $fornecedor);    
-                    $stmt->bindParam(':marca',      $marca);    
                     $stmt->bindParam(':CFOP',      $CFOP);    
                     $stmt->execute();    
-                    echo '{"Aviso": {"text": "Produto Adicionado"}';    
+                    echo json_encode('{"Aviso": {"text": "Produto Adicionado"}');    
                 } catch(PDOException $e){
                     echo '{"Erro": {"text": '.$e->getMessage().'}';
                 }
@@ -329,54 +347,14 @@ $app->add(function ($req, $res, $next) {
             $app->put('/update/{id}', function(Request $request, Response $response){
                 $id = $request->getParam('id');
                 $descricao = $request->getParam('descricao');
-                $embalagem_entrada = $request->getParam('embalagem_entrada');
-                $embalagem_saida = $request->getParam('embalagem_saida');
-                $codigo_barras = $request->getParam('codigo_barras');
-                $situacao_produto = $request->getParam('situacao_produto');
-                $ncm = $request->getParam('ncm');    
-                $estoque_qtd = $request->getParam('estoque_qtd');    
-                $estoque_min = $request->getParam('estoque_min');    
-                $preco_custo = $request->getParam('preco_custo');    
-                $preco_venda = $request->getParam('preco_venda');    
-                $in_tipo_st = $request->getParam('in_tipo_st');    
-                $in_cst = $request->getParam('in_cst');    
-                $in_aliquota_icms = $request->getParam('in_aliquota_icms');    
-                $in_red_trib = $request->getParam('in_red_trib');    
-                $out_tipo_st = $request->getParam('out_tipo_st');    
-                $out_cst = $request->getParam('out_cst');    
-                $out_aliquota_icms = $request->getParam('out_aliquota_icms');    
-                $out_red_trib = $request->getParam('out_red_trib');    
-                $out_dif_aliq_inter = $request->getParam('out_dif_aliq_inter');    
-                $reducao_st = $request->getParam('reducao_st');    
-                $aliq_icms_st = $request->getParam('aliq_icms_st');    
-                $fornecedor = $request->getParam('fornecedor');    
-                $marca = $request->getParam('marca');    
+                $ncm = $request->getParam('NCM');       
+                $preco_custo = $request->getParam('preco_custo');     
                 $CFOP = $request->getParam('CFOP');      
                 $sql = "UPDATE produto SET
                 id=:id,
                 descricao=:descricao,
-                embalagem_entrada=:embalagem_entrada,
-                embalagem_saida=:embalagem_saida,
-                codigo_barras=:codigo_barras,
-                situacao_produto=:situacao_produto,
-                ncm=:ncm,
-                estoque_qtd=:estoque_qtd,
-                estoque_min=:estoque_min,
+                NCM=:NCM,
                 preco_custo=:preco_custo,
-                preco_venda=:preco_venda,
-                in_tipo_st=:in_tipo_st,
-                in_cst=:in_cst,
-                in_aliquota_icms=:in_aliquota_icms,
-                in_red_trib=:in_red_trib,
-                out_tipo_st=:out_tipo_st,
-                out_cst=:out_cst,
-                out_aliquota_icms=:out_aliquota_icms,
-                out_red_trib=:out_red_trib,
-                out_dif_aliq_inter=:out_dif_aliq_inter,
-                reducao_st=:reducao_st,
-                aliq_icms_st=:aliq_icms_st,
-                fornecedor=:fornecedor,
-                marca=:marca,
                 CFOP=:CFOP
                         WHERE id = $id";    
                 try{
@@ -387,36 +365,16 @@ $app->add(function ($req, $res, $next) {
                     $stmt = $db->prepare($sql);  
                     $stmt->bindParam(':id', $id);
                     $stmt->bindParam(':descricao',  $descricao);
-                    $stmt->bindParam(':embalagem_entrada',      $embalagem_entrada);
-                    $stmt->bindParam(':embalagem_saida',      $embalagem_saida);
-                    $stmt->bindParam(':codigo_barras',    $codigo_barras);
-                    $stmt->bindParam(':situacao_produto',       $situacao_produto);
-                    $stmt->bindParam(':ncm',      $ncm);    
-                    $stmt->bindParam(':estoque_qtd',      $estoque_qtd);    
-                    $stmt->bindParam(':estoque_min',      $estoque_min);    
-                    $stmt->bindParam(':preco_custo',      $preco_custo);    
-                    $stmt->bindParam(':preco_venda',      $preco_venda);    
-                    $stmt->bindParam(':in_tipo_st',      $in_tipo_st);    
-                    $stmt->bindParam(':in_cst',      $in_cst);    
-                    $stmt->bindParam(':in_aliquota_icms',      $in_aliquota_icms);    
-                    $stmt->bindParam(':in_red_trib',      $in_red_trib);    
-                    $stmt->bindParam(':out_tipo_st',      $out_tipo_st);    
-                    $stmt->bindParam(':out_cst',      $out_cst);    
-                    $stmt->bindParam(':out_aliquota_icms',      $out_aliquota_icms);    
-                    $stmt->bindParam(':out_red_trib',      $out_red_trib);    
-                    $stmt->bindParam(':out_dif_aliq_inter',      $out_dif_aliq_inter);    
-                    $stmt->bindParam(':reducao_st',      $reducao_st);    
-                    $stmt->bindParam(':aliq_icms_st',      $aliq_icms_st);    
-                    $stmt->bindParam(':fornecedor',      $fornecedor);    
-                    $stmt->bindParam(':marca',      $marca);    
+                    $stmt->bindParam(':NCM',      $ncm);    
+                    $stmt->bindParam(':preco_custo',      $preco_custo); 
                     $stmt->bindParam(':CFOP',      $CFOP);     
                     $stmt->execute();   
-                    echo '{"Aviso": {"text": "Produto Atualizado"}';    
+                    echo json_encode('{"Aviso": {"text": "Produto Atualizado"}');    
                 } catch(PDOException $e){
                     echo '{"Erro": {"text": '.$e->getMessage().'}';
                 }
             });    
-            // Deletar Emissor
+            // Deletar Produto
             $app->delete('/delete/{id}', function(Request $request, Response $response){
                 $id = $request->getAttribute('id');    
                 $sql = "DELETE FROM produto WHERE id = $id";    

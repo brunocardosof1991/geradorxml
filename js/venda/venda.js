@@ -1,6 +1,6 @@
-$(document).ready(function(){    
+$(document).ready(function(){ 
     //Verificar na pasta /Enviado/Autorizado da UniNFe se foi autorizado a NF
-    function getFile() 
+    function getNF() 
     {
         let chaveDeAcesso = true;
         $.ajax({
@@ -12,13 +12,15 @@ $(document).ready(function(){
             console.log(data);  
             if(data == 'success')
             {
-                $("#apiModal .modal-body p").slideUp(700);
-                $("#apiModal .modal-body").append("<p>").text('NFC-e enviada com sucesso!   ').slideDown(700);
+                $("#apiModal .modal-body p").slideUp(850);
+                $("#apiModal .modal-body p").text('NFC-e enviada com sucesso!   ').slideDown(850);
                 $("#apiModal .modal-body").append('<i class="fas fa-thumbs-up fa-2x " style="color:#0fe206"></i>').slideDown(700);
+                $('.chart').data('easyPieChart').update(100).options.barColor = '#0fe206';
+                $("#apiModal .modal-footer .action").text('Imprimir NFC-e').show();
             } 
             if(data == 'error')
             {
-                setTimeout( () => { getFile(); }, 1500);
+                setTimeout( () => { getNF(); }, 1500);
             }
         });     
     }
@@ -220,13 +222,34 @@ $(document).ready(function(){
         }).done((data) =>
         {
             $("#apiModal").modal('show');
-            $("#apiModal").on('shown.bs.modal', () => {           
-                $("#apiModal .modal-title").text('Autorização NFC-e');      
-                $("#apiModal .modal-body").append('<p>').text('Enviando NFC-e para Sefaz,\n isso pode levar até 30s....');        
-                $("#apiModal .modal-footer").append('<button class="btn btn-primary">Imprimir NFC-e</button>');  
-                $("#apiModal .modal-footer").append('<button class="btn btn-danger" data-dismiss="modal">Fechar</button>');  
+            $("#apiModal .modal-title").text('Autorização NFC-e');
+            $("#apiModal").on('shown.bs.modal', () => {    
+                $('.chart').easyPieChart({
+                    // The color of the curcular bar. You can pass either a css valid color string like rgb, rgba hex or string colors. But you can also pass a function that accepts the current percentage as a value to return a dynamically generated color.
+                    barColor: '#e60000',
+                    // The color of the track for the bar, false to disable rendering.
+                    trackColor: '#f2f2f2',
+                    // The color of the scale lines, false to disable rendering.
+                    scaleColor: '#dfe0e0',
+                    // Defines how the ending of the bar line looks like. Possible values are: butt, round and square.
+                    lineCap: 'round',
+                    // Width of the bar line in px.
+                    lineWidth: 3,
+                    // Size of the pie chart in px. It will always be a square.
+                    size: 110,
+                    // Time in milliseconds for a eased animation of the bar growing, or false to deactivate.
+                    animate: 20000,
+                    // Callback function that is called at the start of any animation (only if animate is not false).
+                    onStart: $.noop,
+                    // Callback function that is called at the end of any animation (only if animate is not false).
+                    onStop: $.noop
+                  });               
             }); 
-            getFile();
+            getNF();
         });
     });
+    //Botao fechar modalNFC-e, redirecionar para vendas.php
+    $(".modalApi_fechar").on('click',() => {
+        location = location;
+    });     
 });

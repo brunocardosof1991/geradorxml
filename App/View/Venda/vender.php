@@ -6,11 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">       
 
         <!-- JQUERY-->
-        <script src="../../../js/external/jquery/jquery.js"></script>
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.6/jquery.easypiechart.js"></script>
+        <script src="../../../js/external/jquery/jquery.js"></script>       
 
-        <!-- table-to-json LIB-->
+        <!-- ************** -->
         <script type="module" src="../../../js/venda/venda.js"></script>
 
         <!-- Folha de estilo da página -->
@@ -24,6 +22,8 @@
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
         <!-- ================================================================================================ -->
+        
+        
         <script src="https://cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.6/jquery.easypiechart.js"></script>
         <script>
             $(function () {
@@ -229,7 +229,7 @@
                 </div><!-- END .card-->            
             </div><!-- END .accordion  -->
             </div> <!-- END .row -->
-        </div> <!-- END .container -->
+        </div> <!-- END .container -->   
+        <?php require_once '../../Components/Modal.html'; ?> 
     </body>
 </html>
-<?php require_once '../../Components/Modal.html'; ?>

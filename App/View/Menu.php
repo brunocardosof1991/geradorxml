@@ -11,6 +11,7 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
                 <a class="dropdown-item" href="http://localhost/geradorXml/App/View/Cliente/fetch.php">Listar Clientes</a>
+                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/Cliente/cadastrar.php">Cadastrar Cliente</a>
             </div>
         </li>
         <li class="nav-item dropdown">
@@ -28,6 +29,7 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
                 <a class="dropdown-item" href="http://localhost/geradorXml/App/View/Produto/fetch.php">Listar Produtos</a>
+                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/Produto/cadastrar.php">Cadastar Produto</a>
             </div>
         </li>
         <li class="nav-item dropdown">
@@ -35,8 +37,8 @@
                 Venda                
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
-                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/XML/gerar.php">Vender</a>
-                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/XML/fetch.php">Listar Vendas</a>
+                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/Venda/vender.php">Vender</a>
+                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/Venda/fetch.php">Listar Vendas</a>
             </div>
         </li>
     </ul>

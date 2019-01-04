@@ -8,6 +8,8 @@ use DateTime;
 use DateTimeZone;
 use DOMDocument;
 use DOMAttr;
+use PDOException;
+use ArrayIterator;
 class Xml 
 {
     //<ide>
@@ -172,7 +174,7 @@ class Xml
         }
         return $chaveDeAcesso;
     }
-    private function salvarXml() 
+    private function salvarNF() 
     {
         $connection = new Conexao();
         $sql = "INSERT INTO nf (id,chave,cNF,nNF,CNPJDestinatario,xNomeDestinatario,dhEmi) 
@@ -186,6 +188,38 @@ class Xml
                 '" . $this->getTime() . "'
                 )";
         $connection->executar($sql);
+    }
+    public static function saidaProduto($produto)
+    {
+        $produtoOut = array();
+        for($i=0; $i<count($produto);$i++)
+        {
+            $filtered = array_filter($produto[$i], function($v,$k) {
+                return $k !== "NCM" && $k !== "CFOP" && $k !== "produto" && $k !== "preco" && $k !== "CFOP";
+            }, ARRAY_FILTER_USE_BOTH);
+            array_push($produtoOut,$filtered);
+        } 
+        // begin the sql statement
+        $sql = "INSERT INTO saidaproduto (idproduto, quantidade ) VALUES ";
+        
+        $total = count($produtoOut);
+        
+        // this is where the magic happens
+        $it = new ArrayIterator( $produtoOut );
+        
+        // Iterate over the values in the ArrayObject:
+        while($it->valid()){
+            $currentItem = $it->current();
+            $sql .='('.$currentItem['id'].','.$currentItem['quantidade'].')';
+            $it->next();
+            $sql .= $it->key() ? ',' : ';';
+        }
+        $conn = new Conexao();
+        $a = $conn->consultar($sql);
+        }
+    public static function venda()
+    {
+
     }
     function autorizarXML($informacoesAdicionais, $arrayProduto) 
     {
@@ -426,7 +460,7 @@ class Xml
         $infCpl->appendChild($dom->createTextNode($informacoesAdicionais));
         
         $dom->save($this->gerarChaveDeAcesso() . '-nfe.xml');
-        $this->salvarXml();
+        $this->salvarNF();
     }
     function cancelarXml() 
     {

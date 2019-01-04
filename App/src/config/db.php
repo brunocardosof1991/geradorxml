@@ -1,4 +1,5 @@
 <?php
+//namespace App\src\config;
     class db{
         // Properties
         private $dbhost = 'localhost';

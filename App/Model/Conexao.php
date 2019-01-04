@@ -7,26 +7,37 @@
  */
 
 namespace App\Model;
-
+use PDO;
 class Conexao {
 
-    private function abrir() {
-        $local = "localhost";
-        $banco = "geradorxml";
-        $usuario = "root";
-        $senha = "";
-        $link = mysqli_connect($local, $usuario, $senha, $banco);
+    private $dbhost = 'localhost';
+    private $dbuser = 'root';
+    private $dbpass = '';
+    private $dbname = 'geradorXml';
+
+    public function PDOConnect()
+    {
+        $mysql_connect_str = "mysql:host=$this->dbhost;dbname=$this->dbname";
+        $dbConnection = new PDO($mysql_connect_str, $this->dbuser, $this->dbpass);
+        $dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $dbConnection;
+    }
+    private function abrir() 
+    {
+        $link = mysqli_connect($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname);
         if ($link)
             return $link;
         else
             return FALSE;
     }
 
-    private function fechar($link) {
+    private function fechar($link) 
+    {
         mysqli_close($link);
     }
 
-    public function consultar($query) {
+    public function consultar($query) 
+    {
         $link = $this->abrir();
         if ($link) {
             $result = mysqli_query($link, $query);

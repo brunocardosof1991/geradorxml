@@ -9,7 +9,7 @@
         <script src="../../../js/external/jquery/jquery.js"></script>       
 
         <!-- ************** -->
-        <script type="module" src="../../../js/cliente/fetch.js"></script>
+        <script type="module" src="../../../js/Produto/cadastrar.js"></script>
 
         <!-- Folha de estilo da página -->
         <link href="../../../css/style.css" type="text/css" rel="stylesheet">
@@ -22,6 +22,7 @@
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
         <!-- ================================================================================================ -->
+        
         <script>
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip();
@@ -32,34 +33,13 @@
         <!-- ================================================================================================== -->
     </head>
     <body>   
-    <?php require_once '../Menu.php'; ?> 
+        <?php require_once '../Menu.php'; ?>
         <div class="container" id="container">
-            <div class="row" id="rowCliente">
-                <div class="col-md-12 mx-auto">
-                    <div class="table-responsive-xl">
-                        <table class="table table-hover table-bordered mt-3 mx-auto text-center" id="tableListarClientes">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Nome</th>
-                                    <th scope="col">CPF/CNPJ</th>
-                                    <th scope="col">Endereço</th>
-                                    <th scope="col">Número</th>
-                                    <th scope="col">Complemento</th>
-                                    <th scope="col">Bairro</th>
-                                    <th scope="col">CEP</th>
-                                    <th scope="col">Telefone</th>
-                                    <th scope="col">Excluir</th>
-                                    <th scope="col">Editar</th>
-                                </tr>
-                            </thead>
-                            <tbody><tr></tr></tbody>
-                        </table>
-                    </div> <!-- END #table-responsive -->
-                </div>
-            </div> <!-- END .row -->
-        </div> <!-- END .container -->   
-        <?php require_once '../../Components/Modal.html'; ?> 
-        <?php require_once '../../Components/FormCliente.html'; ?> 
+            <div class="row" id="row">
+                <div class="col-md-10 mx-auto">                             
+                    <?php require_once '../../Components/FormProduto.html'; ?> 
+                </div>      
+            </div>
+        </div>
     </body>
 </html>
