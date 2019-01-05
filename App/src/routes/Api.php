@@ -62,26 +62,79 @@ $app->add(function ($req, $res, $next) {
                 echo '{"Erro": {"text": '.$e->getMessage().'}';
             }   
         });
-        //Rota para verificar se o xml foi autorizado
+        //Rota para verificar se o xml foi autorizado && salvar NF no banco de dados c/ protocolo de autorização, nome e CNPJ do destinatário
+        // As informações salva no banco de dados serão úteis para o cancelamento da NFC-e
         $app->post('/autorizarXml/true', function(Request $request, Response $response)
         { 
             $data = new DateTime('now', new DateTimeZone( 'America/Sao_Paulo'));
             $YM = substr_replace($data->format('Y-m'), '', -3, -2);
+            //Coletar a chave de acesso salva na rota /autirzarXml 
             $chave = file_get_contents("chaveDeAcesso.txt");
             $chave .= '-procNFe.xml';
             $xmlAutorizado = glob("C:/Unimake/UniNFe/12291758000105/nfce/Enviado/Autorizados/$YM/$chave");
             $xmlAutorizado2 = end($xmlAutorizado);
-            //var_dump($xmlAutorizado2);
             $xmlAutorizadoToString = print_r($xmlAutorizado2,true);
-            //var_dump($xmlAutorizadoToString);
             $data = array();
+            //Se a NFC-e foi autorizada...
             if(!empty($xmlAutorizadoToString)) {
-                $data = 'success';
+                //Colocar toda NFC-e em uma variável
+                $NFCe = file_get_contents($xmlAutorizado2);
+                //Coletar o protocolo da NFC-e autorizada
+                $fromP = "<nProt>";
+                $toP = "</nProt>";
+                function getProtocolo($NFCe,$fromP,$toP)
+                {
+                    $sub = substr($NFCe, strpos($NFCe,$fromP)+strlen($fromP),strlen($NFCe));
+                    return substr($sub,0,strpos($sub,$toP));
+                }
+                //Coletar o Nome e CNPJ do destinatário da NFC-e autorizada
+                // PQ os dois juntos? Pois existe 2 <xNome> e <CNPJ>, do emissor e do destinatario
+                // Essa função n consegue ir direto no destinatário, que vem depois do emissor,então peguei os dois juntos
+                // TALVEZ usando algo equivalente ao next da função de array, solucione o problema
+                
+                //Começo da coleta
+                $from = "<dest>";
+                //Fim da coleta
+                $to = "<enderDest>";
+                function getNomeCNPJ($NFCe,$from,$to)
+                {
+                    $sub = substr($NFCe, strpos($NFCe,$from)+strlen($from),strlen($NFCe));
+                    return substr($sub,0,strpos($sub,$to));
+                }
+                //Coletar o nome do destinatario da função getNomeCNPJ
+                $fromN = "<xNome>";
+                $toN = "</xNome>";
+                $stringN = getNomeCNPJ($NFCe,$from,$to);
+                function getNome($stringN,$fromN,$toN)
+                {
+                    $sub = substr($stringN, strpos($stringN,$fromN)+strlen($fromN),strlen($stringN));
+                    return substr($sub,0,strpos($sub,$toN));
+                }
+                //Coletar o CNPJ do destinatario da função getNomeCNPJ
+                $fromC = "<CNPJ>";
+                $toC = "</CNPJ>";
+                $stringC = getNomeCNPJ($NFCe,$from,$to);
+                function getCNPJ($stringC,$fromC,$toC)
+                {
+                    $sub = substr($stringC, strpos($stringC,$fromC)+strlen($fromC),strlen($stringC));
+                    return substr($sub,0,strpos($sub,$toC));
+                }
+                $protocolo = getProtocolo($NFCe,$fromP,$toP);
+                $nome = getProtocolo($stringN,$fromN,$toN);
+                $CNPJ = getCNPJ($stringC,$fromC,$toC);
+                $xml = new Xml();
+                $xml->salvarNF($protocolo,$nome,$CNPJ);
                 echo exec('del /f "chaveDeAcesso.txt"');
+                $data = 'success';
+                //OBS:
+                //Porque a criação das 4 funções anonimas para coletar o protocolo de autorização, CNPJ e nome do destinatário?
+                //Poderia simplismente usar OOP na classe XML o colocar as respectivas informações, menos o protocolo que é criado na autorização.
+                //Na rota /autorizarXml os arrays do destinatários estão sendo preenchidos com os inputs vindo do frontend,
+                //mas por algum motivo a rota /autorizarXml/true não esta conseguindo acessar o espaço de memória que estão guardadas essas informações
             } else {        
                 $data = 'error';
             }
-        echo json_encode($data);
+            echo json_encode($data);
         });
         // Rota para o grupo Cliente
         $app->group('/cliente', function () use ($app) 
@@ -105,19 +158,19 @@ $app->add(function ($req, $res, $next) {
                         {
                             $output .= '
                             <tr>
-                                <td>'.$row->id.'</td>
-                                <td>'.$row->nome.'</td>
-                                <td>'.$row->CNPJ.'</td>
-                                <td>'.$row->endereco.'</td>
-                                <td>'.$row->numero.'</td>
-                                <td>'.$row->complemento.'</td>
-                                <td>'.$row->bairro.'</td>
-                                <td>'.$row->CEP.'</td>
-                                <td>'.$row->fone.'</td>
-                                <td>
+                                <td data-title="ID">'.$row->id.'</td>
+                                <td data-title="Nome">'.$row->nome.'</td>
+                                <td data-title="CPF/CNPJ">'.$row->CNPJ.'</td>
+                                <td data-title="Endereço">'.$row->endereco.'</td>
+                                <td data-title="Número">'.$row->numero.'</td>
+                                <td data-title="Complemento">'.$row->complemento.'</td>
+                                <td data-title="Bairro">'.$row->bairro.'</td>
+                                <td data-title="CEP">'.$row->CEP.'</td>
+                                <td data-title="Telefone">'.$row->fone.'</td>
+                                <td data-title="Excluir">
                                     <i class="fas fa-trash fa-2x" id="excluirCliente" title="Excluir" style="cursor:pointer;color:red"></i>
                                 </td>
-                                <td>
+                                <td data-title="Editar">
                                     <i class="fas fa-user-edit fa-2x" id="editarCliente" title="Editar" style="cursor:pointer;color:orange"></i>
                                 </td>
                             </tr>
@@ -272,15 +325,15 @@ $app->add(function ($req, $res, $next) {
                         {
                             $output .= '
                             <tr>
-                                <td>'.$row->id.'</td>
-                                <td>'.$row->descricao.'</td>
-                                <td>'.$row->ncm.'</td>
-                                <td>'.$row->preco_custo.'</td>
-                                <td>'.$row->CFOP.'</td>
-                                <td>
+                                <td data-title="ID">'.$row->id.'</td>
+                                <td data-title="Produto">'.$row->descricao.'</td>
+                                <td data-title="NCM">'.$row->ncm.'</td>
+                                <td data-title="Preço">'.$row->preco_custo.'</td>
+                                <td data-title="CFOP">'.$row->CFOP.'</td>
+                                <td data-title="Excluir">
                                     <i class="fas fa-trash fa-2x" id="excluirProduto" title="Excluir" style="cursor:pointer;color:red"></i>
                                 </td>
-                                <td>
+                                <td data-title="Editar">
                                     <i class="fas fa-user-edit fa-2x" id="editarProduto" title="Editar" style="cursor:pointer;color:orange"></i>
                                 </td>
                             </tr>
@@ -593,19 +646,14 @@ $app->add(function ($req, $res, $next) {
                             $output .= '
                             <tr>
                                 <td style="display:none;">'.$row->id.'</td>
-                                <td>'.$row->chave.'</td>
-                                <td>'.$row->dhEmi.'</td>
-                                <td>'.$row->CNPJDestinatario.'</td>
-                                <td>
-                                    <i class="fas fa-share-alt fa-2x compartilhar" id="'.$row->id.'" title="Compartilhar" style="cursor:pointer"></i>
-                                </td>
-                                <td>
+                                <td data-title="Chave De Acesso">'.$row->chave.'</td>
+                                <td data-title="Data de Emissão">'.$row->dhEmi.'</td>
+                                <td data-title="CPF/CNPJ Destinatário">'.$row->CNPJDestinatario.'</td>
+                                <td data-title="Protocolo">'.$row->protocolo.'</td>
+                                <td data-title="Excluir">
                                     <i class="fas fa-trash fa-2x excluir" id="'.$row->id.'" title="Excluir" style="cursor:pointer; color:red"></i>
                                 </td>
-                                <td>
-                                    <i class="fas fa-copy fa-2x duplicar" id="'.$row->id.'" title="Duplicar" style="cursor:pointer"></i>
-                                </td>
-                                <td>
+                                <td data-title="Cancelar">
                                     <i class="fas fa-ban fa-2x cancelar" id="'.$row->id.'" title="Cancelar" style="cursor:pointer; color:red"></i>
                                 </td>
                             </tr>

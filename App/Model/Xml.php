@@ -63,25 +63,25 @@ class Xml
     //<dest>
     public $dest = array
     (
-        'ID' => 'DEFAULT',
-        'CNPJ' => 'DEFAULT',
-        'xNome' => 'DEFAULT',
+        'ID' => '',
+        'CNPJ' => '',
+        'xNome' => '',
         'indIEDest' => 9
     );
         //<enderDest>
     public $enderDest = array
     (
-        'xLgr' => 'DEFAULT',
-        'nro' => 'DEFAULT',
-        'xCpl' => 'DEFAULT',
-        'xBairro' => 'DEFAULT',
+        'xLgr' => '',
+        'nro' => '',
+        'xCpl' => '',
+        'xBairro' => '',
         'cMun' => 4314902,
         'xMun' => 'Porto Alegre',
         'UF' => 'RS',
-        'CEP' => 'DEFAULT',
+        'CEP' => '',
         'cPais' => 1058,
         'xPais' => 'Brasil',
-        'fone' => 'DEFAULT'
+        'fone' => ''
     );
     public $detPag = array
     (
@@ -126,7 +126,7 @@ class Xml
     private function gerarNnf() 
     {
         $connection = new Conexao();
-        $query = $connection->consultar("SELECT nNF FROM nf ORDER BY nNF DESC LIMIT 1");
+        $query = $connection->consultar("SELECT nNF FROM nf ORDER BY id DESC LIMIT 1");
         $data = $query->fetch_array(MYSQLI_ASSOC);
         $nNF = $data['nNF'] + 1;
         return $nNF;
@@ -135,7 +135,7 @@ class Xml
     private function gerarCnf() 
     {
         $connection = new Conexao();
-        $query = $connection->consultar("SELECT cNF FROM nf ORDER BY cNF DESC LIMIT 1");
+        $query = $connection->consultar("SELECT cNF FROM nf ORDER BY id DESC LIMIT 1");
         $data = $query->fetch_array(MYSQLI_ASSOC);
         $cNF = $data['cNF'] + 1;
         return $cNF;
@@ -174,17 +174,18 @@ class Xml
         }
         return $chaveDeAcesso;
     }
-    private function salvarNF() 
+    public function salvarNF($protocolo,$nome,$CNPJ) 
     {
         $connection = new Conexao();
-        $sql = "INSERT INTO nf (id,chave,cNF,nNF,CNPJDestinatario,xNomeDestinatario,dhEmi) 
+        $sql = "INSERT INTO nf (id,chave,cNF,nNF,CNPJDestinatario,xNomeDestinatario,protocolo,dhEmi) 
             VALUES(
                 '" . $this->getId() . "',
                 '" . $this->gerarChaveDeAcesso() . "',
                 '" . $this->gerarCnf() . "',
                 '" . $this->gerarNnf() . "',
-                '" . $this->dest['CNPJ']. "',
-                '" . $this->dest['xNome']. "',
+                '" . $CNPJ. "',
+                '" . $nome. "',
+                '" . $protocolo . "',
                 '" . $this->getTime() . "'
                 )";
         $connection->executar($sql);
@@ -460,7 +461,6 @@ class Xml
         $infCpl->appendChild($dom->createTextNode($informacoesAdicionais));
         
         $dom->save($this->gerarChaveDeAcesso() . '-nfe.xml');
-        $this->salvarNF();
     }
     function cancelarXml() 
     {

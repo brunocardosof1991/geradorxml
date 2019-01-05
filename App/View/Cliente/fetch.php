@@ -10,6 +10,7 @@
 
         <!-- ************** -->
         <script type="module" src="../../../js/cliente/fetch.js"></script>
+        <script type="text/javascript" src="../../../js/tableResponsive.js"></script>
 
         <!-- Folha de estilo da página -->
         <link href="../../../css/style.css" type="text/css" rel="stylesheet">

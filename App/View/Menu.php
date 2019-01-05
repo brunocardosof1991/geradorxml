@@ -1,10 +1,14 @@
-<nav class="navbar navbar-expand-lg navbar-success bg-dark">
-  <a class="navbar-brand" href="http://localhost/geradorxml/index.php">LOGO</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-dark mb-2" id="navbar">
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
+    <ul class="navbar-nav mr-auto"> 
+        <li class="nav-item dropdown mr-3">
+            <a class="navbar-brand" href="/geradorXml/index.php">
+                <i class="fas fa-home fa-2x"></i>
+            </a>
+        </li>    
       <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownBlog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Cliente

@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).ready(function () {    
     fetchAll();
     function fetchAll() 
     {        
@@ -8,7 +8,7 @@ $(document).ready(function () {
         }).done((data) => {
 			$("#container").find('table tbody').html(data);            
         });
-    }
+    }        
     $(document).on('click', '#excluirCliente',function() {       
         var id = $(this).closest('tr').children('td:eq(0)').text();
         var nome = $(this).closest('tr').children('td:eq(1)').text();

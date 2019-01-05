@@ -238,7 +238,7 @@ $(document).ready(function(){
                     // Size of the pie chart in px. It will always be a square.
                     size: 110,
                     // Time in milliseconds for a eased animation of the bar growing, or false to deactivate.
-                    animate: 20000,
+                    animate: 22000,
                     // Callback function that is called at the start of any animation (only if animate is not false).
                     onStart: $.noop,
                     // Callback function that is called at the end of any animation (only if animate is not false).

@@ -7,10 +7,8 @@
 
         <!-- JQUERY-->
         <script src="../../../js/external/jquery/jquery.js"></script>
-
-        <!-- table-to-json LIB-->
-        <script src="//lightswitch05.github.io/table-to-json/javascripts/jquery.tabletojson.min.js"></script>  
         <script type="module" src="../../../js/NF/NF.js"></script>
+        <script type="text/javascript" src="../../../js/tableResponsive.js"></script>
 
         <!-- Folha de estilo da página -->
         <link href="../../../css/style.css" type="text/css" rel="stylesheet">
@@ -20,6 +18,7 @@
 
         <!-- Icones fonte awesome -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+        <!-- TABLE -->       
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
         <!-- ================================================================================================ -->
@@ -37,24 +36,23 @@
     <?php require_once '../Menu.php'; ?> 
         <div class="container" id="container">
             <div class="row" id="rowNF">
-                <div class="col-md-12" id="colNF">
-                <div class="table-responsive-xl">
-                    <table class="table table-hover table-bordered mt-3 mx-auto text-center" id="tableListarNF">
-                        <thead class="thead-dark">
+                <div class="col-md-12 col-lg-12 col-xl-12" id="colNF">
+                <div class="table-responsive-md">
+                    <table class="table table-hover table-bordered mt-3 mx-auto text-center js-table-data" id="tableListarNF">
+                        <thead class="bg-dark">
                             <tr>
-                                <th style="display:none;" scope="col">ID</th>
-                                <th scope="col">Chave De Acesso</th>
-                                <th scope="col">Data de Emissão</th>
-                                <th scope="col">CPF/CNPJ Destinatário</th>
-                                <th scope="col">Compartilhar</th>
-                                <th scope="col">Excluir</th>
-                                <th scope="col">Duplicar</th>
-                                <th scope="col">Cancelar</th>
+                                <th style="display:none;">ID</th>
+                                <th>Chave De Acesso</th>
+                                <th>Data de Emissão</th>
+                                <th data-label='CPF/CNPJ'>CPF/CNPJ Destinatário</th>
+                                <th>Protocolo</th>
+                                <th>Excluir</th>
+                                <th>Cancelar</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody><tr data-expanded="true"></tr></tbody>
                     </table>
-                </div> <!-- END #table-responsive -->
+                </div>
                 </div> <!-- END #colNF -->
             </div> <!-- END .row -->
         </div> <!-- END .container -->
