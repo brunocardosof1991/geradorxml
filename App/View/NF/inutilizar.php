@@ -42,5 +42,6 @@
                 </div> <!-- END #colNF -->
             </div> <!-- END .row -->
         </div> <!-- END .container -->
+        <?php require_once '../../View/Footer.php'; ?>
     </body>
 </html>

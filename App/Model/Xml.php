@@ -8,8 +8,8 @@ use DateTime;
 use DateTimeZone;
 use DOMDocument;
 use DOMAttr;
-use PDOException;
 use ArrayIterator;
+use PDO;
 class Xml 
 {
     //<ide>
@@ -95,10 +95,12 @@ class Xml
         'tBand' => 'DEFAULT',
         'cAut' => 'DEFAULT'
     );
+    private $connection = '';
     private $ICMSSN102 = array();
     private $PIS = array ();
     private $COFINS = array();
     function __construct() {
+        $this->connection = new Conexao();
         $this->ICMS = ICMS::$ICMSSN102;
         $this->PIS = PIS::$PISAliq;
         $this->COFINS = COFINS::$COFINSAliq;
@@ -106,11 +108,16 @@ class Xml
     //<ide><idLote></idLote></ide>
     private function getId() 
     {
-        $connection = new Conexao();
-        $query = $connection->consultar("SELECT id FROM nf ORDER BY id DESC LIMIT 1");
-        $data = $query->fetch_array(MYSQLI_ASSOC);
-        $idLote = $data['id'] + 1;
-        return $idLote;
+        $sql = "SELECT id FROM nf ORDER BY id DESC LIMIT 1";    
+        try{
+            $connection = $this->connection->PDOConnect();    
+            $stmt = $connection->query($sql);
+            $idLote = $stmt->fetchAll(PDO::FETCH_ASSOC);           
+            return $idLote[0]["id"]+1;
+            $db = null;
+        }catch(PDOException $e){
+            echo '{"Erro": {"text": '.$e->getMessage().'}';
+        }
     }
     //<ide><dhEmi></dhEmi></ide>
     //Hora do servidor
@@ -124,21 +131,31 @@ class Xml
     }
     //<ide><nNF></nNF></ide>
     private function gerarNnf() 
-    {
-        $connection = new Conexao();
-        $query = $connection->consultar("SELECT nNF FROM nf ORDER BY id DESC LIMIT 1");
-        $data = $query->fetch_array(MYSQLI_ASSOC);
-        $nNF = $data['nNF'] + 1;
-        return $nNF;
+    {        
+        $sql = "SELECT nNF FROM nf ORDER BY nNF DESC LIMIT 1";    
+        try{
+            $connection = $this->connection->PDOConnect();    
+            $stmt = $connection->query($sql);
+            $nNF = $stmt->fetchAll(PDO::FETCH_ASSOC);           
+            return $nNF[0]["nNF"]+1;
+            $db = null;
+        }catch(PDOException $e){
+            echo '{"Erro": {"text": '.$e->getMessage().'}';
+        }
     }
     //<ide><cNF></cNF></ide>
-    private function gerarCnf() 
-    {
-        $connection = new Conexao();
-        $query = $connection->consultar("SELECT cNF FROM nf ORDER BY id DESC LIMIT 1");
-        $data = $query->fetch_array(MYSQLI_ASSOC);
-        $cNF = $data['cNF'] + 1;
-        return $cNF;
+    private function gerarCnf()     
+    {        
+        $sql = "SELECT cNF FROM nf ORDER BY cNF DESC LIMIT 1";    
+        try{
+            $connection = $this->connection->PDOConnect();    
+            $stmt = $connection->query($sql);
+            $cNF = $stmt->fetchAll(PDO::FETCH_ASSOC);           
+            return $cNF[0]["cNF"]+1;
+            $db = null;
+        }catch(PDOException $e){
+            echo '{"Erro": {"text": '.$e->getMessage().'}';
+        }
     }
     public function gerarChaveDeAcesso() 
     {
@@ -176,21 +193,32 @@ class Xml
     }
     public function salvarNF($protocolo,$nome,$CNPJ) 
     {
-        $connection = new Conexao();
-        $sql = "INSERT INTO nf (id,chave,cNF,nNF,CNPJDestinatario,xNomeDestinatario,protocolo,dhEmi) 
-            VALUES(
-                '" . $this->getId() . "',
-                '" . $this->gerarChaveDeAcesso() . "',
-                '" . $this->gerarCnf() . "',
-                '" . $this->gerarNnf() . "',
-                '" . $CNPJ. "',
-                '" . $nome. "',
-                '" . $protocolo . "',
-                '" . $this->getTime() . "'
-                )";
-        $connection->executar($sql);
+        $id = $this->getId();
+        $chave = $this->gerarChaveDeAcesso();
+        $cNF = $this->gerarCnf();
+        $nNF = $this->gerarNnf();
+        $dhEmi = $this->getTime();
+        $sql = "INSERT INTO nf (id,chave,cNF,nNF,CNPJDestinatario,xNomeDestinatario,protocolo,dhEmi) VALUES
+        (:id,:chave,:cNF,:nNF,:CNPJDestinatario,:xNomeDestinatario,:protocolo,:dhEmi)";
+        try{
+            $connection = $this->connection->PDOConnect();
+            $stmt = $connection->prepare($sql);
+            $stmt->execute
+            (array(
+                ':id' => $id,
+                ':chave' => $chave,
+                ':cNF' => $cNF,
+                ':nNF' => $nNF,
+                ':CNPJDestinatario' => $CNPJ,
+                ':xNomeDestinatario' => $nome,
+                ':protocolo' => $protocolo,
+                ':dhEmi' => $dhEmi
+            ));
+        } catch(PDOException $e){
+            echo '{"Erro": {"text": '.$e->getMessage().'}';
+        }
     }
-    public static function saidaProduto($produto)
+    public function saidaProduto($produto)
     {
         $produtoOut = array();
         for($i=0; $i<count($produto);$i++)
@@ -215,8 +243,7 @@ class Xml
             $it->next();
             $sql .= $it->key() ? ',' : ';';
         }
-        $conn = new Conexao();
-        $a = $conn->consultar($sql);
+        $this->connection->consultar($sql);
         }
     public static function venda()
     {

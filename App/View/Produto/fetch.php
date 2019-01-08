@@ -34,11 +34,11 @@
     </head>
     <body>     
     <?php require_once '../Menu.php'; ?> 
-        <div class="container" id="container">
+        <div class="container mb-5" id="container">
             <div class="row" id="rowProduto">
                 <div class="col-md-12 mx-auto">
                     <div class="table-responsive-xl">
-                        <table class="table table-hover table-bordered mt-3 mx-auto text-center" id="tableListarProdutos">
+                        <table class="table table-hover table-bordered mt-3 mx-auto text-center js-table-data" id="tableListarProdutos">
                             <thead class="thead-dark">
                                 <tr>
                                     <th scope="col">ID</th>
@@ -50,7 +50,7 @@
                                     <th scope="col">Editar</th>
                                 </tr>
                             </thead>
-                            <tbody><tr></tr></tbody>
+                            <tbody><tr data-expanded="true"></tr></tbody>
                         </table>
                     </div> <!-- END #table-responsive -->
                 </div>
@@ -58,5 +58,6 @@
         </div> <!-- END .container --> 
         <?php require_once '../../Components/Modal.html'; ?> 
         <?php require_once '../../Components/FormProduto.html'; ?> 
+        <?php require_once '../../View/Footer.php'; ?>
     </body>
 </html>

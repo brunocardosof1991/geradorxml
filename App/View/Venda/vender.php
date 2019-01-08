@@ -36,9 +36,9 @@
     </head>
     <body>   
     <?php require_once '../Menu.php'; ?> 
-        <div class="container" id="container">
+        <div class="container mb-5" id="container">
             <div class="row" id="rowNF">
-            <div id="accordion" class="col-md-8 mx-auto mt-3">
+            <div id="accordion" class="col-md-8 mx-auto mt-3 mb-3">
                 <div class="card text-center bg-light" id="cardCadastrarProduto">
                     <div class="card-header bg-dark" id="headingOne">
                         <h5 class="mb-0 text-center">
@@ -230,6 +230,7 @@
             </div><!-- END .accordion  -->
             </div> <!-- END .row -->
         </div> <!-- END .container -->   
-        <?php require_once '../../Components/Modal.html'; ?> 
+        <?php require_once '../../Components/Modal.html'; ?>          
+        <?php require_once '../../View/Footer.php'; ?>
     </body>
 </html>

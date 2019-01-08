@@ -1,11 +1,4 @@
 <?php
-
-/**
- * Description of cls
- *
- * @author assparremberger
- */
-
 namespace App\Model;
 use PDO;
 class Conexao {

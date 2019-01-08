@@ -38,10 +38,11 @@
         <?php require_once '../Menu.php'; ?>
         <div class="container" id="container">
             <div class="row" id="row">
-                <div class="col-md-10 mx-auto">                             
+                <div class="col-md-8 mx-auto">                             
                     <?php require_once '../../Components/FormCliente.html'; ?> 
                 </div>      
             </div>
         </div>
+        <?php require_once '../../View/Footer.php'; ?>
     </body>
 </html>

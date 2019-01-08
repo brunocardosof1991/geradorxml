@@ -1,7 +1,7 @@
 <?php
 namespace App\Model;
 use App\Model\Conexao;
-use ArrayObject;
+use PDO;
 
 class NF
 {
@@ -12,6 +12,7 @@ class NF
     public $dhEmi;
     public $CNPJDestinatario;
     public $xNomeDestinatario;
+    public $protocolo;
     private $connection = '';
 
     function __construct()
@@ -19,105 +20,107 @@ class NF
         $this->connection = new Conexao();    
     }
 
-    public function get_NF($id = 0) 
-	{
-        //Função estática não aceita $this;
-        $query="SELECT * FROM NF";
-        if($id !== 0) 
-        {
-            $query = '';
-            $query ="SELECT * FROM NF WHERE id=".$id." LIMIT 1";
+    public function getAllNFCe()
+    {       
+        $sql = "SELECT * FROM nf";    
+        try{
+            $connection = $this->connection->PDOConnect();    
+            $stmt = $connection->query($sql);
+            $NF = $stmt->fetchAll(PDO::FETCH_OBJ);
+            return ($NF);
+        }catch(PDOException $e){
+            echo '{"Erro": {"text": '.$e->getMessage().'}';
         }
-		$result = $this->connection->consultar($query);
-        $lista = new ArrayObject();
-        while (list($id, $chave, $cNF, $nNF, $dhEmi, $CNPJDestinatario, $xNomeDestinatario) 
-        = mysqli_fetch_row($result)) 
-        {     
-            $NF = new NF();
-            $NF->id = $id;
-            $NF->chave = $chave;
-            $NF->cNF = $cNF;
-            $NF->nNF = $nNF;
-            $NF->dhEmi = $dhEmi;
-            $NF->CNPJDestinatario = $CNPJDestinatario;
-            $NF->xNomeDestinatario = $xNomeDestinatario;
-            $lista->append($NF);
-        }		
-        header('Content-Type: application/json');
-        echo json_encode($lista);
     }
-    public function insert_NF()
-	{
-		$data = json_decode(file_get_contents('php://input'), true);
-		$NF_id  =$data["id"];
-		$NF_chave=$data["chave"];
-		$NF_cNF=$data["cNF"];
-		$NF_nNF=$data["nNF"];
-		$NF_dhEmi=$data["dhEmi"];
-		$NF_CNPJDestinatario=$data["CNPJDestinatario"];
-		$NF_xNomeDestinatario=$data["xNomeDestinatario"];
-		echo $query="INSERT INTO NF SET id='{$NF_id}',chave='{$NF_chave}', cNF='{$NF_cNF}', nNF='{$NF_nNF}', dhEmi='{$NF_dhEmi}',
-        CNPJDestinatario='{$NF_CNPJDestinatario}', xNomeDestinatario='{$NF_xNomeDestinatario}' ";        
-        $result = $this->connection->consultar($query);
-        $response = array();
-        if ($result === true) {
-			$response=array(
-				'status' => 1,
-				'status_message' =>'NF Added Successfully.'
-			);
-        } else {
-			$response=array(
-				'status' => 0,
-				'status_message' =>'NF Addition Failed.'
-			);
-        }
-		header('Content-Type: application/json');
-		echo json_encode($response);
-    }	
-    public function update_NF($id)
-	{
-		$data = json_decode(file_get_contents('php://input'), true);
-		$NF_chave=$data["chave"];
-		$NF_cNF=$data["cNF"];
-		$NF_nNF=$data["nNF"];
-		$NF_dhEmi=$data["dhEmi"];
-		$NF_CNPJDestinatario=$data["CNPJDestinatario"];
-		$NF_xNomeDestinatario=$data["xNomeDestinatario"];
-		$query="UPDATE NF SET chave='{$NF_chave}', cNF='{$NF_cNF}', nNF='{$NF_nNF}', dhEmi='{$NF_dhEmi}',
-        CNPJDestinatario='{$NF_CNPJDestinatario}', xNomeDestinatario='{$NF_xNomeDestinatario}' WHERE id ='{$id}' ";        
-        $result = $this->connection->consultar($query);
-        $response = array();
-        if ($result === true) {
-			$response=array(
-				'status' => 1,
-				'status_message' =>'NF Updated Successfully.'
-			);
-        } else {
-			$response=array(
-				'status' => 0,
-				'status_message' =>'NF Updated Failed.'
-			);
-        }
-		header('Content-Type: application/json');
-		echo json_encode($response);
-    }
-    public function delete_NF($id)
+    public function getNFCe($id)
     {
-        $query="DELETE FROM NF WHERE id={$id}";
-        $result = $this->connection->consultar($query);
-        $response = array();
-        if ($result === true) {
-			$response=array(
-				'status' => 1,
-				'status_message' =>'NF Deleted Successfully.'
-			);
-        } else {
-			$response=array(
-				'status' => 0,
-				'status_message' =>'NF Deleted Failed.'
-			);
+        $id = $request->getAttribute('id');    
+        $sql = "SELECT * FROM nf WHERE id = {$id}";    
+        try{
+            $connection = $this->connection->PDOConnect();  
+            $stmt = $connection->query($sql);
+            $NF = $stmt->fetch(PDO::FETCH_OBJ);
+            $db = null;
+            return ($NF);
+        } catch(PDOException $e){
+            echo '{"Erro": {"text": '.$e->getMessage().'}';
         }
-		header('Content-Type: application/json');
-		echo json_encode($response);
+    }
+    public function addNFCe($request)
+    {
+        $id = $request->getParam('id');
+        $chave = $request->getParam('chave');
+        $cNF = $request->getParam('cNF');
+        $nNF = $request->getParam('nNF');
+        $dhEmi = $request->getParam('dhEmi');
+        $CNPJDestinatario = $request->getParam('CNPJDestinatario');
+        $xNomeDestinatario = $request->getParam('xNomeDestinatario');    
+        $sql = "INSERT INTO nf (id,chave,cNF,nNF,dhEmi,CNPJDestinatario,xNomeDestinatario) VALUES
+        (:id,:chave,:cNF,:nNF,:dhEmi,:CNPJDestinatario,:xNomeDestinatario)";    
+        try{
+            $connection = $this->connection->PDOConnect();  
+            $stmt = $connection->prepare($sql);    
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':chave',  $chave);
+            $stmt->bindParam(':cNF',      $cNF);
+            $stmt->bindParam(':nNF',      $nNF);
+            $stmt->bindParam(':dhEmi',    $dhEmi);
+            $stmt->bindParam(':CNPJDestinatario',       $CNPJDestinatario);
+            $stmt->bindParam(':xNomeDestinatario',      $xNomeDestinatario);    
+            $stmt->execute();    
+            echo '{"Aviso": {"text": "NF Adicionada"}';    
+        } catch(PDOException $e){
+            echo '{"Erro": {"text": '.$e->getMessage().'}';
+        }
+    }
+    public function updateNFCe($request)
+    {
+        $id = $request->getParam('id');
+        $chave = $request->getParam('chave');
+        $cNF = $request->getParam('cNF');
+        $nNF = $request->getParam('nNF');
+        $dhEmi = $request->getParam('dhEmi');
+        $CNPJDestinatario = $request->getParam('CNPJDestinatario');
+        $xNomeDestinatario = $request->getParam('xNomeDestinatario');    
+        $sql = "UPDATE nf SET
+                    id 	= :id,
+                    chave 	= :chave,
+                    cNF		= :cNF,
+                    nNF		= :nNF,
+                    dhEmi 	= :dhEmi,
+                    CNPJDestinatario 		= :CNPJDestinatario,
+                    xNomeDestinatario		= :xNomeDestinatario
+                WHERE id = $id";    
+        try{
+            $connection = $this->connection->PDOConnect();  
+            $stmt = $connection->prepare($sql);    
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':chave',  $chave);
+            $stmt->bindParam(':cNF',      $cNF);
+            $stmt->bindParam(':nNF',      $nNF);
+            $stmt->bindParam(':dhEmi',    $dhEmi);
+            $stmt->bindParam(':CNPJDestinatario',       $CNPJDestinatario);
+            $stmt->bindParam(':xNomeDestinatario',      $xNomeDestinatario);    
+            $stmt->execute();    
+            echo '{"Aviso": {"text": "NF Atualizada"}';    
+        } catch(PDOException $e){
+            echo '{"Erro": {"text": '.$e->getMessage().'}';
+        }
+    }
+    public function deleteNFCe($id)
+    {    
+        $sql = "DELETE FROM nf WHERE id = {$id}";    
+        try{
+            // Get DB Object
+            $db = new Conexao();
+            // Connect
+            $db = $db->PDOConnect();    
+            $stmt = $db->prepare($sql);
+            $stmt->execute();
+            $db = null;
+            echo '{"Aviso": {"text": "NF Deletada"}';
+        } catch(PDOException $e){
+            echo '{"Erro": {"text": '.$e->getMessage().'}';
+        }
     }
 }

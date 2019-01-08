@@ -8,7 +8,7 @@ $(document).ready(function(){
             method: 'post',
             dataType: 'json',
             data: {chaveDeAcesso:chaveDeAcesso}
-        }).done((data)=>{         
+        }).done(function (data){         
             console.log(data);  
             if(data == 'success')
             {
@@ -20,14 +20,14 @@ $(document).ready(function(){
             } 
             if(data == 'error')
             {
-                setTimeout( () => { getNF(); }, 1500);
+                setTimeout( function () { getNF(); }, 1500);
             }
         });     
     }
     // This method iterates over an object and removes all keys with falsy values.
-    const removeEmpty = (obj) => {
+    const removeEmpty = function (obj) {
         let newObj = {};
-        Object.keys(obj).forEach((prop) => {
+        Object.keys(obj).forEach(function (prop) {
           if (obj[prop]) { newObj[prop] = obj[prop]; }
         });
         return newObj;
@@ -89,7 +89,7 @@ $(document).ready(function(){
             
         }
     }
-    $("#inputSearchProduto_XmlGerar").on('keyup', (e)=>{
+    $("#inputSearchProduto_XmlGerar").on('keyup', function (e){
         e.preventDefault();       
         if (e.keyCode === 13) 
         {
@@ -103,7 +103,7 @@ $(document).ready(function(){
                     method: 'get',
                     url: 'http://localhost/geradorXml/App/public/api/produto/'+produto,
                     dataType: 'json'
-                }).done((data) => {
+                }).done(function(data) {
                     if(data === false || data == '') 
                     {
                         alert("Produto não existe");
@@ -123,7 +123,7 @@ $(document).ready(function(){
         }
     });    
     //#rowFormaPagamento
-    $("#payment").change(() => {
+    $("#payment").change(function () {
         let formaPagamento = $("#payment").val();
         if(formaPagamento == 1 || formaPagamento == 2 ) 
         {
@@ -140,7 +140,7 @@ $(document).ready(function(){
             $("#divinputRegistro").show().addClass("mx-auto");
             $("#divinputNomeCliente").show().addClass("mx-auto");
             //Calcular Troco
-            $('#inputDinheiro').focusout(() => {                    
+            $('#inputDinheiro').focusout(function () {                    
                 let val1 = calcularValorTotal();
                 let val2 = $("#inputDinheiro").val();
                 let result = val2 - val1;
@@ -160,7 +160,7 @@ $(document).ready(function(){
         }
     });
     //Enviar ID/NOME do cliente
-    $('#inputName').on('keyup',(e) => {
+    $('#inputName').on('keyup',function(e) {
         if (e.keyCode === 13) 
         {    
             var user_id = $('#container').find('input[name="inputName"]').val();
@@ -173,7 +173,7 @@ $(document).ready(function(){
                     method: 'get',
                     url: 'http://localhost/geradorXml/App/public/api/cliente/'+user_id,
                     dataType: 'json'
-                }).done((data) => {
+                }).done(function(data) {
                     $('#container').find('input[name="clientID"]').val(data.id);
                     $('#container').find('input[name="inputName"]').val(data.nome);
                     $('#container').find('input[name="inputRegistro"]').val(data.CNPJ);
@@ -187,7 +187,7 @@ $(document).ready(function(){
             }     
         } 
     });
-    $("#buttonFinalizarVenda").click(()=>{
+    $("#buttonFinalizarVenda").click(function(){
         //Coletar todos inpts        
         var input = {};
         $("input").each(function() {
@@ -219,11 +219,11 @@ $(document).ready(function(){
             url:'http://localhost/geradorXml/App/public/api/autorizarXml',
             dataType: 'json',
             data:{json:json, produto:produto}
-        }).done((data) =>
+        }).done(function (data)
         {
             $("#apiModal").modal('show');
             $("#apiModal .modal-title").text('Autorização NFC-e');
-            $("#apiModal").on('shown.bs.modal', () => {    
+            $("#apiModal").on('shown.bs.modal', function() {    
                 $('.chart').easyPieChart({
                     // The color of the curcular bar. You can pass either a css valid color string like rgb, rgba hex or string colors. But you can also pass a function that accepts the current percentage as a value to return a dynamically generated color.
                     barColor: '#e60000',
@@ -249,7 +249,7 @@ $(document).ready(function(){
         });
     });
     //Botao fechar modalNFC-e, redirecionar para vendas.php
-    $(".modalApi_fechar").on('click',() => {
+    $(".modalApi_fechar").on('click',function() {
         location = location;
     });     
 });

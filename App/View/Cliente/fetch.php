@@ -9,7 +9,7 @@
         <script src="../../../js/external/jquery/jquery.js"></script>       
 
         <!-- ************** -->
-        <script type="module" src="../../../js/cliente/fetch.js"></script>
+        <script type="module" src="../../../js/Cliente/fetch.js"></script>
         <script type="text/javascript" src="../../../js/tableResponsive.js"></script>
 
         <!-- Folha de estilo da página -->
@@ -32,13 +32,13 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
         <!-- ================================================================================================== -->
     </head>
-    <body>   
+    <body>     
     <?php require_once '../Menu.php'; ?> 
-        <div class="container" id="container">
+        <div class="container mb-5" id="container">
             <div class="row" id="rowCliente">
                 <div class="col-md-12 mx-auto">
                     <div class="table-responsive-xl">
-                        <table class="table table-hover table-bordered mt-3 mx-auto text-center" id="tableListarClientes">
+                        <table class="table table-hover table-bordered mt-3 mx-auto text-center js-table-data" id="tableListarClientes">
                             <thead class="thead-dark">
                                 <tr>
                                     <th scope="col">ID</th>
@@ -54,13 +54,14 @@
                                     <th scope="col">Editar</th>
                                 </tr>
                             </thead>
-                            <tbody><tr></tr></tbody>
+                            <tbody><tr data-expanded="true"></tr></tbody>
                         </table>
                     </div> <!-- END #table-responsive -->
                 </div>
             </div> <!-- END .row -->
-        </div> <!-- END .container -->   
+        </div> <!-- END .container --> 
         <?php require_once '../../Components/Modal.html'; ?> 
         <?php require_once '../../Components/FormCliente.html'; ?> 
+        <?php require_once '../../View/Footer.php'; ?>
     </body>
 </html>

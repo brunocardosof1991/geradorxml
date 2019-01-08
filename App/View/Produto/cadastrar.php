@@ -41,5 +41,6 @@
                 </div>      
             </div>
         </div>
+        <?php require_once '../../View/Footer.php'; ?>
     </body>
 </html>

@@ -12,7 +12,7 @@ $(document).ready(function(){
             url:'http://localhost/geradorXml/App/public/api/produto/add',
             dataType: 'json',
             data:{produto:produto, NCM:NCM, preco:preco, CFOP:CFOP }
-        }).done((data) =>{
+        }).done(function(data){
             if(data == '{\"Aviso\": {\"text\": \"Produto Adicionado\"}') 
             {
                 alert('Produto Adicionado com Sucesso!!');

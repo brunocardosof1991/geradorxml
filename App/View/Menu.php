@@ -46,5 +46,15 @@
             </div>
         </li>
     </ul>
+    <ul class="navbar-nav" id="navConfig">
+        <li class="nav-item dropdown my-auto">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownBlog" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Configurações
+                </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
+                <a class="dropdown-item" href="/geradorXml/App/View/Emissor/fetch.php" id="navbarCadastrarEmpresa">Cadastrar Empresa</a>
+            </div>
+       </li>    
+    </ul>
   </div>
 </nav>

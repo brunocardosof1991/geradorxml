@@ -1,11 +1,11 @@
-$(document).ready(function () {    
+$(document).ready(function () {   
     fetchAll();
     function fetchAll() 
     {        
         $.ajax({
             method: 'get',
             url: 'http://localhost/geradorXml/App/public/api/cliente/'
-        }).done((data) => {
+        }).done(function(data) {
 			$("#container").find('table tbody').html(data);            
         });
     }        
@@ -18,7 +18,7 @@ $(document).ready(function () {
             $.ajax({
                 method:'delete',
                 url: 'http://localhost/geradorXml/App/public/api/cliente/delete/'+id
-            }).done((data) =>{
+            }).done(function(data){
                 if(data == '{"Aviso": {"text": "Produto Deletado"}')
                 {
                     alert(nome+' Deletedo Com Sucesso!!');   
@@ -27,16 +27,17 @@ $(document).ready(function () {
             });          
         }
     });
-    $(document).on('click', '#editarCliente',() => {   
-        let id = $("#tableListarClientes").find("td:eq(0)").text();
-        let nomeTable = $("#tableListarClientes").find("td:eq(1)").text();
-        let CNPJTable = $("#tableListarClientes").find("td:eq(2)").text();
-        let enderecoTable = $("#tableListarClientes").find("td:eq(3)").text();
-        let numeroTable = $("#tableListarClientes").find("td:eq(4)").text();
-        let complementoTable = $("#tableListarClientes").find("td:eq(5)").text();
-        let bairroTable = $("#tableListarClientes").find("td:eq(6)").text();
-        let CEPTable = $("#tableListarClientes").find("td:eq(7)").text();
-        let foneTable = $("#tableListarClientes").find("td:eq(8)").text();
+    $(document).on('click', '#editarCliente',function() {   
+        var id = $(this).closest('tr').children('td:eq(0)').text();
+        var nomeTable = $(this).closest('tr').children('td:eq(1)').text();
+        var CNPJTable = $(this).closest('tr').children('td:eq(2)').text();
+        var enderecoTable = $(this).closest('tr').children('td:eq(3)').text();
+        var numeroTable = $(this).closest('tr').children('td:eq(4)').text();
+        var complementoTable = $(this).closest('tr').children('td:eq(5)').text();
+        var bairroTable = $(this).closest('tr').children('td:eq(6)').text();
+        var CEPTable = $(this).closest('tr').children('td:eq(7)').text();
+        var foneTable = $(this).closest('tr').children('td:eq(8)').text();
+        console.log((nomeTable));
         $("#apiModal .modal-body .chart").remove(); 
         $("#apiModal .modal-body p").remove(); 
         $("h1").remove(); 
@@ -52,7 +53,7 @@ $(document).ready(function () {
         $('#inputBairroCliente').val(bairroTable);
         $('#inputCEPCliente').val(CEPTable);
         $('#inputTelefoneCliente').val(foneTable);           
-        $("#apiModal .modal-footer .action").on('click',()=>{
+        $("#apiModal .modal-footer .action").on('click',function(){
             let nome = $('#inputNomeCliente').val();
             let CNPJ = $('#inputCNPJCliente').val();
             let endereco = $('#inputEnderecoCliente').val();
@@ -67,7 +68,7 @@ $(document).ready(function () {
                 dataType: 'json',
                 data:{id:id, nome:nome, CNPJ:CNPJ, endereco:endereco, numero:numero, 
                     complemento:complemento, bairro:bairro, CEP:CEP, fone:fone }
-            }).done((data)=>{
+            }).done(function(data){
                 if(data == '{\"Aviso\": {\"text\": \"Cliente Atualizado\"}')
                 {
                     alert('Cliente Atualizado');
@@ -77,7 +78,7 @@ $(document).ready(function () {
         });
     });
     //Botao fechar modalNFC-e, redirecionar para vendas.php
-    $(".modalApi_fechar").on('click',() => {
+    $(".modalApi_fechar").on('click',function() {
         location = location;
     });  
 });

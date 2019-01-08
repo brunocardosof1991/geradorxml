@@ -17,7 +17,7 @@ $(document).ready(function(){
             dataType: 'json',
             data:{nome:nome, CNPJ:CNPJ, endereco:endereco, numero:numero, 
                 complemento:complemento, bairro:bairro, CEP:CEP, fone:fone }
-        }).done((data) =>{
+        }).done(function(data){
             if(data == '{\"Aviso\": {\"text\": \"Cliente Adicionado\"}') 
             {
                 alert('Cliente Adicionado com Sucesso!!');
