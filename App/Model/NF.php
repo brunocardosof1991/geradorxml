@@ -5,14 +5,14 @@ use PDO;
 
 class NF
 {
-    public $id;
-    public $chave;
-    public $cNF;
-    public $nNF;
-    public $dhEmi;
-    public $CNPJDestinatario;
-    public $xNomeDestinatario;
-    public $protocolo;
+    private $id;
+    private $chave;
+    private $cNF;
+    private $nNF;
+    private $dhEmi;
+    private $CNPJDestinatario;
+    private $xNomeDestinatario;
+    private $protocolo;
     private $connection = '';
 
     function __construct()

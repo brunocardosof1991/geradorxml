@@ -8,6 +8,7 @@ class Conexao {
     private $dbpass = '';
     private $dbname = 'geradorXml';
 
+    //PDO Driver
     public function PDOConnect()
     {
         $mysql_connect_str = "mysql:host=$this->dbhost;dbname=$this->dbname";
@@ -15,6 +16,7 @@ class Conexao {
         $dbConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $dbConnection;
     }
+    //MySQLi Driver
     private function abrir() 
     {
         $link = mysqli_connect($this->dbhost, $this->dbuser, $this->dbpass, $this->dbname);

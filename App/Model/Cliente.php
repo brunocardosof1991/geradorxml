@@ -1,97 +1,25 @@
 <?php
 namespace App\Model;
 use App\Model\Conexao;
-use ArrayObject;
 use PDO;
 
 class Cliente {
     
-    public $id;
-    public $nome;
-    public $CNPJ;
-    public $endereco;
-    public $numero;
-    public $complemento;
-    public $bairro;
-    public $CEP;
-    public $fone;
+    private $id;
+    private $nome;
+    private $CNPJ;
+    private $endereco;
+    private $numero;
+    private $complemento;
+    private $bairro;
+    private $CEP;
+    private $fone;
     private $connection = '';
 
    function __construct()
    {
        $this->connection = new Conexao();
    }
-    
-    function getId() {
-        return $this->id;
-    }
-
-    function getNome() {
-        return $this->nome;
-    }
-
-    function getCNPJ() {
-        return $this->CNPJ;
-    }
-
-    function getEndereco() {
-        return $this->endereco;
-    }
-
-    function getNumero() {
-        return $this->numero;
-    }
-
-    function getComplemento() {
-        return $this->complemento;
-    }
-
-    function getBairro() {
-        return $this->bairro;
-    }
-
-    function getCEP() {
-        return $this->CEP;
-    }
-
-    function getCelular() {
-        return $this->celular;
-    }
-    function setId($id) {
-        $this->id = $id;
-    }
-
-    function setNome($nome) {
-        $this->nome = $nome;
-    }
-
-    function setCNPJ($CNPJ) {
-        $this->CNPJ = $CNPJ;
-    }
-
-    function setEndereco($endereco) {
-        $this->endereco = $endereco;
-    }
-
-    function setNumero($numero) {
-        $this->numero = $numero;
-    }
-
-    function setComplemento($complemento) {
-        $this->complemento = $complemento;
-    }
-
-    function setBairro($bairro) {
-        $this->bairro = $bairro;
-    }
-
-    function setCEP($CEP) {
-        $this->CEP = $CEP;
-    }
-
-    function setCelular($celular) {
-        $this->celular = $celular;
-    }
     public function getAllClients()
     {            
         $sql = "SELECT * FROM cliente";    

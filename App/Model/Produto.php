@@ -1,11 +1,9 @@
 <?php
 namespace App\Model;
 use App\Model\Conexao;
-use ArrayObject;
 use PDO;
 
-class Produto
-{
+class Produto {
     private $id;
     private $descricao;
     private $NCM;
@@ -43,23 +41,22 @@ class Produto
         }
     }
     public function addProduto($request)
-    {
-        $descricao = $request->getParam('produto');
-        $ncm = $request->getParam('NCM');  
-        $preco_custo = $request->getParam('preco');  
-        $CFOP = $request->getParam('CFOP');    
-        $sql = "INSERT INTO produto (descricao,ncm, preco_custo,CFOP) 
-        VALUES
-        (:descricao,:ncm,:preco_custo,:CFOP)";    
+    {        
+        $descricao = $request->getParam('descricao');
+        $ncm = $request->getParam('ncm');
+        $preco_custo = $request->getParam('preco_custo');
+        $CFOP = $request->getParam('CFOP');
+        $sql = "INSERT INTO produto (descricao,ncm,preco_custo,CFOP) VALUES
+        (:descricao,:ncm,:preco_custo,:CFOP)";
         try{
-            $connection = $this->connection->PDOConnect();     
-            $stmt = $connection->prepare($sql);    
+            $connection = $this->connection->PDOConnect();  
+            $stmt = $connection->prepare($sql);
             $stmt->bindParam(':descricao',  $descricao);
-            $stmt->bindParam(':ncm',      $ncm);  
-            $stmt->bindParam(':preco_custo',      $preco_custo);    
-            $stmt->bindParam(':CFOP',      $CFOP);    
-            $stmt->execute();    
-            echo json_encode('{"Aviso": {"text": "Produto Adicionado"}');    
+            $stmt->bindParam(':ncm',      $ncm);
+            $stmt->bindParam(':preco_custo',    $preco_custo);
+            $stmt->bindParam(':CFOP',       $CFOP);
+            $stmt->execute();
+            echo json_encode('{"Aviso": {"text": "Produto Adicionado"}');
         } catch(PDOException $e){
             echo '{"Erro": {"text": '.$e->getMessage().'}';
         }

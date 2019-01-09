@@ -1,4 +1,4 @@
-$(document).ready(function(){  
+$(document).ready(function(){	
 	fetchAll();
 	var emissor = [];
 	var size = '';
@@ -33,6 +33,9 @@ $(document).ready(function(){
 		});
 	}
 	$(document).on('click','#editarEmissor',function(e){
+		$('#apiModal').on('hidden.bs.modal', function () {
+			$(this).find('form').trigger('reset');
+		})
 		e.preventDefault(); 
 		console.log(size)
 		let id = emissor[0]['id'];
@@ -58,8 +61,6 @@ $(document).ready(function(){
         $("h1").remove(); 
         $("#apiModal .modal-title").text('Editar Emissor');
         $("#apiModal").modal('show');
-		$('#apiModal').on('shown.bs.modal', function (e) {
-		  });		
         $("#apiModal .modal-body").append($('#formEmissor').show());
         $("#apiModal .modal-footer .action").text('Editar').show();
         $("#apiModal .modal-footer .action").on('click',function(e){
@@ -80,7 +81,6 @@ $(document).ready(function(){
 			let CRT = $('#inputCRT').val();
 			let IM = $('#inputIM').val();
 			let IE = $('#inputIE').val();
-			console.log(fantasia);
 			$.ajax({
 				method:'put',
 				url: 'http://localhost/geradorXml/App/public/api/emissor/update/'+id,
@@ -92,52 +92,60 @@ $(document).ready(function(){
 				if(data == '{"Aviso": {"text": "Emissor Atualizado"}')
 				{
 					alert('Emissor Atualizado');
-					location = location;  
+					location = location;
 				}
 			});
-		});      
+		});       
 	});
 	$(document).on('click','#addEmissor',function(e){
-        $("#apiModal .modal-body .chart").remove(); 
-        $("#apiModal .modal-body p").remove(); 
-        $("h1").remove(); 
-        $("#apiModal .modal-title").text('Cadastrar Emissor');
-		$("#apiModal").modal('show');
-        $("#apiModal .modal-body").append($('#formEmissor').show());
-        $("#apiModal .modal-footer .action").text('Cadastrar').show();
-        $("#apiModal .modal-footer .action").on('click',function(e){	
-			e.preventDefault(); 	
-			let CNPJ = $('#inputCNPJ').val();
-			let fantasia = $('#inputFantasia').val();
-			let social = $('#inputSocial').val();
-			let endereco = $('#inputEndereco').val();
-			let numero = $('#inputNumero').val();
-			let bairro = $('#inputBairro').val();
-			let fone = $('#inputTelefone').val();
-			let CEP = $('#inputCEP').val();
-			let cidade = $('#inputCidade').val();
-			let UF = $('#inputUF').val();
-			let pais = $('#inputPais').val();
-			let cPais = $('#inputCPais').val();
-			let cMun = $('#inputCMunicipio').val();
-			let CNAE = $('#inputCNAE').val();
-			let CRT = $('#inputCRT').val();
-			let IM = $('#inputIM').val();
-			let IE = $('#inputIE').val();
-			$.ajax({
-				method:'post',
-				url:'http://localhost/geradorXml/App/public/api/emissor/add',
-				dataType: 'json',
-				data:{CNPJ:CNPJ, xFant:fantasia, xNome:social, xLgr:endereco, nro:numero,
-					xBairro:bairro, fone:fone, CEP:CEP, xMun:cidade, UF:UF, xPais:pais, cPais:cPais, cMun:cMun,
-					CNAE:CNAE, CRT:CRT, IM:IM, IE:IE}
-			}).done(function(data){
-				if(data == '{"Aviso": {"text": "Emissor Adicionado"}') 
-				{
-					alert('Emissor Adicionado com Sucesso!!');
-					window.location.replace("http://localhost/geradorXml/App/View/Emissor/fetch.php");                
-				}
-			});
+		$.showModal({
+			title: 'Cadastrar Emissor',
+			body:
+				'<form><div class="form-group row">' +
+				'<div class="col-3"><label for="text" class="col-form-label">Text</label></div>' +
+				'<div class="col-9"><input type="text" class="form-control" id="text"/></div>' +
+				'</div>' +
+				'<div class="form-group row">' +
+				'<div class="col-3"><label for="select" class="col-form-label">Select</label></div>' +
+				'<div class="col-9"><select id="select" class="form-control">' +
+				'<option value=""></option>' +
+				'<option value="red">red</option><option value="green">green</option><option value="blue">blue</option>' +
+				'</select></div>' +
+				'</div>' +
+				'<div class="form-group row">' +
+				'<div class="col-3"><label for="textarea" class="col-form-label">Textarea</label></div>' +
+				'<div class="col-9"><textarea id="textarea" rows="5" class="form-control"></textarea></div>' +
+				'</div></form>',
+			footer: '<button type="button" class="btn btn-link" data-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary">Send</button>',
+			onCreate: function (modal) {
+				// create event handler for form submit and handle values
+				$(modal.element).on("click", "button[type='submit']", function (event) {
+					event.preventDefault()
+					var $form = $(modal.element).find("form")
+					$.showAlert({
+						title: "Result",
+						body:
+							"<b>text:</b> " + $form.find("#text").val() + "<br/>" +
+							"<b>select:</b> " + $form.find("#select").val() + "<br/>" +
+							"<b>textarea:</b> " + $form.find("#textarea").val()
+					})
+					modal.hide()
+				})
+			}
+		})
+		$.ajax({
+			method:'post',
+			url:'http://localhost/geradorXml/App/public/api/emissor/add',
+			dataType: 'json',
+			data:{CNPJ:CNPJ, xFant:fantasia, xNome:social, xLgr:endereco, nro:numero,
+				xBairro:bairro, fone:fone, CEP:CEP, xMun:cidade, UF:UF, xPais:pais, cPais:cPais, cMun:cMun,
+				CNAE:CNAE, CRT:CRT, IM:IM, IE:IE}
+		}).done(function(data){
+			if(data == '{"Aviso": {"text": "Emissor Adicionado"}') 
+			{
+				alert('Emissor Adicionado com Sucesso!!');
+				window.location.replace("http://localhost/geradorXml/App/View/Emissor/fetch.php");                
+			}
 		});
 	});
     //Botao fechar modalNFC-e, redirecionar para vendas.php

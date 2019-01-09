@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">       
 
         <!-- JQUERY-->
-        <script src="../../../js/external/jquery/jquery.js"></script>       
+        <script src="../../../js/external/jquery/jquery.js"></script>     
 
         <!-- ************** -->
         <script type="module" src="../../../js/Emissor/fetch.js"></script>

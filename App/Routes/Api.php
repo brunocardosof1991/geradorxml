@@ -83,7 +83,9 @@ $app->add(function ($req, $res, $next) {
                 //Colocar toda NFC-e em uma variável
                 $NFCe = file_get_contents($xmlAutorizado2);
                 //Coletar o protocolo da NFC-e autorizada
+                //Começo da coleta
                 $fromP = "<nProt>";
+                //Fim da coleta
                 $toP = "</nProt>";
                 function getProtocolo($NFCe,$fromP,$toP)
                 {
@@ -93,8 +95,7 @@ $app->add(function ($req, $res, $next) {
                 //Coletar o Nome e CNPJ do destinatário da NFC-e autorizada
                 // PQ os dois juntos? Pois existe 2 <xNome> e <CNPJ>, do emissor e do destinatario
                 // Essa função n consegue ir direto no destinatário, que vem depois do emissor,então peguei os dois juntos
-                // TALVEZ usando algo equivalente ao next da função de array, solucione o problema
-                
+                // TALVEZ usando algo equivalente ao next da função de array, solucione o problema                
                 //Começo da coleta
                 $from = "<dest>";
                 //Fim da coleta
@@ -123,7 +124,7 @@ $app->add(function ($req, $res, $next) {
                     return substr($sub,0,strpos($sub,$toC));
                 }
                 $protocolo = getProtocolo($NFCe,$fromP,$toP);
-                $nome = getProtocolo($stringN,$fromN,$toN);
+                $nome = getNome($stringN,$fromN,$toN);
                 $CNPJ = getCNPJ($stringC,$fromC,$toC);
                 $xml = new Xml();
                 $xml->salvarNF($protocolo,$nome,$CNPJ);
@@ -185,7 +186,6 @@ $app->add(function ($req, $res, $next) {
             // Consultar um cliente especifico
             $app->get('/{id}', function(Request $request, Response $response){
                 $id = $request->getAttribute('id');   
-                $output = '';
                 $cliente = new Cliente();
                 $cliente = $cliente->getClient($id); 
             });    
@@ -252,11 +252,11 @@ $app->add(function ($req, $res, $next) {
                 $produto = new Produto();
                 $produto = $produto->getProduto($id);
             });    
-            // Adicionar Produto
-            $app->post('/add', function(Request $request, Response $response){
+            // Adicionar Produto            
+            $app->post('/add', function(Request $request, Response $response){            
                 $produto = new Produto();
-                $produto = $produto->addProduto($request);
-            });    
+                $produto = $produto->addProduto($request); 
+            });   
             // Atualizar Produto
             $app->put('/update/{id}', function(Request $request, Response $response){
                 $produto = new Produto();

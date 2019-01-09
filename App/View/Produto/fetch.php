@@ -54,6 +54,9 @@
                         </table>
                     </div> <!-- END #table-responsive -->
                 </div>
+                <div class="col-md-12" id="colAddButton">
+                    <button id="addProduto">Cadastrar Produto</button>
+                </div>
             </div> <!-- END .row -->
         </div> <!-- END .container --> 
         <?php require_once '../../Components/Modal.html'; ?> 

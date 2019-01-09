@@ -58,9 +58,49 @@ $(document).ready(function(){
                 if(data == '{\"Aviso\": {\"text\": \"Produto Atualizado\"}')
                 {
                     alert('Produto Atualizado');
-                    location = location;  
+                    location = location;             
                 }
             });
         });
     });
+    $(document).on('click','#addProduto',function(){
+    $("#apiModal .modal-body .chart").remove(); 
+    $("#apiModal .modal-body p").remove(); 
+    $("h1").remove(); 
+    $("#apiModal .modal-title").text('Cadastrar Produto');
+    $("#apiModal").modal('show');
+    $('#apiModal').on('shown.bs.modal', function (e) {
+        $(this)
+          .find("input,textarea,select")
+             .val('')
+             .end()
+          .find("input[type=checkbox], input[type=radio]")
+             .prop("checked", "")
+             .end();
+    });
+    $("#apiModal .modal-body").append($('#formProduto').show());
+    $("#apiModal .modal-footer .action").text('Cadastrar').show();        
+    $("#apiModal .modal-footer .action").on('click', function (e){
+        let descricao = $('#inputDescricaoProduto').val();
+        let NCM = $('#inputNCMProduto').val();
+        let preco_custo = $('#inputPrecoProduto').val();
+        let CFOP = $('#inputCFOPProduto').val();
+        $.ajax({
+            method:'post',
+            url: 'http://localhost/geradorXml/App/public/api/produto/add',
+            dataType: 'json',
+            data:{descricao:descricao, ncm:NCM, preco_custo:preco_custo, CFOP:CFOP}
+            }).done(function(data){
+                if(data == '{"Aviso": {"text": "Produto Adicionado"}')
+                {
+                    alert('Produto Adicionado com Sucesso'); 
+                    location = location;
+                }
+            });
+        });
+    });
+    //Botao fechar modalNFC-e, redirecionar para vendas.php
+    $(".modalApi_fechar").on('click',function() {
+        location = location;
+    });    
 });

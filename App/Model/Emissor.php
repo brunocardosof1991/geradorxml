@@ -4,25 +4,25 @@ use App\Model\Conexao;
 use PDO;
 
 class Emissor {    
-    public $connection = '';
-    public $id;
-    public $CNPJ;
-    public $xNome;
-    public $xFant;
-    public $fone;
-    public $CNAE;
-    public $CRT;
-    public $IM;
-    public $IE;
-    public $xLgr;
-    public $xBairro;
-    public $nro;
-    public $CEP;
-    public $cMun;
-    public $xMun;
-    public $UF;
-    public $xPais;
-    public $cPais;
+    private $connection = '';
+    private $id;
+    private $CNPJ;
+    private $xNome;
+    private $xFant;
+    private $fone;
+    private $CNAE;
+    private $CRT;
+    private $IM;
+    private $IE;
+    private $xLgr;
+    private $xBairro;
+    private $nro;
+    private $CEP;
+    private $cMun;
+    private $xMun;
+    private $UF;
+    private $xPais;
+    private $cPais;
     
     function __construct() 
     {

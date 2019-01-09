@@ -7,12 +7,14 @@ $(document).ready(function(){
         let NCM = $('#inputNCMProduto').val();
         let preco = $('#inputPrecoProduto').val();
         let CFOP = $('#inputCFOPProduto').val();
+        console.log(CFOP);
         $.ajax({
             method:'post',
             url:'http://localhost/geradorXml/App/public/api/produto/add',
             dataType: 'json',
-            data:{produto:produto, NCM:NCM, preco:preco, CFOP:CFOP }
+            data:{descricao:produto, ncm:NCM, preco_custo:preco, CFOP:CFOP }
         }).done(function(data){
+            console.log(data);
             if(data == '{\"Aviso\": {\"text\": \"Produto Adicionado\"}') 
             {
                 alert('Produto Adicionado com Sucesso!!');
