@@ -31,28 +31,30 @@
         <!-- ======================== LINK BOOTSTRAP CSS 4.1 ================================================== -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
         <!-- ================================================================================================== -->
+            
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+  
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
     </head>
     <body>     
     <?php require_once '../Menu.php'; ?> 
         <div class="container mb-5" id="container">
             <div class="row" id="rowProduto">
                 <div class="col-md-12 mx-auto">
-                    <div class="table-responsive-xl">
-                        <table class="table table-hover table-bordered mt-3 mx-auto text-center js-table-data" id="tableListarProdutos">
+                        <table class="table table-hover table-bordered mt-3 mx-auto text-center js-table-data display" id="tableListarProdutos" style="width:100%">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">Produto</th>
-                                    <th scope="col">NCM</th>
-                                    <th scope="col">Preço</th>
-                                    <th scope="col">CFOP</th>
-                                    <th scope="col">Excluir</th>
-                                    <th scope="col">Editar</th>
+                                    <th >ID</th>
+                                    <th >Produto</th>
+                                    <th >NCM</th>
+                                    <th >Preço</th>
+                                    <th >CFOP</th>
+                                    <th >Excluir</th>
+                                    <th >Editar</th>
                                 </tr>
                             </thead>
-                            <tbody><tr data-expanded="true"></tr></tbody>
+                            <tbody></tbody>
                         </table>
-                    </div> <!-- END #table-responsive -->
                 </div>
                 <div class="col-md-12" id="colAddButton">
                     <button id="addProduto">Cadastrar Produto</button>

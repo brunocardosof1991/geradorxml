@@ -16,9 +16,7 @@ $(document).ready(function(){
         }).done(function(data){
             console.log(data);
             if(data == '{\"Aviso\": {\"text\": \"Produto Adicionado\"}') 
-            {
-                alert('Produto Adicionado com Sucesso!!');
-                window.location.replace("http://localhost/geradorXml/App/View/Produto/fetch.php");                
+            {              
             }
         });
     });   

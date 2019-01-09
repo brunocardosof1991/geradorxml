@@ -145,43 +145,8 @@ $app->add(function ($req, $res, $next) {
         {        
             $app->get('/', function(Request $request, Response $response)
             {
-                $output = '';
                 $cliente = new Cliente();
                 $cliente = $cliente->getAllClients();
-                if(count($cliente) > 0)
-                {
-                    foreach($cliente as $row)
-                    {
-                        $output .= '
-                            <tr>
-                                <td data-title="ID:">'.$row->id.'</td>
-                                <td data-title="Nome:">'.$row->nome.'</td>
-                                <td data-title="CPF/CNPJ:">'.$row->CNPJ.'</td>
-                                <td data-title="Endereço:">'.$row->endereco.'</td>
-                                <td data-title="Número:">'.$row->numero.'</td>
-                                <td data-title="Complemento:">'.$row->complemento.'</td>
-                                <td data-title="Bairro:">'.$row->bairro.'</td>
-                                <td data-title="CEP:">'.$row->CEP.'</td>
-                                <td data-title="Telefone:">'.$row->fone.'</td>
-                                <td data-title="Excluir:">
-                                    <i class="fas fa-trash fa-2x" id="excluirCliente" title="Excluir" style="cursor:pointer;color:red"></i>
-                                </td>
-                                <td data-title="Editar:">
-                                    <i class="fas fa-user-edit fa-2x" id="editarCliente" title="Editar" style="cursor:pointer;color:orange"></i>
-                                </td>
-                            </tr>
-                            ';
-                        }
-                    }
-                    else
-                    {
-                    $output .= '
-                    <tr>
-                        <td colspan="11" text-align="center">Nenhum Cliente Cadastrado</td>
-                    </tr>
-                    ';
-                    }
-                    echo ($output);
             });                
             // Consultar um cliente especifico
             $app->get('/{id}', function(Request $request, Response $response){
@@ -212,39 +177,8 @@ $app->add(function ($req, $res, $next) {
         {  
             //Consultar todos produtos cadastrados     
             $app->get('/', function(Request $request, Response $response){
-                $output = '';
                 $produto = new Produto();
                 $produto = $produto->getAllProdutos();
-                //RETORNAR TABLE HTML
-                if(count($produto) > 0)
-                {
-                    foreach($produto as $row)
-                    {
-                        $output .= '
-                        <tr>
-                            <td data-title="ID:">'.$row->id.'</td>
-                            <td data-title="Produto:">'.$row->descricao.'</td>
-                            <td data-title="NCM:">'.$row->ncm.'</td>
-                            <td data-title="Preço:">'.$row->preco_custo.'</td>
-                            <td data-title="CFOP:">'.$row->CFOP.'</td>
-                            <td data-title="Excluir:">
-                                <i class="fas fa-trash fa-2x" id="excluirProduto" title="Excluir" style="cursor:pointer;color:red"></i>
-                            </td>
-                            <td data-title="Editar:">
-                                <i class="fas fa-user-edit fa-2x" id="editarProduto" title="Editar" style="cursor:pointer;color:orange"></i>
-                            </td>
-                        </tr>
-                        ';
-                    }
-                }else
-                {
-                    $output .= '
-                    <tr>
-                        <td colspan="7" text-align="center">Nenhum Produto Cadastrado</td>
-                    </tr>
-                    ';
-                }
-                echo ($output);
             });             
             // Consultar um Produto especifico
             $app->get('/{id}', function(Request $request, Response $response){
@@ -275,7 +209,6 @@ $app->add(function ($req, $res, $next) {
         {        
             $app->get('/', function(Request $request, Response $response)
             {
-                $output = '';
                 $emissor = new Emissor();
                 $emissor = $emissor->getEmissor();
                 echo json_encode($emissor);
@@ -425,39 +358,8 @@ $app->add(function ($req, $res, $next) {
         $app->group('/nf', function () use ($app) 
         {        
             $app->get('/', function(Request $request, Response $response){
-                $output = '';
                 $NF = new NF();
                 $NF = $NF->getAllNFCe();
-                //RETORNAR TABLE HTML
-                if(count($NF) > 0)
-                {
-                    foreach($NF as $row)
-                    {
-                        $output .= '
-                        <tr>
-                            <td style="display:none;">'.$row->id.'</td>
-                            <td data-title="Chave De Acesso:">'.$row->chave.'</td>
-                            <td data-title="Data de Emissão:">'.$row->dhEmi.'</td>
-                            <td data-title="CPF/CNPJ Destinatário:">'.$row->CNPJDestinatario.'</td>
-                            <td data-title="Protocolo:">'.$row->protocolo.'</td>
-                            <td data-title="Excluir:">
-                                <i class="fas fa-trash fa-2x excluir" id="'.$row->id.'" title="Excluir" style="cursor:pointer; color:red"></i>
-                            </td>
-                            <td data-title="Cancelar:">
-                                <i class="fas fa-ban fa-2x cancelar" id="'.$row->id.'" title="Cancelar" style="cursor:pointer; color:red"></i>
-                            </td>
-                        </tr>
-                        ';
-                    }
-                }else
-                {
-                    $output .= '
-                    <tr>
-                        <td colspan="4" align="center">No Data Found</td>
-                    </tr>
-                    ';
-                }
-                echo ($output);
             });    
             // Consultar uma NF especifica
             $app->get('/{id}', function(Request $request, Response $response){

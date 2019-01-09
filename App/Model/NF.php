@@ -22,12 +22,13 @@ class NF
 
     public function getAllNFCe()
     {       
-        $sql = "SELECT * FROM nf";    
+        $sql = "SELECT id, chave, dhEmi, CNPJDestinatario, protocolo FROM nf";    
         try{
             $connection = $this->connection->PDOConnect();    
             $stmt = $connection->query($sql);
             $NF = $stmt->fetchAll(PDO::FETCH_OBJ);
-            return ($NF);
+            echo json_encode($NF);            
+            $connection = null;
         }catch(PDOException $e){
             echo '{"Erro": {"text": '.$e->getMessage().'}';
         }

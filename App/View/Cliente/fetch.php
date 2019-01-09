@@ -31,6 +31,10 @@
         <!-- ======================== LINK BOOTSTRAP CSS 4.1 ================================================== -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
         <!-- ================================================================================================== -->
+            
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+  
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
     </head>
     <body>     
     <?php require_once '../Menu.php'; ?> 
@@ -38,7 +42,7 @@
             <div class="row" id="rowCliente">
                 <div class="col-md-12 mx-auto">
                     <div class="table-responsive-xl">
-                        <table class="table table-hover table-bordered mt-3 mx-auto text-center js-table-data" id="tableListarClientes">
+                        <table class="table table-hover table-bordered mt-3 mx-auto text-center js-table-data display" id="tableListarClientes">
                             <thead class="thead-dark">
                                 <tr>
                                     <th scope="col">ID</th>
@@ -54,7 +58,7 @@
                                     <th scope="col">Editar</th>
                                 </tr>
                             </thead>
-                            <tbody><tr data-expanded="true"></tr></tbody>
+                            <tbody></tbody>
                         </table>
                     </div> <!-- END #table-responsive -->
                 </div>

@@ -27,7 +27,7 @@ class Cliente {
             $connection = $this->connection->PDOConnect();
             $stmt = $connection->query($sql);
             $cliente = $stmt->fetchAll(PDO::FETCH_OBJ);
-            return ($cliente);
+            echo json_encode($cliente);
             $connection = null;
         } catch(PDOException $e){
             return '{"Erro": {"text": '.$e->getMessage().'}';

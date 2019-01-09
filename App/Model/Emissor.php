@@ -36,6 +36,7 @@ class Emissor {
             $stmt = $connection->query($sql);
             $emissor = $stmt->fetchAll(PDO::FETCH_OBJ);
             return ($emissor);
+            $connection = null;
         }catch(PDOException $e){
             echo '{"Erro": {"text": '.$e->getMessage().'}';
         }

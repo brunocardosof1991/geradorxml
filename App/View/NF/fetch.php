@@ -15,9 +15,6 @@
         <!-- Folha de estilo da página -->
         <link href="../../../css/style.css" type="text/css" rel="stylesheet">
 
-        <!-- Fontes do google -->
-        <link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet"> 
-
         <!-- Icones fonte awesome -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 
@@ -31,6 +28,9 @@
         <!-- ======================== LINK BOOTSTRAP CSS 4.1 ================================================== -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
         <!-- ================================================================================================== -->
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+  
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
     </head>
     <body>     
     <?php require_once '../Menu.php'; ?> 
@@ -38,10 +38,10 @@
             <div class="row" id="rowNF">
                 <div class="col-md-12 mx-auto">
                     <div class="table-responsive-xl">
-                    <table class="table table-hover table-bordered mx-auto text-center js-table-data" id="tableListarNF">
+                    <table class="table table-hover table-bordered mx-auto text-center js-table-data display" id="tableListarNF">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th style="display:none;">ID</th>
+                                    <th>ID</th>
                                     <th>Chave De Acesso</th>
                                     <th>Data de Emissão</th>
                                     <th>CPF/CNPJ Destinatário</th>
@@ -50,7 +50,7 @@
                                     <th>Cancelar</th>
                                 </tr>
                             </thead>
-                            <tbody><tr data-expanded="true"></tr></tbody>
+                            <tbody></tbody>
                         </table>
                     </div> <!-- END #table-responsive -->
                 </div>

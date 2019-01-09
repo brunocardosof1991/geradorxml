@@ -23,7 +23,8 @@ class Produto {
             $connection = $this->connection->PDOConnect();    
             $stmt = $connection->query($sql);
             $produto = $stmt->fetchAll(PDO::FETCH_OBJ);
-            return ($produto);
+            echo json_encode ($produto);            
+            $connection = null;
         }catch(PDOException $e){
             echo '{"Erro": {"text": '.$e->getMessage().'}';
         }

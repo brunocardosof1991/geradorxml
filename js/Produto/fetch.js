@@ -1,14 +1,36 @@
-$(document).ready(function(){
-    fetchAll();  
-    function fetchAll() 
-    {        
-        $.ajax({
-            method: 'get',
-            url: 'http://localhost/geradorXml/App/public/api/produto/'
-        }).done(function(data) {
-			$("#container").find('table tbody').html(data);            
-        });
-    }
+$(document).ready(function(){            
+    var table = $("#tableListarProdutos").DataTable({
+    pagingType: "full_numbers",
+    responsive: true,
+    ajax: {
+        url: 'http://localhost/geradorXml/App/public/api/produto/',
+        method: "get",
+        dataSrc: ""
+    },
+    columns: 
+    [
+        { data: "id" },
+        { data: "descricao" },
+        { data: "ncm" },
+        { data: "preco_custo" },
+        { data: "CFOP" },
+        { data: "Editar" },
+        { data: "Excluir" }
+    ],
+    columnDefs: 
+    [ 
+        {
+            targets: [-1],
+            data: null,
+            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-user-edit fa-2x' id='editarProduto' style='cursor:pointer;color:orange'></i></a></div>"
+        },
+        {
+            targets: [-2],
+            data: null,
+            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-trash fa-2x' id='excluirProduto' style='cursor:pointer;color:red'></i></a></div>"
+        }
+    ]
+    });
     $(document).on('click', '#excluirProduto',function() {       
         var id = $(this).closest('tr').children('td:eq(0)').text();
         var produto = $(this).closest('tr').children('td:eq(1)').text();
@@ -21,7 +43,7 @@ $(document).ready(function(){
             }).done(function(data){
                 if(data == '{"Aviso": {"text": "Produto Deletado"}')
                 {
-                    alert(produto+' Deletedo Com Sucesso!!');   
+                    alert(produto+' Foi Deletedo Com Sucesso!!');   
                 }   
                 location = location;        
             });          

@@ -1,14 +1,40 @@
-$(document).ready(function () {   
-    fetchAll();
-    function fetchAll() 
-    {        
-        $.ajax({
-            method: 'get',
-            url: 'http://localhost/geradorXml/App/public/api/cliente/'
-        }).done(function(data) {
-			$("#container").find('table tbody').html(data);            
-        });
-    }        
+$(document).ready(function () {             
+    var table = $("#tableListarClientes").DataTable({
+    pagingType: "full_numbers",
+    responsive: true,
+    ajax: {
+        url: 'http://localhost/geradorXml/App/public/api/cliente/',
+        method: "get",
+        dataSrc: ""
+    },
+    columns: 
+    [
+        { data: "id" },
+        { data: "nome" },
+        { data: "CNPJ" },
+        { data: "endereco" },
+        { data: "numero" },
+        { data: "complemento" },
+        { data: "bairro" },
+        { data: "CEP" },
+        { data: "fone" },
+        { data: "Editar" },
+        { data: "Excluir" }
+    ],
+    columnDefs: 
+    [ 
+        {
+            targets: [-1],
+            data: null,
+            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-user-edit fa-2x' id='editarProduto' style='cursor:pointer;color:orange'></i></a></div>"
+        },
+        {
+            targets: [-2],
+            data: null,
+            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-trash fa-2x' id='excluirProduto' style='cursor:pointer;color:red'></i></a></div>"
+        }
+    ]
+    }); 
     $(document).on('click', '#excluirCliente',function() {       
         var id = $(this).closest('tr').children('td:eq(0)').text();
         var nome = $(this).closest('tr').children('td:eq(1)').text();
