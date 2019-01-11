@@ -53,11 +53,14 @@
                             <tbody></tbody>
                         </table>
                     </div> <!-- END #table-responsive -->
+                <div class="col-md-12" id="colButton">
+                    <button id="inutilzarNF">Inutilizar Números</button>
+                </div>
                 </div>
             </div> <!-- END .row -->
         </div> <!-- END .container --> 
         <?php require_once '../../Components/Modal.html'; ?> 
-        <?php require_once '../../Components/FormNF.html'; ?>         
+        <?php require_once '../../Components/FormInutilizar.html'; ?>         
         <?php require_once '../../View/Footer.php'; ?>
     </body>
 </html>

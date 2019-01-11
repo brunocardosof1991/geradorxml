@@ -70,6 +70,7 @@ class Cliente {
             $stmt->bindParam(':CEP',      $CEP);
             $stmt->bindParam(':fone',      $fone);
             $stmt->execute();
+            $connection = null;
             echo json_encode('{"success": "Cliente Adicionado"}');
         } catch(PDOException $e){
             echo '{"error": '.$e->getMessage().'}';
@@ -110,6 +111,7 @@ class Cliente {
             $stmt->bindParam(':CEP',      $CEP);
             $stmt->bindParam(':fone',      $fone);
             $stmt->execute();
+            $connection = null;
             echo json_encode('{"success": "Cliente Atualizado"}');
         } catch(PDOException $e){
             echo '{"error": '.$e->getMessage().'}';

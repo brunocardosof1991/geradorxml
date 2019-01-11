@@ -113,5 +113,36 @@ $(document).ready(function () {
                 }
             });
         }// END Confirm
+    });// END Cancelar NFCe
+    
+    $(document).on('click', '#inutilzarNF',function() {
+        //Resetar Modal
+        $('#apiModal').on('shown.bs.modal', function (e) {
+            $(this)
+              .find("input,textarea,select")
+                 .val('')
+                 .end()
+              .find("input[type=checkbox], input[type=radio]")
+                 .prop("checked", "")
+                 .end();
+        });
+        $("#apiModal .modal-title").text('Inutilizar Números');
+        $("#apiModal .modal-body p").hide();
+        //Mostrar Modal
+        $("#apiModal").modal('show');
+        $("#apiModal .modal-footer .action").text('Inutilizar').show(); 
+        $("#apiModal .modal-body").append($('#formInutilizar').show());
+        $("#apiModal .modal-footer .action").on('click',function(){
+            let inicio = $('#inputInicio').val();
+            let fim = $('#inputFim').val();
+            $.ajax({
+                method:'post',
+                url: 'http://localhost/geradorXml/App/public/api/inutilizar',
+                dataType: 'json',
+                data:{inicio:inicio, fim:fim}
+            }).done(function(data){
+                console.log(data);
+            });
+        });
     });
 });

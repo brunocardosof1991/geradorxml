@@ -26,6 +26,19 @@ $app->add(function ($req, $res, $next) {
     // Rota para o grupo API
     $app->group('/api', function () use ($app) 
     { 
+        $app->post('/cappta', function(Request $request, Response $response)
+        { 
+            
+        });
+        $app->post('/inutilizar', function(Request $request, Response $response)
+        { 
+            $xml = new Xml();
+            $inicio = $request->getParam('inicio');
+            $fim = $request->getParam('fim');
+            $xml->inutilizarXml($inicio,$fim);
+            echo json_encode('{"success": "Numeracao Inutilizada"}');
+            echo exec('move c:\xampp\htdocs\geradorXml\App\public\*-ped-inu.xml c:\Unimake\UniNFe\12291758000105\nfce\Envio > nul');
+        });
         // Rota para a criação do XML de cancelamento
         // NF/fetch.js
         $app->post('/cancelarNFCe', function(Request $request, Response $response)
@@ -103,7 +116,7 @@ $app->add(function ($req, $res, $next) {
                 echo '{"error": '.$e->getMessage().'}';
             }   
         });//END /autorizarNFCe
-        //Rota para verificar se o xml foi autorizado && salvar NF no banco de dados c/ protocolo de autorização, nome e CNPJ do destinatário
+        //Rota para verificar se o xml foi autorizado && salvar NF no banco de dados c/ protocolo de autorização
         // As informações salva no banco de dados serão úteis para o cancelamento da NFC-e
         $app->post('/autorizarNFCe/true', function(Request $request, Response $response)
         { 

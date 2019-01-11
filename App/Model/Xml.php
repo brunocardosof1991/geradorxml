@@ -21,7 +21,7 @@ class Xml
         'cNF' => 'DEFAULT',
         'natOp' => 'Venda de mercadorias',
         'mod' => '65',
-        'serie' => '000',
+        'serie' => '001',
         'nNF' => 'DEFAULT',
         'dhEmi' => 'DEFAULT',
         'tpNF' => '1',
@@ -562,5 +562,36 @@ class Xml
                     $xJust = $detEvento->appendChild($dom->createElement('xJust'));
                     $xJust->appendChild($dom->createTextNode('NFC-e enviado em duplicidade'));
         $dom->save($chave.'-ped-eve.xml');        
+    }
+    public function inutilizarXml($inicio,$fim)
+    {
+        $id = $this->ide['cUF'].date('y').$this->emit['CNPJ'].$this->ide['mod'].$this->ide['serie'].$inicio.$fim;
+        $dom = new DOMDocument('1.0','utf-8');
+        $inutNFe = $dom->appendChild($dom->createElement('inutNFe'));
+        $inutNFe->setAttributeNode(new DOMAttr('xmlns','http://www.portalfiscal.inf.br/nfe'));
+        $inutNFe->setAttributeNode(new DOMAttr('versao','4.00'));
+            $infInut   = $inutNFe->appendChild($dom->createElement('inutNFe'));
+            $infInut ->setAttributeNode(new DOMAttr('id','ID'.$id));                
+                $tpAmb = $infInut->appendChild($dom->createElement('tpAmb'));
+                $tpAmb->appendChild($dom->createTextNode($this->ide['tpAmb']));
+                $xServ = $infInut->appendChild($dom->createElement('xServ'));
+                $xServ->appendChild($dom->createTextNode('INUTILIZAR'));
+                $cUF = $infInut->appendChild($dom->createElement('cUF'));
+                $cUF->appendChild($dom->createTextNode($this->ide['cUF']));
+                $ano = $infInut->appendChild($dom->createElement('ano'));
+                $ano->appendChild($dom->createTextNode(date('y')));
+                $CNPJ = $infInut->appendChild($dom->createElement('CNPJ'));
+                $CNPJ->appendChild($dom->createTextNode($this->emit['CNPJ']));
+                $mod = $infInut->appendChild($dom->createElement('mod'));
+                $mod->appendChild($dom->createTextNode($this->ide['mod']));
+                $serie = $infInut->appendChild($dom->createElement('serie'));
+                $serie->appendChild($dom->createTextNode(substr($this->ide['serie'], -1, 1)));
+                $nNFIni = $infInut->appendChild($dom->createElement('nNFIni'));
+                $nNFIni->appendChild($dom->createTextNode(substr($inicio,6,3)));
+                $nNFFin = $infInut->appendChild($dom->createElement('nNFFin'));
+                $nNFFin->appendChild($dom->createTextNode(substr($fim,6,3)));
+                $xJust = $infInut->appendChild($dom->createElement('xJust'));
+                $xJust->appendChild($dom->createTextNode('Erro interno no sistema'));
+        $dom->save($id.'-ped-inu.xml'); 
     }
 }

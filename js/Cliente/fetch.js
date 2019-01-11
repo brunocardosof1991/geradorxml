@@ -26,7 +26,7 @@ $(document).ready(function () {
         {
             targets: [-1],
             data: null,
-            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-user-edit fa-2x' id='editarProduto' style='cursor:pointer;color:orange' title='Editar'></i></a></div>"
+            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-user-edit fa-2x' id='editarCliente' style='cursor:pointer;color:orange' title='Editar'></i></a></div>"
         },
         {
             targets: [-2],
@@ -64,7 +64,6 @@ $(document).ready(function () {
         var bairroTable = $(this).closest('tr').children('td:eq(6)').text();
         var CEPTable = $(this).closest('tr').children('td:eq(7)').text();
         var foneTable = $(this).closest('tr').children('td:eq(8)').text();
-        console.log((nomeTable));
         $("#apiModal .modal-body .chart").remove(); 
         $("#apiModal .modal-body p").remove(); 
         $("h1").remove(); 
@@ -96,7 +95,8 @@ $(document).ready(function () {
                 data:{id:id, nome:nome, CNPJ:CNPJ, endereco:endereco, numero:numero, 
                     complemento:complemento, bairro:bairro, CEP:CEP, fone:fone }
             }).done(function(data){
-                if(data == '{"success": "Cliente Adicionado"}')
+                console.log((data));
+                if(data == '{"success": "Cliente Atualizado"}')
                 {
                     alert('Cliente Atualizado');
                     location = location;  
