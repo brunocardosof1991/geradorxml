@@ -16,7 +16,7 @@ class Produto {
         $this->connection = new Conexao();
     }
 
-    public function getAllProdutos()
+    public function getAll()
     {        
         $sql = "SELECT * FROM produto";    
         try{
@@ -26,22 +26,23 @@ class Produto {
             echo json_encode ($produto);            
             $connection = null;
         }catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
-    public function getProduto($id)
+    public function get($id)
     {        
         $sql = "SELECT * FROM produto WHERE id = {$id}";    
         try{
             $connection = $this->connection->PDOConnect();    
             $stmt = $connection->query($sql);
             $produto = $stmt->fetchAll(PDO::FETCH_OBJ);
-            return ($produto);
+            $connection = null;
+            echo json_encode($produto);
         }catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
-    public function addProduto($request)
+    public function add($request)
     {        
         $descricao = $request->getParam('descricao');
         $ncm = $request->getParam('ncm');
@@ -57,12 +58,12 @@ class Produto {
             $stmt->bindParam(':preco_custo',    $preco_custo);
             $stmt->bindParam(':CFOP',       $CFOP);
             $stmt->execute();
-            echo json_encode('{"Aviso": {"text": "Produto Adicionado"}');
+            echo json_encode('{"success": "Produto Adicionado"}');
         } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
-    public function updateProduto($request)
+    public function update($request)
     {
         $id = $request->getParam('id');
         $descricao = $request->getParam('descricao');
@@ -84,23 +85,24 @@ class Produto {
             $stmt->bindParam(':NCM',      $ncm);    
             $stmt->bindParam(':preco_custo',      $preco_custo); 
             $stmt->bindParam(':CFOP',      $CFOP);     
-            $stmt->execute();   
-            echo json_encode('{"Aviso": {"text": "Produto Atualizado"}');    
+            $stmt->execute(); 
+            $connection = null;  
+            echo json_encode('{"success": "Produto Atualizado"}');    
         } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
-    public function deleteProduto($id)
+    public function delete($id)
     {    
         $sql = "DELETE FROM produto WHERE id = {$id}";    
         try{
             $connection = $this->connection->PDOConnect();   
             $stmt = $connection->prepare($sql);
             $stmt->execute();
-            $db = null;
-            echo '{"Aviso": {"text": "Produto Deletado"}';
+            $connection = null;
+            echo '{"success": "Produto Deletado"}';
         } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
 }

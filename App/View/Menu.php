@@ -33,7 +33,6 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
                 <a class="dropdown-item" href="http://localhost/geradorXml/App/View/Produto/fetch.php">Listar Produtos</a>
-                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/Produto/cadastrar.php">Cadastar Produto</a>
             </div>
         </li>
         <li class="nav-item dropdown">
@@ -52,7 +51,8 @@
                     Configurações
                 </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
-                <a class="dropdown-item" href="/geradorXml/App/View/Emissor/fetch.php" id="navbarCadastrarEmpresa">Cadastrar Empresa</a>
+                <a class="dropdown-item" href="/geradorXml/App/View/Emissor/fetchEmit.php" id="navbarCadastrarEmpresa">Cadastrar Empresa</a>
+                <a class="dropdown-item" href="/geradorXml/App/View/Emissor/fetchIde.php" id="navbarCadastrarEmpresa">Cadastrar Identificação da NFC-e</a>
             </div>
        </li>    
     </ul>

@@ -10,8 +10,6 @@ class NF
     private $cNF;
     private $nNF;
     private $dhEmi;
-    private $CNPJDestinatario;
-    private $xNomeDestinatario;
     private $protocolo;
     private $connection = '';
 
@@ -20,9 +18,9 @@ class NF
         $this->connection = new Conexao();    
     }
 
-    public function getAllNFCe()
+    public function getAll()
     {       
-        $sql = "SELECT id, chave, dhEmi, CNPJDestinatario, protocolo FROM nf";    
+        $sql = "SELECT id, chave, dhEmi, protocolo FROM nf";    
         try{
             $connection = $this->connection->PDOConnect();    
             $stmt = $connection->query($sql);
@@ -30,10 +28,10 @@ class NF
             echo json_encode($NF);            
             $connection = null;
         }catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
-    public function getNFCe($id)
+    public function get($id)
     {
         $id = $request->getAttribute('id');    
         $sql = "SELECT * FROM nf WHERE id = {$id}";    
@@ -41,23 +39,21 @@ class NF
             $connection = $this->connection->PDOConnect();  
             $stmt = $connection->query($sql);
             $NF = $stmt->fetch(PDO::FETCH_OBJ);
-            $db = null;
-            return ($NF);
+            $connection = null;
+            echo  json_encode($NF);
         } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
-    public function addNFCe($request)
+    public function add($request)
     {
         $id = $request->getParam('id');
         $chave = $request->getParam('chave');
         $cNF = $request->getParam('cNF');
         $nNF = $request->getParam('nNF');
-        $dhEmi = $request->getParam('dhEmi');
-        $CNPJDestinatario = $request->getParam('CNPJDestinatario');
-        $xNomeDestinatario = $request->getParam('xNomeDestinatario');    
-        $sql = "INSERT INTO nf (id,chave,cNF,nNF,dhEmi,CNPJDestinatario,xNomeDestinatario) VALUES
-        (:id,:chave,:cNF,:nNF,:dhEmi,:CNPJDestinatario,:xNomeDestinatario)";    
+        $dhEmi = $request->getParam('dhEmi');  
+        $sql = "INSERT INTO nf (id,chave,cNF,nNF,dhEmi) VALUES
+        (:id,:chave,:cNF,:nNF,:dhEmi)";    
         try{
             $connection = $this->connection->PDOConnect();  
             $stmt = $connection->prepare($sql);    
@@ -66,31 +62,26 @@ class NF
             $stmt->bindParam(':cNF',      $cNF);
             $stmt->bindParam(':nNF',      $nNF);
             $stmt->bindParam(':dhEmi',    $dhEmi);
-            $stmt->bindParam(':CNPJDestinatario',       $CNPJDestinatario);
-            $stmt->bindParam(':xNomeDestinatario',      $xNomeDestinatario);    
-            $stmt->execute();    
-            echo '{"Aviso": {"text": "NF Adicionada"}';    
+            $stmt->execute();   
+            $connection = null; 
+            echo '{"success": "NF Adicionada"}';    
         } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
-    public function updateNFCe($request)
+    public function update($request)
     {
         $id = $request->getParam('id');
         $chave = $request->getParam('chave');
         $cNF = $request->getParam('cNF');
         $nNF = $request->getParam('nNF');
-        $dhEmi = $request->getParam('dhEmi');
-        $CNPJDestinatario = $request->getParam('CNPJDestinatario');
-        $xNomeDestinatario = $request->getParam('xNomeDestinatario');    
+        $dhEmi = $request->getParam('dhEmi'); 
         $sql = "UPDATE nf SET
                     id 	= :id,
                     chave 	= :chave,
                     cNF		= :cNF,
                     nNF		= :nNF,
-                    dhEmi 	= :dhEmi,
-                    CNPJDestinatario 		= :CNPJDestinatario,
-                    xNomeDestinatario		= :xNomeDestinatario
+                    dhEmi 	= :dhEmi
                 WHERE id = $id";    
         try{
             $connection = $this->connection->PDOConnect();  
@@ -100,28 +91,24 @@ class NF
             $stmt->bindParam(':cNF',      $cNF);
             $stmt->bindParam(':nNF',      $nNF);
             $stmt->bindParam(':dhEmi',    $dhEmi);
-            $stmt->bindParam(':CNPJDestinatario',       $CNPJDestinatario);
-            $stmt->bindParam(':xNomeDestinatario',      $xNomeDestinatario);    
             $stmt->execute();    
-            echo '{"Aviso": {"text": "NF Atualizada"}';    
+            $connection = null;
+            echo '{"success": "NF Atualizada"}';    
         } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": {"text": '.$e->getMessage().'}';
         }
     }
-    public function deleteNFCe($id)
+    public function delete($id)
     {    
         $sql = "DELETE FROM nf WHERE id = {$id}";    
         try{
-            // Get DB Object
-            $db = new Conexao();
-            // Connect
-            $db = $db->PDOConnect();    
-            $stmt = $db->prepare($sql);
+            $connection = $this->connection->PDOConnect();    
+            $stmt = $connection->prepare($sql);
             $stmt->execute();
-            $db = null;
-            echo '{"Aviso": {"text": "NF Deletada"}';
+            $connection = null;
+            echo '{"success": "NF Deletada"}';
         } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
 }

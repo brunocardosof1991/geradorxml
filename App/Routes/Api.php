@@ -9,6 +9,7 @@ use App\Model\NF;
 use App\Model\Emissor;
 
 $app = new \Slim\App;
+$xml = new Xml();
 
 $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response;
@@ -21,16 +22,52 @@ $app->add(function ($req, $res, $next) {
             ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
             ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 });
-    // Rotas:Cliente, Produto, Emissor e NF
+    // Rotas:NF E Eventos NF, Cliente, Produto, Emissor
     // Rota para o grupo API
     $app->group('/api', function () use ($app) 
-    {
-        // Rota para o autorizar XML
-        $app->post('/autorizarXml', function(Request $request, Response $response)
-        {          
+    { 
+        // Rota para a criação do XML de cancelamento
+        // NF/fetch.js
+        $app->post('/cancelarNFCe', function(Request $request, Response $response)
+        {
+            $xml = new Xml();
+            $protocolo = $request->getParam('protocolo');
+            $chave = $request->getParam('chave');
+            $xml->cancelarXml($protocolo, $chave);
+            echo json_encode('{"success": "XML Cancelado"}');
+            file_put_contents('chaveDeAcesso.txt',substr_replace($chave,'', 0, 3));
+            echo exec('move c:\xampp\htdocs\geradorXml\App\public\*-ped-eve.xml c:\Unimake\UniNFe\12291758000105\nfce\Envio > nul');
+        });
+        //Rota para verificar <cStat>135</cStat><xMotivo>Evento registrado e vinculado a NF-e</xMotivo>
+        $app->post('/cancelarNFCe/true', function(Request $request, Response $response)
+        { 
+            $data = new DateTime('now', new DateTimeZone( 'America/Sao_Paulo'));
+            $YM = substr_replace($data->format('Y-m'), '', -3, -2);
+            //Coletar a chave de acesso salva na rota /autirzarXml 
+            $chave = file_get_contents("chaveDeAcesso.txt");
+            $chave .= '_110111_01-procEventoNFe.xml';
+            $xmlAutorizado = glob("C:/Unimake/UniNFe/12291758000105/nfce/Enviado/Autorizados/$YM/$chave");
+            $xmlAutorizado2 = end($xmlAutorizado);
+            $xmlAutorizadoToString = print_r($xmlAutorizado2,true);
+            $data = array();
+            //Se a NFC-e foi cancelada...
+            if(!empty($xmlAutorizadoToString)) {
+                $xml = new Xml();
+                //$xml->salvarNFCancelada($protocolo);
+                echo exec('del /f "chaveDeAcesso.txt"');
+                $data = 'success';
+            } else {        
+                $data = 'error';
+            }
+            echo json_encode($data);
+        });  
+        //Rota para a criação do XML de autorização
+        $app->post('/autorizarNFCe', function(Request $request, Response $response)
+        {
             $file1Array = json_decode($request->getParam('json'),true);
             $produto = json_decode($request->getParam('produto'),true);
             $xml = new Xml();
+            //Destinatário
             $xml->dest['ID'] = $file1Array[0]['clientID'];
             $xml->dest['xNome'] = $file1Array[0]['inputName'];
             $xml->dest['CNPJ'] = $file1Array[0]['inputRegistro'];
@@ -40,7 +77,7 @@ $app->add(function ($req, $res, $next) {
             $xml->enderDest['xBairro'] = $file1Array[0]['inputBairro'];
             $xml->enderDest['CEP'] = $file1Array[0]['inputCEP'];
             $xml->enderDest['fone'] = $file1Array[0]['inputFone'];
-    
+            //Forma de Pagamento
             if($file1Array[1]['payment'] == 01 || $file1Array[1]['payment']== 02)
             {
                 $xml->detPag['tPag'] = $file1Array[1]['payment'];
@@ -54,20 +91,21 @@ $app->add(function ($req, $res, $next) {
                 $xml->card['tBand'] = $file1Array[1]['bandeira'];
                 $xml->card['cAut'] = $file1Array[0]['codigoSeguranca'];        
             }
+            //Informações Adicionais NFC-e - Text Area
             $informacoesAdicionais = $file1Array[2];
             try {
                 file_put_contents('chaveDeAcesso.txt',$xml->gerarChaveDeAcesso());
                 $xml->autorizarXML($informacoesAdicionais,$produto);
-                $xml->saidaProduto($produto);
-                echo json_encode('XML Criado Com Sucesso');                
+                //$xml->saidaProduto($produto);
+                echo json_encode('{"success": "XML Autorizado"}');                
                 echo exec('move c:\xampp\htdocs\geradorXml\App\public\*-nfe.xml c:\Unimake\UniNFe\12291758000105\nfce\Envio > nul');
             } catch (\Throwable $e) {
-                echo '{"Erro": {"text": '.$e->getMessage().'}';
+                echo '{"error": '.$e->getMessage().'}';
             }   
-        });
+        });//END /autorizarNFCe
         //Rota para verificar se o xml foi autorizado && salvar NF no banco de dados c/ protocolo de autorização, nome e CNPJ do destinatário
         // As informações salva no banco de dados serão úteis para o cancelamento da NFC-e
-        $app->post('/autorizarXml/true', function(Request $request, Response $response)
+        $app->post('/autorizarNFCe/true', function(Request $request, Response $response)
         { 
             $data = new DateTime('now', new DateTimeZone( 'America/Sao_Paulo'));
             $YM = substr_replace($data->format('Y-m'), '', -3, -2);
@@ -91,84 +129,46 @@ $app->add(function ($req, $res, $next) {
                 {
                     $sub = substr($NFCe, strpos($NFCe,$fromP)+strlen($fromP),strlen($NFCe));
                     return substr($sub,0,strpos($sub,$toP));
-                }
-                //Coletar o Nome e CNPJ do destinatário da NFC-e autorizada
-                // PQ os dois juntos? Pois existe 2 <xNome> e <CNPJ>, do emissor e do destinatario
-                // Essa função n consegue ir direto no destinatário, que vem depois do emissor,então peguei os dois juntos
-                // TALVEZ usando algo equivalente ao next da função de array, solucione o problema                
-                //Começo da coleta
-                $from = "<dest>";
-                //Fim da coleta
-                $to = "<enderDest>";
-                function getNomeCNPJ($NFCe,$from,$to)
-                {
-                    $sub = substr($NFCe, strpos($NFCe,$from)+strlen($from),strlen($NFCe));
-                    return substr($sub,0,strpos($sub,$to));
-                }
-                //Coletar o nome do destinatario da função getNomeCNPJ
-                $fromN = "<xNome>";
-                $toN = "</xNome>";
-                $stringN = getNomeCNPJ($NFCe,$from,$to);
-                function getNome($stringN,$fromN,$toN)
-                {
-                    $sub = substr($stringN, strpos($stringN,$fromN)+strlen($fromN),strlen($stringN));
-                    return substr($sub,0,strpos($sub,$toN));
-                }
-                //Coletar o CNPJ do destinatario da função getNomeCNPJ
-                $fromC = "<CNPJ>";
-                $toC = "</CNPJ>";
-                $stringC = getNomeCNPJ($NFCe,$from,$to);
-                function getCNPJ($stringC,$fromC,$toC)
-                {
-                    $sub = substr($stringC, strpos($stringC,$fromC)+strlen($fromC),strlen($stringC));
-                    return substr($sub,0,strpos($sub,$toC));
-                }
+                }  
                 $protocolo = getProtocolo($NFCe,$fromP,$toP);
-                $nome = getNome($stringN,$fromN,$toN);
-                $CNPJ = getCNPJ($stringC,$fromC,$toC);
                 $xml = new Xml();
-                $xml->salvarNF($protocolo,$nome,$CNPJ);
+                $xml->salvarNF($protocolo);
                 echo exec('del /f "chaveDeAcesso.txt"');
                 $data = 'success';
-                //OBS:
-                //Porque a criação das 4 funções anonimas para coletar o protocolo de autorização, CNPJ e nome do destinatário?
-                //Poderia simplismente usar OOP na classe XML o colocar as respectivas informações, menos o protocolo que é criado na autorização.
-                //Na rota /autorizarXml os arrays do destinatários estão sendo preenchidos com os inputs vindo do frontend,
-                //mas por algum motivo a rota /autorizarXml/true não esta conseguindo acessar o espaço de memória que estão guardadas essas informações
             } else {        
                 $data = 'error';
             }
             echo json_encode($data);
-        });
+        });//END /autorizarNFCe/true
         // Rota para o grupo Cliente
         $app->group('/cliente', function () use ($app) 
         {        
             $app->get('/', function(Request $request, Response $response)
             {
                 $cliente = new Cliente();
-                $cliente = $cliente->getAllClients();
+                $cliente = $cliente->getAll();
             });                
             // Consultar um cliente especifico
             $app->get('/{id}', function(Request $request, Response $response){
                 $id = $request->getAttribute('id');   
                 $cliente = new Cliente();
-                $cliente = $cliente->getClient($id); 
+                $cliente = $cliente->get($id); 
             });    
             // Adicionar Cliente
             $app->post('/add', function(Request $request, Response $response){            
                 $cliente = new Cliente();
-                $cliente = $cliente->addClient($request); 
+                $cliente = $cliente->add($request); 
             });
             // Atualizar Cliente
             $app->put('/update/{id}', function(Request $request, Response $response){
                 $cliente = new Cliente();
-                $cliente = $cliente->updateClient($request);
+                $cliente = $cliente->update($request);
             });
             // Deletar Cliente
             $app->delete('/delete/{id}', function(Request $request, Response $response){
                 $id = $request->getAttribute('id');
                 $cliente = new Cliente();
-                $cliente = $cliente->deleteClient($id);
+                $cliente = $cliente->delete($id);
             });
         });// END Group /Cliente
         //**************************************************************************************************/    
@@ -178,210 +178,88 @@ $app->add(function ($req, $res, $next) {
             //Consultar todos produtos cadastrados     
             $app->get('/', function(Request $request, Response $response){
                 $produto = new Produto();
-                $produto = $produto->getAllProdutos();
+                $produto = $produto->getAll();
             });             
             // Consultar um Produto especifico
             $app->get('/{id}', function(Request $request, Response $response){
                 $id = $request->getAttribute('id');
                 $produto = new Produto();
-                $produto = $produto->getProduto($id);
+                $produto = $produto->get($id);
             });    
             // Adicionar Produto            
             $app->post('/add', function(Request $request, Response $response){            
                 $produto = new Produto();
-                $produto = $produto->addProduto($request); 
+                $produto = $produto->add($request); 
             });   
             // Atualizar Produto
             $app->put('/update/{id}', function(Request $request, Response $response){
                 $produto = new Produto();
-                $produto = $produto->updateProduto($request);
+                $produto = $produto->update($request);
             });    
             // Deletar Produto
             $app->delete('/delete/{id}', function(Request $request, Response $response){
                 $id = $request->getAttribute('id');
                 $produto = new Produto();
-                $produto = $produto->deleteProduto($id);
+                $produto = $produto->delete($id);
             });
         });//END grupo Produto        
         //**************************************************************************************************/
         // Rota para o grupo Emissor
         $app->group('/emissor', function () use ($app) 
         {        
+            //Consultar Emissor Cadastrado
+            //É permitido somente 1   
             $app->get('/', function(Request $request, Response $response)
             {
                 $emissor = new Emissor();
-                $emissor = $emissor->getEmissor();
-                echo json_encode($emissor);
+                $emissor = $emissor->get();
             });   
             // Adicionar Emissor
             $app->post('/add', function(Request $request, Response $response){
-                $id = $request->getParam('id');
-                $CNPJ = $request->getParam('CNPJ');
-                $xNome = $request->getParam('xNome');
-                $xLgr = $request->getParam('xLgr');
-                $xFant = $request->getParam('xFant');
-                $nro = $request->getParam('nro');
-                $xBairro = $request->getParam('xBairro');    
-                $cMun = $request->getParam('cMun');    
-                $xMun = $request->getParam('xMun');    
-                $UF = $request->getParam('UF');    
-                $CEP = $request->getParam('CEP');    
-                $cPais = $request->getParam('cPais');    
-                $xPais = $request->getParam('xPais');    
-                $fone = $request->getParam('fone');    
-                $IE = $request->getParam('IE');    
-                $IM = $request->getParam('IM');    
-                $crt = $request->getParam('CRT');    
-                $cnae = $request->getParam('CNAE');    
-                $sql = "INSERT INTO emissor (id,CNPJ,xNome,xLgr,xFant,nro,xBairro,cMun,xMun,UF,CEP,cPais,xPais,fone,IE,IM,crt,cnae) VALUES
-                (:id,:CNPJ,:xNome,:xLgr,:xFant,:nro,:xBairro,:cMun,:xMun,:UF,:CEP,:cPais,:xPais,:fone,:IE,:IM,:CRT,:CNAE)";    
-                try{
-                    // Get DB Object
-                    $db = new Conexao();
-                    // Connect
-                    $db = $db->PDOConnect();    
-                    $stmt = $db->prepare($sql);    
-                    $stmt->bindParam(':id', $id);
-                    $stmt->bindParam(':CNPJ',  $CNPJ);
-                    $stmt->bindParam(':xNome',      $xNome);
-                    $stmt->bindParam(':xLgr',      $xLgr);
-                    $stmt->bindParam(':xFant',    $xFant);
-                    $stmt->bindParam(':nro',       $nro);
-                    $stmt->bindParam(':xBairro',      $xBairro);    
-                    $stmt->bindParam(':cMun',      $cMun);    
-                    $stmt->bindParam(':xMun',      $xMun);    
-                    $stmt->bindParam(':UF',      $UF);    
-                    $stmt->bindParam(':CEP',      $CEP);    
-                    $stmt->bindParam(':cPais',      $cPais);    
-                    $stmt->bindParam(':xPais',      $xPais);    
-                    $stmt->bindParam(':fone',      $fone);    
-                    $stmt->bindParam(':IE',      $IE);    
-                    $stmt->bindParam(':IM',      $IM);    
-                    $stmt->bindParam(':CRT',      $CRT);    
-                    $stmt->bindParam(':CNAE',      $CNAE);    
-                    $stmt->execute();    
-                    echo json_encode('{"Aviso": {"text": "Emissor Adicionado"}');    
-                } catch(PDOException $e){
-                    echo '{"Erro": {"text": '.$e->getMessage().'}';
-                }
+                $emissor = new Emissor();
+                $emissor = $emissor->add();
             });    
             // Atualizar Emissor
             $app->put('/update/{id}', function(Request $request, Response $response){
-                $id = $request->getParam('id');
-                $CNPJ = $request->getParam('CNPJ');
-                $xNome = $request->getParam('xNome');
-                $xLgr = $request->getParam('xLgr');
-                $xFant = $request->getParam('xFant');
-                $nro = $request->getParam('nro');
-                $xBairro = $request->getParam('xBairro');    
-                $cMun = $request->getParam('cMun');    
-                $xMun = $request->getParam('xMun');    
-                $UF = $request->getParam('UF');    
-                $CEP = $request->getParam('CEP');    
-                $cPais = $request->getParam('cPais');    
-                $xPais = $request->getParam('xPais');    
-                $fone = $request->getParam('fone');    
-                $IE = $request->getParam('IE');    
-                $IM = $request->getParam('IM');    
-                $CRT = $request->getParam('CRT');    
-                $CNAE = $request->getParam('CNAE');     
-                $sql = "UPDATE emissor SET
-                id=:id,
-                CNPJ=:CNPJ,
-                xNome=:xNome,
-                xLgr=:xLgr,
-                xFant=:xFant,
-                nro=:nro,
-                xBairro=:xBairro,
-                cMun=:cMun,
-                xMun=:xMun,
-                UF=:UF,
-                CEP=:CEP,
-                cPais=:cPais,
-                xPais=:xPais,
-                fone=:fone,
-                IE=:IE,
-                IM=:IM,
-                CRT=:CRT,
-                CNAE=:CNAE
-                        WHERE id = $id";    
-                try{
-                    // Get DB Object
-                    $db = new Conexao();
-                    // Connect
-                    $db = $db->PDOConnect();    
-                    $stmt = $db->prepare($sql);   
-                    $stmt->bindParam(':id', $id);
-                    $stmt->bindParam(':CNPJ',  $CNPJ);
-                    $stmt->bindParam(':xNome',      $xNome);
-                    $stmt->bindParam(':xLgr',      $xLgr);
-                    $stmt->bindParam(':xFant',    $xFant);
-                    $stmt->bindParam(':nro',       $nro);
-                    $stmt->bindParam(':xBairro',      $xBairro);    
-                    $stmt->bindParam(':cMun',      $cMun);    
-                    $stmt->bindParam(':xMun',      $xMun);    
-                    $stmt->bindParam(':UF',      $UF);    
-                    $stmt->bindParam(':CEP',      $CEP);    
-                    $stmt->bindParam(':cPais',      $cPais);    
-                    $stmt->bindParam(':xPais',      $xPais);    
-                    $stmt->bindParam(':fone',      $fone);    
-                    $stmt->bindParam(':IE',      $IE);    
-                    $stmt->bindParam(':IM',      $IM);    
-                    $stmt->bindParam(':CRT',      $CRT);    
-                    $stmt->bindParam(':CNAE',      $CNAE);    
-                    $stmt->execute();   
-                    echo json_encode('{"Aviso": {"text": "Emissor Atualizado"}');    
-                } catch(PDOException $e){
-                    echo '{"Erro": {"text": '.$e->getMessage().'}';
-                }
+                $emissor = new Emissor();
+                $emissor = $emissor->update();
             });    
             // Deletar Emissor
             $app->delete('/delete/{id}', function(Request $request, Response $response){
-                $id = $request->getAttribute('id');    
-                $sql = "DELETE FROM emissor WHERE id = $id";    
-                try{
-                    // Get DB Object
-                    $db = new Conexao();
-                    // Connect
-                    $db = $db->PDOConnect();    
-                    $stmt = $db->prepare($sql);
-                    $stmt->execute();
-                    $db = null;
-                    echo '{"Aviso": {"text": "Emissor Deletado"}';
-                } catch(PDOException $e){
-                    echo '{"Erro": {"text": '.$e->getMessage().'}';
-                }
+                $id = $request->getAttribute('id');
+                $emissor = new Emissor();
+                $emissor = $emissor->delete($id);  
             });
         }); //END grupo emissor
         //**************************************************************************************************/
-        // Rota para o grupo NFC-e
+        // Rota para o grupo NF
         $app->group('/nf', function () use ($app) 
         {        
             $app->get('/', function(Request $request, Response $response){
                 $NF = new NF();
-                $NF = $NF->getAllNFCe();
+                $NF = $NF->getAll();
             });    
             // Consultar uma NF especifica
             $app->get('/{id}', function(Request $request, Response $response){
                 $id = $request->getAttribute('id');
                 $NF = new NF();
-                $NF = $NF->getNFCe($id);                
+                $NF = $NF->get($id);                
             });    
             // Adicionar NF
             $app->post('/add', function(Request $request, Response $response){
                 $NF = new NF();
-                $NF = $NF->addNFCe($request);
+                $NF = $NF->add($request);
             });    
             // Atualizar NF
             $app->put('/update/{id}', function(Request $request, Response $response){
                 $NF = new NF();
-                $NF = $NF->updateNFCe();
+                $NF = $NF->update();
             });    
             // Deletar NF
             $app->delete('/delete/{id}', function(Request $request, Response $response){
                 $id = $request->getAttribute('id');
                 $NF = new NF();
-                $NF = $NF->deleteNFCe($id);
+                $NF = $NF->delete($id);
             });
         });// END Group /nf   
     }); // END Group /api

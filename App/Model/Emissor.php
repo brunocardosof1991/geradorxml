@@ -28,80 +28,146 @@ class Emissor {
     {
         $this->connection = new Conexao();
     }
-    public function getEmissor()
+    public function get()
     {        
         $sql = "SELECT * FROM emissor";    
         try{
             $connection = $this->connection->PDOConnect();    
             $stmt = $connection->query($sql);
             $emissor = $stmt->fetchAll(PDO::FETCH_OBJ);
-            return ($emissor);
+            echo json_encode($emissor);
             $connection = null;
         }catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo json_encode('{"error": '.$e->getMessage().'}');
         }
     }
-    public function addEmissor($request)
-    {
-        $descricao = $request->getParam('produto');
-        $ncm = $request->getParam('NCM');  
-        $preco_custo = $request->getParam('preco');  
-        $CFOP = $request->getParam('CFOP');    
-        $sql = "INSERT INTO produto (descricao,ncm, preco_custo,CFOP) 
-        VALUES
-        (:descricao,:ncm,:preco_custo,:CFOP)";    
-        try{
-            $connection = $this->connection->PDOConnect();     
-            $stmt = $connection->prepare($sql);    
-            $stmt->bindParam(':descricao',  $descricao);
-            $stmt->bindParam(':ncm',      $ncm);  
-            $stmt->bindParam(':preco_custo',      $preco_custo);    
-            $stmt->bindParam(':CFOP',      $CFOP);    
-            $stmt->execute();    
-            echo json_encode('{"Aviso": {"text": "Produto Adicionado"}');    
-        } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
-        }
-    }
-    public function updateEmissor($request)
+    public function add($request)
     {
         $id = $request->getParam('id');
-        $descricao = $request->getParam('descricao');
-        $ncm = $request->getParam('NCM');       
-        $preco_custo = $request->getParam('preco_custo');     
-        $CFOP = $request->getParam('CFOP');      
-        $sql = "UPDATE produto SET
-        id=:id,
-        descricao=:descricao,
-        NCM=:NCM,
-        preco_custo=:preco_custo,
-        CFOP=:CFOP
-                WHERE id = $id";    
+        $CNPJ = $request->getParam('CNPJ');
+        $xNome = $request->getParam('xNome');
+        $xLgr = $request->getParam('xLgr');
+        $xFant = $request->getParam('xFant');
+        $nro = $request->getParam('nro');
+        $xBairro = $request->getParam('xBairro');    
+        $cMun = $request->getParam('cMun');    
+        $xMun = $request->getParam('xMun');    
+        $UF = $request->getParam('UF');    
+        $CEP = $request->getParam('CEP');    
+        $cPais = $request->getParam('cPais');    
+        $xPais = $request->getParam('xPais');    
+        $fone = $request->getParam('fone');    
+        $IE = $request->getParam('IE');    
+        $IM = $request->getParam('IM');    
+        $CRT = $request->getParam('CRT');    
+        $CNAE = $request->getParam('CNAE');    
+        $sql = "INSERT INTO emissor (id,CNPJ,xNome,xLgr,xFant,nro,xBairro,cMun,xMun,UF,CEP,cPais,xPais,fone,IE,IM,crt,cnae) VALUES
+        (:id,:CNPJ,:xNome,:xLgr,:xFant,:nro,:xBairro,:cMun,:xMun,:UF,:CEP,:cPais,:xPais,:fone,:IE,:IM,:CRT,:CNAE)";    
         try{
-            $connection = $this->connection->PDOConnect();   
-            $stmt = $connection->prepare($sql);  
+            $connection = $this->connection->PDOConnect();      
+            $stmt = $connection->prepare($sql);    
             $stmt->bindParam(':id', $id);
-            $stmt->bindParam(':descricao',  $descricao);
-            $stmt->bindParam(':NCM',      $ncm);    
-            $stmt->bindParam(':preco_custo',      $preco_custo); 
-            $stmt->bindParam(':CFOP',      $CFOP);     
-            $stmt->execute();   
-            echo json_encode('{"Aviso": {"text": "Produto Atualizado"}');    
+            $stmt->bindParam(':CNPJ',  $CNPJ);
+            $stmt->bindParam(':xNome',      $xNome);
+            $stmt->bindParam(':xLgr',      $xLgr);
+            $stmt->bindParam(':xFant',    $xFant);
+            $stmt->bindParam(':nro',       $nro);
+            $stmt->bindParam(':xBairro',      $xBairro);    
+            $stmt->bindParam(':cMun',      $cMun);    
+            $stmt->bindParam(':xMun',      $xMun);    
+            $stmt->bindParam(':UF',      $UF);    
+            $stmt->bindParam(':CEP',      $CEP);    
+            $stmt->bindParam(':cPais',      $cPais);    
+            $stmt->bindParam(':xPais',      $xPais);    
+            $stmt->bindParam(':fone',      $fone);    
+            $stmt->bindParam(':IE',      $IE);    
+            $stmt->bindParam(':IM',      $IM);    
+            $stmt->bindParam(':CRT',      $CRT);    
+            $stmt->bindParam(':CNAE',      $CNAE);    
+            $stmt->execute();    
+            echo json_encode('{"success": "Emissor Adicionado"}');    
         } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
-    public function deleteEmissor($id)
-    {    
-        $sql = "DELETE FROM produto WHERE id = {$id}";    
+    public function update($request)
+    {
+        $id = $request->getParam('id');
+        $CNPJ = $request->getParam('CNPJ');
+        $xNome = $request->getParam('xNome');
+        $xLgr = $request->getParam('xLgr');
+        $xFant = $request->getParam('xFant');
+        $nro = $request->getParam('nro');
+        $xBairro = $request->getParam('xBairro');    
+        $cMun = $request->getParam('cMun');    
+        $xMun = $request->getParam('xMun');    
+        $UF = $request->getParam('UF');    
+        $CEP = $request->getParam('CEP');    
+        $cPais = $request->getParam('cPais');    
+        $xPais = $request->getParam('xPais');    
+        $fone = $request->getParam('fone');    
+        $IE = $request->getParam('IE');    
+        $IM = $request->getParam('IM');    
+        $CRT = $request->getParam('CRT');    
+        $CNAE = $request->getParam('CNAE');     
+        $sql = "UPDATE emissor SET
+        id=:id,
+        CNPJ=:CNPJ,
+        xNome=:xNome,
+        xLgr=:xLgr,
+        xFant=:xFant,
+        nro=:nro,
+        xBairro=:xBairro,
+        cMun=:cMun,
+        xMun=:xMun,
+        UF=:UF,
+        CEP=:CEP,
+        cPais=:cPais,
+        xPais=:xPais,
+        fone=:fone,
+        IE=:IE,
+        IM=:IM,
+        CRT=:CRT,
+        CNAE=:CNAE
+                WHERE id = $id";    
         try{
-            $connection = $this->connection->PDOConnect();   
+            $connection = $this->connection->PDOConnect();    
+            $stmt = $connection->prepare($sql);   
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':CNPJ',  $CNPJ);
+            $stmt->bindParam(':xNome',      $xNome);
+            $stmt->bindParam(':xLgr',      $xLgr);
+            $stmt->bindParam(':xFant',    $xFant);
+            $stmt->bindParam(':nro',       $nro);
+            $stmt->bindParam(':xBairro',      $xBairro);    
+            $stmt->bindParam(':cMun',      $cMun);    
+            $stmt->bindParam(':xMun',      $xMun);    
+            $stmt->bindParam(':UF',      $UF);    
+            $stmt->bindParam(':CEP',      $CEP);    
+            $stmt->bindParam(':cPais',      $cPais);    
+            $stmt->bindParam(':xPais',      $xPais);    
+            $stmt->bindParam(':fone',      $fone);    
+            $stmt->bindParam(':IE',      $IE);    
+            $stmt->bindParam(':IM',      $IM);    
+            $stmt->bindParam(':CRT',      $CRT);    
+            $stmt->bindParam(':CNAE',      $CNAE);    
+            $stmt->execute();   
+            echo json_encode('{"success": "Emissor Atualizado"}');    
+        } catch(PDOException $e){
+            echo '{"error": '.$e->getMessage().'}';
+        }
+    }
+    public function delete($id)
+    {    
+        $sql = "DELETE FROM emissor WHERE id = $id";    
+        try{
+            $connection = $this->connection->PDOConnect();      
             $stmt = $connection->prepare($sql);
             $stmt->execute();
-            $db = null;
-            echo '{"Aviso": {"text": "Produto Deletado"}';
+            $connection = null;
+            echo '{"success": "Emissor Deletado"}';
         } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
 }

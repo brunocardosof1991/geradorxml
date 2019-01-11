@@ -6,7 +6,7 @@
     <infEvento Id="ID1101115011031029073900013955001000000001105112804102">
     Identificador da TAG a ser assinada, a regra de formação do Id é:
     “ID” + tpEvento + chave da NF-e + nSeqEvento
-      <cOrgao>50</cOrgao>
+      <cOrgao>50</cOrgao> RS 43
       Código do órgão de recepção do Evento. Utilizar a 
       Tabela do IBGE, utilizar 91 para identificar o Ambiente Nacional.
       <tpAmb>2</tpAmb>
@@ -21,7 +21,7 @@
       <detEvento versao="1.00">
         <descEvento>Cancelamento</descEvento>
         <nProt>010101010101010</nProt>
-        431065042370749-pro-rec UniNFe
+        Protocolo de autorização
         <xJust>Justificativa do cancelamento</xJust>
       </detEvento>
     </infEvento>

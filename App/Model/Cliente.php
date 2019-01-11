@@ -20,7 +20,7 @@ class Cliente {
    {
        $this->connection = new Conexao();
    }
-    public function getAllClients()
+    public function getAll()
     {            
         $sql = "SELECT * FROM cliente";    
         try{
@@ -30,23 +30,23 @@ class Cliente {
             echo json_encode($cliente);
             $connection = null;
         } catch(PDOException $e){
-            return '{"Erro": {"text": '.$e->getMessage().'}';
+            echo json_encode('{"Erro": {"text": '.$e->getMessage().'}');
         }
     }    
-    public function getClient($id)
+    public function get($id)
     {            
         $sql = "SELECT * FROM cliente WHERE id= {$id}";    
         try{
             $connection = $this->connection->PDOConnect();
             $stmt = $connection->query($sql);
             $cliente = $stmt->fetchAll(PDO::FETCH_OBJ);
-            return ($cliente);
+            echo  json_encode($cliente);
             $connection = null;
         } catch(PDOException $e){
-            return '{"Erro": {"text": '.$e->getMessage().'}';
+            echo json_encode('{"Erro": {"text": '.$e->getMessage().'}');
         }
     }
-    public function addClient($request)
+    public function add($request)
     {        
         $nome = $request->getParam('nome');
         $CNPJ = $request->getParam('CNPJ');
@@ -70,12 +70,12 @@ class Cliente {
             $stmt->bindParam(':CEP',      $CEP);
             $stmt->bindParam(':fone',      $fone);
             $stmt->execute();
-            echo json_encode('{"Aviso": {"text": "Cliente Adicionado"}');
+            echo json_encode('{"success": "Cliente Adicionado"}');
         } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
-    public function updateClient($request)
+    public function update($request)
     {
         $id = $request->getParam('id');
         $nome = $request->getParam('nome');
@@ -110,12 +110,12 @@ class Cliente {
             $stmt->bindParam(':CEP',      $CEP);
             $stmt->bindParam(':fone',      $fone);
             $stmt->execute();
-            echo json_encode('{"Aviso": {"text": "Cliente Atualizado"}');
+            echo json_encode('{"success": "Cliente Atualizado"}');
         } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
-    public function deleteClient($id)
+    public function delete($id)
     {
         $sql = "DELETE FROM cliente WHERE id = {$id}";
         try{
@@ -123,9 +123,9 @@ class Cliente {
             $stmt = $connection->prepare($sql);
             $stmt->execute();
             $connection = null;
-            echo '{"Aviso": {"text": "Cliente Deletado"}';
+            echo '{"success": "Cliente Deletado"}';
         } catch(PDOException $e){
-            echo '{"Erro": {"text": '.$e->getMessage().'}';
+            echo '{"error": '.$e->getMessage().'}';
         }        
     }
 }

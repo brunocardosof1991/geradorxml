@@ -18,7 +18,7 @@ $(document).ready(function(){
             data:{nome:nome, CNPJ:CNPJ, endereco:endereco, numero:numero, 
                 complemento:complemento, bairro:bairro, CEP:CEP, fone:fone }
         }).done(function(data){
-            if(data == '{\"Aviso\": {\"text\": \"Cliente Adicionado\"}') 
+            if(data == '{"success": "Cliente Adicionado"}') 
             {
                 alert('Cliente Adicionado com Sucesso!!');
                 window.location.replace("http://localhost/geradorXml/App/View/Cliente/fetch.php");

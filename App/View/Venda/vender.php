@@ -57,16 +57,16 @@
                                     <table class="table table-hover table-bordered mt-3 mx-auto text-center" id="tableListarProduto_XmlGerar">
                                         <thead class="thead-dark">
                                             <tr>
-                                                <th scope="col" style="display: none;">NCM</th>
-                                                <th scope="col" style="display: none;">CFOP</th>
-                                                <th scope="col">ID</th>
-                                                <th scope="col">Produto</th>
-                                                <th scope="col">Preço</th>
-                                                <th scope="col">Quantidade</th>
-                                                <th scope="col">Excluir</th>
+                                                <th>id</th>
+                                                <th>descricao</th>
+                                                <th style="display: none;">ncm</th>
+                                                <th>preco_custo</th>
+                                                <th style="display: none;">CFOP</th>
+                                                <th>Quantidade</th>
+                                                <th>Excluir</th>
                                             </tr>
                                         </thead>
-                                        <tbody><tr></tr></tbody>
+                                        <tbody></tbody>
                                     </table>
                                 </div> <!-- END #table-responsive -->
                             </div>

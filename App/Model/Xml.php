@@ -12,6 +12,8 @@ use ArrayIterator;
 use PDO;
 class Xml 
 {
+    private $tpEvento = 110111;
+    private $nSeqEvento = 1;
     //<ide>
     private $ide = array
     (
@@ -36,29 +38,29 @@ class Xml
         'verProc' => '1.0.0'
     );
     //<emit>
-    public $emit = array
+    private $emit = array
     (
-        'CNPJ' => 12291758000105,
-        'xNome' => 'SYS',
-        'xFant' => 'Nome Fantasia',
-        'IE' => '0963376802',
-        'IM' => 14018,
-        'CNAE' => 6202300,
-        'CRT' => 1
+        'CNPJ' => NULL,
+        'xNome' => NULL,
+        'xFant' => NULL,
+        'IE' => NULL,
+        'IM' => NULL,
+        'CNAE' => NULL,
+        'CRT' => NULL
     );
     //<enderEmit>
-    public $enderEmit = array
+    private $enderEmit = array
     (
-        'xLgr' => 'Endereco da Empresa',
-        'nro' => 'Numero da Empresa',
-        'xBairro' => 'Bairro da Empresa',
-        'cMun' => 4314902,
-        'xMun' => 'Porto Alegre',
-        'UF' => 'RS',
-        'CEP' => 92500000,
-        'cPais' => 1058,
-        'xPais' => 'Brasil',
-        'fone' => '51999688986'
+        'xLgr' => NULL,
+        'nro' => NULL,
+        'xBairro' => NULL,
+        'cMun' => NULL,
+        'xMun' => NULL,
+        'UF' => NULL,
+        'CEP' => NULL,
+        'cPais' => NULL,
+        'xPais' => NULL,
+        'fone' => NULL
     );
     //<dest>
     public $dest = array
@@ -104,17 +106,35 @@ class Xml
         $this->ICMS = ICMS::$ICMSSN102;
         $this->PIS = PIS::$PISAliq;
         $this->COFINS = COFINS::$COFINSAliq;
+        //Emissor - Emissor fora da rota faz mais sentido
+        $this->emit['CNPJ'] = $this->gerarEmit()[0]['CNPJ'];
+        $this->emit['xNome'] = $this->gerarEmit()[0]['xNome'];
+        $this->emit['xFant'] = $this->gerarEmit()[0]['xFant'];
+        $this->emit['IE'] = $this->gerarEmit()[0]['IE'];
+        $this->emit['IM'] = $this->gerarEmit()[0]['IM'];
+        $this->emit['CNAE'] = $this->gerarEmit()[0]['CNAE'];
+        $this->emit['CRT'] = $this->gerarEmit()[0]['CRT'];
+        $this->enderEmit['xLgr'] = $this->gerarEmit()[0]['xLgr'];
+        $this->enderEmit['nro'] = $this->gerarEmit()[0]['nro'];
+        $this->enderEmit['xBairro'] = $this->gerarEmit()[0]['xBairro'];
+        $this->enderEmit['cMun'] = $this->gerarEmit()[0]['cMun'];
+        $this->enderEmit['xMun'] = $this->gerarEmit()[0]['xMun'];
+        $this->enderEmit['UF'] = $this->gerarEmit()[0]['UF'];
+        $this->enderEmit['CEP'] = $this->gerarEmit()[0]['CEP'];
+        $this->enderEmit['cPais'] = $this->gerarEmit()[0]['cPais'];
+        $this->enderEmit['xPais'] = $this->gerarEmit()[0]['xPais'];
+        $this->enderEmit['fone'] = $this->gerarEmit()[0]['fone'];
     }
     //<ide><idLote></idLote></ide>
-    private function getId() 
+    private function getId($table) 
     {
-        $sql = "SELECT id FROM nf ORDER BY id DESC LIMIT 1";    
+        $sql = "SELECT id FROM $table ORDER BY id DESC LIMIT 1";    
         try{
             $connection = $this->connection->PDOConnect();    
             $stmt = $connection->query($sql);
             $idLote = $stmt->fetchAll(PDO::FETCH_ASSOC);           
             return $idLote[0]["id"]+1;
-            $db = null;
+            $connection = null;
         }catch(PDOException $e){
             echo '{"Erro": {"text": '.$e->getMessage().'}';
         }
@@ -138,7 +158,7 @@ class Xml
             $stmt = $connection->query($sql);
             $nNF = $stmt->fetchAll(PDO::FETCH_ASSOC);           
             return $nNF[0]["nNF"]+1;
-            $db = null;
+            $connection = null;
         }catch(PDOException $e){
             echo '{"Erro": {"text": '.$e->getMessage().'}';
         }
@@ -152,7 +172,20 @@ class Xml
             $stmt = $connection->query($sql);
             $cNF = $stmt->fetchAll(PDO::FETCH_ASSOC);           
             return $cNF[0]["cNF"]+1;
-            $db = null;
+            $connection = null;
+        }catch(PDOException $e){
+            echo '{"Erro": {"text": '.$e->getMessage().'}';
+        }
+    }
+    private function gerarEmit()
+    {
+        $sql = "SELECT * FROM emissor";    
+        try{
+            $connection = $this->connection->PDOConnect();    
+            $stmt = $connection->query($sql);
+            $emit = $stmt->fetchAll(PDO::FETCH_ASSOC);           
+            return $emit;
+            $connection = null;
         }catch(PDOException $e){
             echo '{"Erro": {"text": '.$e->getMessage().'}';
         }
@@ -191,15 +224,16 @@ class Xml
         }
         return $chaveDeAcesso;
     }
-    public function salvarNF($protocolo,$nome,$CNPJ) 
-    {
-        $id = $this->getId();
+    public function salvarNF($protocolo) 
+    {   
+        $table = 'nf';
+        $id = $this->getId($table);
         $chave = $this->gerarChaveDeAcesso();
         $cNF = $this->gerarCnf();
         $nNF = $this->gerarNnf();
         $dhEmi = $this->getTime();
-        $sql = "INSERT INTO nf (id,chave,cNF,nNF,CNPJDestinatario,xNomeDestinatario,protocolo,dhEmi) VALUES
-        (:id,:chave,:cNF,:nNF,:CNPJDestinatario,:xNomeDestinatario,:protocolo,:dhEmi)";
+        $sql = "INSERT INTO nf (id,chave,cNF,nNF,protocolo,dhEmi) VALUES
+        (:id,:chave,:cNF,:nNF,:protocolo,:dhEmi)";
         try{
             $connection = $this->connection->PDOConnect();
             $stmt = $connection->prepare($sql);
@@ -209,15 +243,15 @@ class Xml
                 ':chave' => $chave,
                 ':cNF' => $cNF,
                 ':nNF' => $nNF,
-                ':CNPJDestinatario' => $CNPJ,
-                ':xNomeDestinatario' => $nome,
                 ':protocolo' => $protocolo,
                 ':dhEmi' => $dhEmi
             ));
+            $connection = null;
         } catch(PDOException $e){
             echo '{"Erro": {"text": '.$e->getMessage().'}';
         }
     }
+    /*
     public function saidaProduto($produto)
     {
         $produtoOut = array();
@@ -249,6 +283,7 @@ class Xml
     {
 
     }
+    */
     function autorizarXML($informacoesAdicionais, $arrayProduto) 
     {
         $dom = new DOMDocument('1.0', 'utf-8');
@@ -351,9 +386,9 @@ class Xml
                     $cEAN = $prod->appendChild($dom->createElement('cEAN'));
                     $cEAN->appendChild($dom->createTextNode('SEM GTIN'));
                     $xProd = $prod->appendChild($dom->createElement('xProd'));
-                    $xProd->appendChild($dom->createTextNode($arrayProduto[$i]['produto']));
+                    $xProd->appendChild($dom->createTextNode($arrayProduto[$i]['descricao']));
                     $NCM = $prod->appendChild($dom->createElement('NCM'));
-                    $NCM->appendChild($dom->createTextNode($arrayProduto[$i]['NCM']));
+                    $NCM->appendChild($dom->createTextNode($arrayProduto[$i]['ncm']));
                     $CFOP = $prod->appendChild($dom->createElement('CFOP'));
                     $CFOP->appendChild($dom->createTextNode($arrayProduto[$i]['CFOP']));
                     $uCom = $prod->appendChild($dom->createElement('uCom'));
@@ -489,43 +524,43 @@ class Xml
         
         $dom->save($this->gerarChaveDeAcesso() . '-nfe.xml');
     }
-    function cancelarXml() 
+    function cancelarXml($protocolo, $chave) 
     {
         $dom = new DOMDocument('1.0', 'utf-8');
         $envEvento = $dom->appendChild($dom->createElement('envEvento'));
         $envEvento->setAttributeNode(new DOMAttr('versao', '1.00'));
         $envEvento->setAttributeNode(new DOMAttr('xmlns', 'http://www.portalfiscal.inf.br/nfe'));
             $idLote = $envEvento->appendChild($dom->createElement('idLote'));
-            $idLote->appendChild($dom->createTextNode('Numero de controle do SyS'));
+            $idLote->appendChild($dom->createTextNode($this->getId($table = 'nfCancelada')));
             $evento = $envEvento->appendChild($dom->createElement('evento'));
-                $evento->setAttributeNode(new DOMAttr('versao', '1.00'));
-                $evento->setAttributeNode(new DOMAttr('xmlns', 'http://www.portalfiscal.inf.br/nfe'));
+            $evento->setAttributeNode(new DOMAttr('versao', '1.00'));
+            $evento->setAttributeNode(new DOMAttr('xmlns', 'http://www.portalfiscal.inf.br/nfe'));
             $infEvento = $evento->appendChild($dom->createElement('infEvento'));
-                $infEvento->setAttributeNode(new DOMAttr('Id', 'Combinação de Tags'));
+            $infEvento->setAttributeNode(new DOMAttr('Id', 'ID'.$this->tpEvento.substr_replace($chave,'', 0, 3).'0'.$this->nSeqEvento));
                 $cOrgao = $infEvento->appendChild($dom->createElement('cOrgao'));
-                $cOrgao->appendChild($dom->createTextNode('Numero IBGE'));
+                $cOrgao->appendChild($dom->createTextNode(43));
                 $tpAmb = $infEvento->appendChild($dom->createElement('tpAmb'));
                 $tpAmb->appendChild($dom->createTextNode(2));
                 $CNPJ = $infEvento->appendChild($dom->createElement('CNPJ'));
-                $CNPJ->appendChild($dom->createTextNode(2));
+                $CNPJ->appendChild($dom->createTextNode($this->emit['CNPJ']));
                 $chNFe = $infEvento->appendChild($dom->createElement('chNFe'));
-                $chNFe->appendChild($dom->createTextNode('Chave de Acesso'));
+                $chNFe->appendChild($dom->createTextNode(substr_replace($chave,'', 0, 3)));
                 $dhEvento = $infEvento->appendChild($dom->createElement('dhEvento'));
-                $dhEvento->appendChild($dom->createTextNode('Horario do Evento'));
+                $dhEvento->appendChild($dom->createTextNode($this->getTime()));
                 $tpEvento = $infEvento->appendChild($dom->createElement('tpEvento'));
-                $tpEvento->appendChild($dom->createTextNode('110111'));
+                $tpEvento->appendChild($dom->createTextNode($this->tpEvento));
                 $nSeqEvento = $infEvento->appendChild($dom->createElement('nSeqEvento'));
-                $nSeqEvento->appendChild($dom->createTextNode(1));
-                $nSeqEvento = $infEvento->appendChild($dom->createElement('verEvento'));
-                $nSeqEvento->appendChild($dom->createTextNode('1.00'));
+                $nSeqEvento->appendChild($dom->createTextNode($this->nSeqEvento));
+                $verEvento = $infEvento->appendChild($dom->createElement('verEvento'));
+                $verEvento->appendChild($dom->createTextNode('1.00'));
                 $detEvento = $infEvento->appendChild($dom->createElement('detEvento'));
                 $detEvento->setAttributeNode(new DOMAttr('versao', '1.00'));
                     $descEvento = $detEvento->appendChild($dom->createElement('descEvento'));
                     $descEvento->appendChild($dom->createTextNode('Cancelamento'));
                     $nProt = $detEvento->appendChild($dom->createElement('nProt'));
-                    $nProt->appendChild($dom->createTextNode('Cancelamento'));
+                    $nProt->appendChild($dom->createTextNode($protocolo));
                     $xJust = $detEvento->appendChild($dom->createElement('xJust'));
-                    $xJust->appendChild($dom->createTextNode('Justificativa'));
-        $dom->save('canc1101103511031029073900013955001000000001105112804101-ped-eve.xml');        
+                    $xJust->appendChild($dom->createTextNode('NFC-e enviado em duplicidade'));
+        $dom->save($chave.'-ped-eve.xml');        
     }
 }

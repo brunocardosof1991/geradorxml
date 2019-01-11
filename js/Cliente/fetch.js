@@ -26,12 +26,12 @@ $(document).ready(function () {
         {
             targets: [-1],
             data: null,
-            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-user-edit fa-2x' id='editarProduto' style='cursor:pointer;color:orange'></i></a></div>"
+            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-user-edit fa-2x' id='editarProduto' style='cursor:pointer;color:orange' title='Editar'></i></a></div>"
         },
         {
             targets: [-2],
             data: null,
-            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-trash fa-2x' id='excluirProduto' style='cursor:pointer;color:red'></i></a></div>"
+            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-trash fa-2x' id='excluirCliente' style='cursor:pointer;color:red' title='Excluir'></i></a></div>"
         }
     ]
     }); 
@@ -45,9 +45,10 @@ $(document).ready(function () {
                 method:'delete',
                 url: 'http://localhost/geradorXml/App/public/api/cliente/delete/'+id
             }).done(function(data){
-                if(data == '{"Aviso": {"text": "Produto Deletado"}')
+                // data == "{"Aviso": {"text": "Cliente Deletado"}" NÃO FUNFA?!?!?!
+                if(typeof nome !== "undefined")
                 {
-                    alert(nome+' Deletedo Com Sucesso!!');   
+                    alert(nome+' Foi Deletedo Com Sucesso!!');   
                 }   
                 location = location;        
             });          
@@ -95,7 +96,7 @@ $(document).ready(function () {
                 data:{id:id, nome:nome, CNPJ:CNPJ, endereco:endereco, numero:numero, 
                     complemento:complemento, bairro:bairro, CEP:CEP, fone:fone }
             }).done(function(data){
-                if(data == '{\"Aviso\": {\"text\": \"Cliente Atualizado\"}')
+                if(data == '{"success": "Cliente Adicionado"}')
                 {
                     alert('Cliente Atualizado');
                     location = location;  

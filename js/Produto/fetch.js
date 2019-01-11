@@ -22,12 +22,12 @@ $(document).ready(function(){
         {
             targets: [-1],
             data: null,
-            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-user-edit fa-2x' id='editarProduto' style='cursor:pointer;color:orange'></i></a></div>"
+            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-user-edit fa-2x' id='editarProduto' style='cursor:pointer;color:orange' title='Editar'></i></a></div>"
         },
         {
             targets: [-2],
             data: null,
-            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-trash fa-2x' id='excluirProduto' style='cursor:pointer;color:red'></i></a></div>"
+            defaultContent: "<div style='text-align:center'><a class='btn btn-default'><i class='fas fa-trash fa-2x' id='excluirProduto' style='cursor:pointer;color:red' title='Excluir'></i></a></div>"
         }
     ]
     });
@@ -41,7 +41,7 @@ $(document).ready(function(){
                 method:'delete',
                 url: 'http://localhost/geradorXml/App/public/api/produto/delete/'+id
             }).done(function(data){
-                if(data == '{"Aviso": {"text": "Produto Deletado"}')
+                if(data == '{"success": "Produto Deletado"}')
                 {
                     alert(produto+' Foi Deletedo Com Sucesso!!');   
                 }   
@@ -77,7 +77,7 @@ $(document).ready(function(){
                 dataType: 'json',
                 data:{id:id, descricao:descricao, NCM:NCM, preco_custo:preco_custo, CFOP:CFOP}
             }).done(function(data){
-                if(data == '{\"Aviso\": {\"text\": \"Produto Atualizado\"}')
+                if(data == '{"success": "Produto Atualizado"}')
                 {
                     alert('Produto Atualizado');
                     location = location;             
@@ -113,7 +113,7 @@ $(document).ready(function(){
             dataType: 'json',
             data:{descricao:descricao, ncm:NCM, preco_custo:preco_custo, CFOP:CFOP}
             }).done(function(data){
-                if(data == '{"Aviso": {"text": "Produto Adicionado"}')
+                if(data == '{"success": "Produto Adicionado"}')
                 {
                     alert('Produto Adicionado com Sucesso'); 
                     location = location;
