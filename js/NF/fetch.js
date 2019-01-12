@@ -31,7 +31,7 @@ $(document).ready(function () {
         ]
     });
     function getNF() 
-    {
+    {   
         let chaveDeAcesso = true;
         $.ajax({
             url: "http://localhost/geradorXml/App/public/api/cancelarNFCe/true",
@@ -42,10 +42,11 @@ $(document).ready(function () {
             if(data == 'success')
             {
                 $("#apiModal .modal-body p").slideUp(850);
-                $("#apiModal .modal-body p").text('NFC-e cancelado e excluido com sucesso!   ').slideDown(850);
+                $("#apiModal .modal-body p").text('NFC-e cancelada e excluida com sucesso!   ').slideDown(850);
                 $("#apiModal .modal-body").append('<i class="fas fa-thumbs-up fa-2x " style="color:#0fe206"></i>').slideDown(700);
                 $('.chart').data('easyPieChart').update(100).options.barColor = '#0fe206';
                 $("#apiModal .modal-footer .action").text('Imprimir NFC-e').show();
+                setTimeout( function () {location = location; }, 10000);
             } 
             if(data == 'error')
             {
@@ -135,11 +136,12 @@ $(document).ready(function () {
         $("#apiModal .modal-footer .action").on('click',function(){
             let inicio = $('#inputInicio').val();
             let fim = $('#inputFim').val();
+            let just = $('#inputJust').val();
             $.ajax({
                 method:'post',
                 url: 'http://localhost/geradorXml/App/public/api/inutilizar',
                 dataType: 'json',
-                data:{inicio:inicio, fim:fim}
+                data:{inicio:inicio, fim:fim, just:just}
             }).done(function(data){
                 console.log(data);
             });

@@ -21,6 +21,7 @@ $(document).ready(function(){
             if(data == 'error')
             {
                 setTimeout( function () { getNF(); }, 1500);
+                setTimeout( function () { alert('Erro ao autorizar NFC-e'); location = location;}, 25000);
             }
         });     
     }
@@ -97,17 +98,13 @@ $(document).ready(function(){
         if (e.keyCode === 13) 
         {
             let produto = $("#inputSearchProduto_XmlGerar").val();
-            if(produto == '')
-            {
-                alert("Produto não existe");
-            } else 
+            if (!isNaN(produto)) 
             {
                 $.ajax({
                     method: 'get',
                     url: 'http://localhost/geradorXml/App/public/api/produto/'+produto,
                     dataType: 'json'
                 }).done(function(data) {
-                    let i = '';
                     if(data == '') 
                     {
                         alert("Produto não existe");
@@ -121,8 +118,31 @@ $(document).ready(function(){
                         $("<td>").text(data[0].CFOP).hide(),
                         $('<td>').append("<input type='number' class='form-control' id='inputQuantidadeProduto_XmlGerar'/>"),
                         $('<td>').append('<i class="fas fa-trash fa-2x"></i>').css({'cursor':'pointer', 'color':'#FF0516'}).click(excluirProdutoTabela)
-                    ).appendTo('#tableListarProduto_XmlGerar tbody').html();
-                        
+                    ).appendTo('#tableListarProduto_XmlGerar tbody').html();                        
+                    }
+                });
+            }else if (isNaN(produto))
+            {
+                $.ajax({
+                    method: 'get',
+                    url: 'http://localhost/geradorXml/App/public/api/produto/descricao/'+produto,
+                    dataType: 'json'
+                }).done(function(data) {
+                    console.log(data);
+                    if(data == '') 
+                    {
+                        alert("Produto não existe");
+                    } else 
+                    {
+                        $("<tr>").append(
+                        $("<td>").text(data[0].id),
+                        $("<td>").text(data[0].descricao),
+                        $("<td>").text(data[0].ncm).hide(),
+                        $("<td>").text(data[0].preco_custo),
+                        $("<td>").text(data[0].CFOP).hide(),
+                        $('<td>').append("<input type='number' class='form-control' id='inputQuantidadeProduto_XmlGerar'/>"),
+                        $('<td>').append('<i class="fas fa-trash fa-2x"></i>').css({'cursor':'pointer', 'color':'#FF0516'}).click(excluirProdutoTabela)
+                    ).appendTo('#tableListarProduto_XmlGerar tbody').html();                        
                     }
                 });
             }

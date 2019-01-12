@@ -10,6 +10,7 @@
 
         <!-- ************** -->
         <script type="module" src="../../../js/venda/venda.js"></script>
+        <script type="module" src="../../../js/main.js"></script>
 
         <!-- Folha de estilo da página -->
         <link href="../../../css/style.css" type="text/css" rel="stylesheet">

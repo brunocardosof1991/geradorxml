@@ -563,15 +563,15 @@ class Xml
                     $xJust->appendChild($dom->createTextNode('NFC-e enviado em duplicidade'));
         $dom->save($chave.'-ped-eve.xml');        
     }
-    public function inutilizarXml($inicio,$fim)
+    public function inutilizarXml($inicio,$fim,$just)
     {
         $id = $this->ide['cUF'].date('y').$this->emit['CNPJ'].$this->ide['mod'].$this->ide['serie'].$inicio.$fim;
         $dom = new DOMDocument('1.0','utf-8');
         $inutNFe = $dom->appendChild($dom->createElement('inutNFe'));
         $inutNFe->setAttributeNode(new DOMAttr('xmlns','http://www.portalfiscal.inf.br/nfe'));
         $inutNFe->setAttributeNode(new DOMAttr('versao','4.00'));
-            $infInut   = $inutNFe->appendChild($dom->createElement('inutNFe'));
-            $infInut ->setAttributeNode(new DOMAttr('id','ID'.$id));                
+            $infInut   = $inutNFe->appendChild($dom->createElement('infInut'));
+            $infInut ->setAttributeNode(new DOMAttr('Id','ID'.$id));                
                 $tpAmb = $infInut->appendChild($dom->createElement('tpAmb'));
                 $tpAmb->appendChild($dom->createTextNode($this->ide['tpAmb']));
                 $xServ = $infInut->appendChild($dom->createElement('xServ'));
@@ -587,11 +587,11 @@ class Xml
                 $serie = $infInut->appendChild($dom->createElement('serie'));
                 $serie->appendChild($dom->createTextNode(substr($this->ide['serie'], -1, 1)));
                 $nNFIni = $infInut->appendChild($dom->createElement('nNFIni'));
-                $nNFIni->appendChild($dom->createTextNode(substr($inicio,6,3)));
+                $nNFIni->appendChild($dom->createTextNode($inicio));
                 $nNFFin = $infInut->appendChild($dom->createElement('nNFFin'));
-                $nNFFin->appendChild($dom->createTextNode(substr($fim,6,3)));
+                $nNFFin->appendChild($dom->createTextNode($fim));
                 $xJust = $infInut->appendChild($dom->createElement('xJust'));
-                $xJust->appendChild($dom->createTextNode('Erro interno no sistema'));
+                $xJust->appendChild($dom->createTextNode($just));
         $dom->save($id.'-ped-inu.xml'); 
     }
 }

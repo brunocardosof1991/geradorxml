@@ -30,8 +30,14 @@ class Produto {
         }
     }
     public function get($id)
-    {        
-        $sql = "SELECT * FROM produto WHERE id = {$id}";    
+    {       
+        if(strlen($id) === 8)
+        {
+            $sql = "SELECT * FROM produto WHERE cEAN = {$id}";
+        } else if(strlen($id) > 8)
+        {
+            $sql = "SELECT * FROM produto WHERE id = {$id}"; 
+        }
         try{
             $connection = $this->connection->PDOConnect();    
             $stmt = $connection->query($sql);
@@ -39,6 +45,19 @@ class Produto {
             $connection = null;
             echo json_encode($produto);
         }catch(PDOException $e){
+            echo '{"error": '.$e->getMessage().'}';
+        }
+    }
+    public function getByDescricao($descricao)
+    {      
+    $sql = "SELECT * FROM produto WHERE descricao = '".$descricao."' ";
+        try{
+            $connection = $this->connection->PDOConnect();    
+            $stmt = $connection->query($sql);
+            $produto = $stmt->fetchAll(PDO::FETCH_OBJ);
+            $connection = null;
+            echo json_encode($produto);
+        } catch(PDOException $e){
             echo '{"error": '.$e->getMessage().'}';
         }
     }

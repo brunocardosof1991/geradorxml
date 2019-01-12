@@ -24,7 +24,6 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
                 <a class="dropdown-item" href="http://localhost/geradorXml/App/View/NF/fetch.php">Listar NFC-e</a>
-                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/NF/inutilizar.php">Inutilizar Números</a>
             </div>
         </li>
         <li class="nav-item dropdown">

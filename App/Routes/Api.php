@@ -8,8 +8,12 @@ use App\Model\Produto;
 use App\Model\NF;
 use App\Model\Emissor;
 
-$app = new \Slim\App;
-$xml = new Xml();
+$app = new \Slim\App([
+    'settings' => [
+        // Only set this if you need access to route within middleware
+        'determineRouteBeforeAppMiddleware' => true
+    ]
+]); 
 
 $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response;
@@ -26,16 +30,22 @@ $app->add(function ($req, $res, $next) {
     // Rota para o grupo API
     $app->group('/api', function () use ($app) 
     { 
-        $app->post('/cappta', function(Request $request, Response $response)
-        { 
-            
+        $app->post('/verifyFiles', function(Request $request, Response $response)
+        {             
+            //Arquivo passado da rota /autorizarNFCe para /autorizarNFCe/true
+            //Arquivo utilizado para encontrar o xml autorizada na pasta /Enviado/Autorizados do UniNFe
+            if(glob("chaveDeAcesso.txt"))
+            {                
+                unlink('chaveDeAcesso.txt');
+            }
         });
         $app->post('/inutilizar', function(Request $request, Response $response)
         { 
             $xml = new Xml();
             $inicio = $request->getParam('inicio');
             $fim = $request->getParam('fim');
-            $xml->inutilizarXml($inicio,$fim);
+            $just = $request->getParam('just');
+            $xml->inutilizarXml($inicio,$fim,$just);
             echo json_encode('{"success": "Numeracao Inutilizada"}');
             echo exec('move c:\xampp\htdocs\geradorXml\App\public\*-ped-inu.xml c:\Unimake\UniNFe\12291758000105\nfce\Envio > nul');
         });
@@ -193,11 +203,17 @@ $app->add(function ($req, $res, $next) {
                 $produto = new Produto();
                 $produto = $produto->getAll();
             });             
-            // Consultar um Produto especifico
+            // Consultar um Produto especifico por ID
             $app->get('/{id}', function(Request $request, Response $response){
                 $id = $request->getAttribute('id');
                 $produto = new Produto();
                 $produto = $produto->get($id);
+            });    
+            // Consultar um Produto especifico pela descrição
+            $app->get('/descricao/{descricao}', function(Request $request, Response $response){
+                $descricao = $request->getAttribute('descricao'); // return NotFound for non existent route
+                $produto = new Produto();
+                $produto = $produto->getByDescricao($descricao);
             });    
             // Adicionar Produto            
             $app->post('/add', function(Request $request, Response $response){            

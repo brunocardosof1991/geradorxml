@@ -33,37 +33,6 @@ html, body {
  :-ms-input-placeholder {  
     text-align: center; 
  }
- .card-ide {
-  &::before,
-  &::after {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    transform: scale3d(0, 0, 1);
-    transition: transform .3s ease-out 0s;
-    background: rgba(255, 255, 255, .1);
-    content: '';
-    pointer-events: none;
-  }
-
-  &::before {
-    transform-origin: left top;
-  }
-
-  &::after {
-    transform-origin: right bottom;
-  }
-
-  &:hover,
-  &:focus {
-    &::before,
-    &::after {
-      transform: scale3d(1, 1, 1);
-    }
-  }
-}
  @media screen and (max-width: 1199px) {
    thead { display: none; }
    tr {

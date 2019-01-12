@@ -11,6 +11,7 @@
         <!-- ************** -->
         <script type="module" src="../../../js/NF/fetch.js"></script>
         <script type="text/javascript" src="../../../js/tableResponsive.js"></script>
+        <script type="module" src="../../../js/main.js"></script>
 
         <!-- Folha de estilo da página -->
         <link href="../../../css/style.css" type="text/css" rel="stylesheet">
