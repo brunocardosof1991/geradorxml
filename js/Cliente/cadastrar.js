@@ -9,6 +9,8 @@ $(document).ready(function(){
         let numero = $('#inputNumeroCliente').val();
         let complemento = $('#inputComplementoCliente').val();
         let bairro = $('#inputBairroCliente').val();
+        let municipio = $('#inputMunicipioCliente').val();
+        let UF = $('#inputUFCliente').val();
         let CEP = $('#inputCEPCliente').val();
         let fone = $('#inputTelefoneCliente').val();
         $.ajax({
@@ -16,7 +18,7 @@ $(document).ready(function(){
             url:'http://localhost/geradorXml/App/public/api/cliente/add',
             dataType: 'json',
             data:{nome:nome, CNPJ:CNPJ, endereco:endereco, numero:numero, 
-                complemento:complemento, bairro:bairro, CEP:CEP, fone:fone }
+                complemento:complemento, bairro:bairro, municipio:municipio, UF:UF, CEP:CEP, fone:fone }
         }).done(function(data){
             if(data == '{"success": "Cliente Adicionado"}') 
             {

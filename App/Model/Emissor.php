@@ -28,6 +28,47 @@ class Emissor {
     {
         $this->connection = new Conexao();
     }
+    public function addIde($request)
+    {   
+        var_dump($request->getParam('cUF'));
+        var_dump($request->getParam('natOp'));
+        var_dump($request->getParam('mod'));
+        var_dump($request->getParam('serie'));
+        var_dump($request->getParam('tpNF'));
+        var_dump($request->getParam('idDest'));
+        var_dump($request->getParam('cMunFG'));
+        var_dump($request->getParam('tpImp'));
+        var_dump($request->getParam('tpEmis'));
+        var_dump($request->getParam('tpAmb'));
+        var_dump($request->getParam('finNFe'));
+        var_dump($request->getParam('indFinal'));
+        var_dump($request->getParam('indPres'));
+        var_dump($request->getParam('procEmi'));
+        $cUF = $request->getParam('cUF');
+        $natOp = $request->getParam('natOp');
+        $mod = $request->getParam('mod');
+        $serie = $request->getParam('serie');
+        $tpNF = $request->getParam('tpNF');
+        $idDest = $request->getParam('idDest');
+        $cMunFG = $request->getParam('cMunFG');
+        $tpImp = $request->getParam('tpImp');
+        $tpEmis = $request->getParam('tpEmis');
+        $tpAmb = $request->getParam('tpAmb');
+        $finNFe = $request->getParam('finNFe');
+        $indFinal = $request->getParam('indFinal');
+        $indPres = $request->getParam('indPres');
+        $procEmi = $request->getParam('procEmi');
+        $sql = "INSERT INTO ide (cUF,natOp,mod,serie,tpNF,idDest,cMunFG,tpImp,tpEmis,tpAmb,finNFe,indFinal,indPres,procEmi) VALUES 
+        ($cUF,'".$natOp."',$mod,$serie,$tpNF,$idDest,$cMunFG,$tpImp,$tpEmis,$tpAmb,$finNFe,$indFinal,$indPres,$procEmi)";   
+        try{
+            $connection = $this->connection->PDOConnect();      
+            $stmt = $connection->prepare($sql);      
+            $stmt->execute();    
+            echo json_encode('{"success": "Ide Adicionado"}');    
+        } catch(PDOException $e){
+            echo json_encode('{"error": '.$e->getMessage().'}');
+        }
+    }
     public function get()
     {        
         $sql = "SELECT * FROM emissor";    

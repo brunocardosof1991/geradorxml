@@ -22,10 +22,9 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-        <!-- ================================================================================================ -->
-        
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.6/jquery.easypiechart.js"></script>
+        <!-- ================================================================================================ --> 
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.6/jquery.easypiechart.js"></script>        
+        <script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>
         <script>
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip();
@@ -38,8 +37,7 @@
     <body>   
     <?php require_once '../Menu.php'; ?> 
         <div class="container mb-5" id="container">
-            <div class="row" id="rowNF">
-            <div id="accordion" class="col-md-8 mx-auto mt-3 mb-3">
+            <div id="accordion" class="col-md-12 mx-auto mt-5 mb-5">
                 <div class="card text-center bg-light" id="cardCadastrarProduto">
                     <div class="card-header bg-dark" id="headingOne">
                         <h5 class="mb-0 text-center">
@@ -50,18 +48,23 @@
                     </div>
                     <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                         <div class="card-body">
-                            <div class="col-md-12">
-                                <input type="text" id="inputSearchProduto_XmlGerar" placeholder="Nome do produto, ID ou código de barras" class="form-control input-lg">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <input type="text" id="inputSearchProduto_XmlGerar" placeholder="Nome do produto, ID ou código de barras" class="form-control input-lg">
+                                </div>
+                                <div class="col-md-2">
+                                    <i class="fas fa-broom fa-3x inputReset" title="Apagar" style='cursor:pointer;color:red'></i>
+                                </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="table-responsive-xl">
                                     <table class="table table-hover table-bordered mt-3 mx-auto text-center" id="tableListarProduto_XmlGerar">
                                         <thead class="thead-dark">
                                             <tr>
-                                                <th>id</th>
-                                                <th>descricao</th>
+                                                <th>ID</th>
+                                                <th>Descrição</th>
                                                 <th style="display: none;">ncm</th>
-                                                <th>preco_custo</th>
+                                                <th>Preço</th>
                                                 <th style="display: none;">CFOP</th>
                                                 <th>Quantidade</th>
                                                 <th>Excluir</th>
@@ -190,7 +193,7 @@
                                 <h6>Logradouro</h6>
                                 <input id="inputEndereco" type="text" class="form-control" name="inputEndereco" placeholder="..."/>
                             </div>
-                            <div id="divinputNumero" class="form-group col-md-4" >
+                            <div id="divinputRegistro" class="form-group col-md-4" >
                                 <h6>Número</h6>
                                 <input id="inputNumero" type="number" class="form-control" name="inputNumero" placeholder="..."/>
                             </div>
@@ -199,14 +202,22 @@
                                 <input id="inputBairro" type="text" class="form-control" name="inputBairro" placeholder="..."/>
                             </div>
                             <div id="divinputRegistro" class="form-group col-md-4" >
+                                <h6>Municipio</h6>
+                                <input id="inputMunicipio" type="text" class="form-control" name="inputMunicipio" placeholder="..."/>
+                            </div>
+                            <div id="divinputRegistro" class="form-group col-md-4" >
+                                <h6>UF</h6>
+                                <input id="inputUF" type="text" class="form-control" name="inputUF" placeholder="..."/>
+                            </div>
+                            <div id="divinputRegistro" class="form-group col-md-4" >
                                 <h6>Complemento</h6>
                                 <input id="inputComplemento" type="text" class="form-control" name="inputComplemento" placeholder="..."/>
                             </div>
-                            <div id="divinputRegistro" class="form-group col-md-4" >
+                            <div id="divinputRegistro" class="form-group col-md-6" >
                                 <h6>CEP</h6>
                                 <input id="inputCEP" type="number" class="form-control" name="inputCEP" placeholder="..."/>
                             </div>
-                            <div id="divinputRegistro" class="form-group col-md-4" >
+                            <div id="divinputRegistro" class="form-group col-md-6" >
                                 <h6>Telefone</h6>
                                 <input id="inputFone" type="number" class="form-control" name="inputFone" placeholder="..."/>
                             </div>
@@ -229,7 +240,6 @@
                     </div><!-- END #collapseThree -->
                 </div><!-- END .card-->            
             </div><!-- END .accordion  -->
-            </div> <!-- END .row -->
         </div> <!-- END .container -->   
         <?php require_once '../../Components/Modal.html'; ?>          
         <?php require_once '../../View/Footer.php'; ?>

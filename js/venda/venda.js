@@ -1,27 +1,38 @@
 $(document).ready(function(){ 
     //Verificar na pasta /Enviado/Autorizado da UniNFe se foi autorizado a NF
-    function getNF() 
+    //Função chamada na promise done do click no botao Finalizar Venda
+    //Essa função contêm a criação da DANFE. Motivo: Só sera criado a DANFE se tudo ocorrer bem na autorização
+    function confirmarAutorizacao() 
     {
         let chaveDeAcesso = true;
         $.ajax({
-            url: "http://localhost/geradorXml/App/public/api/autorizarNFCe/true",
+            url: "http://localhost/geradorXml/App/public/api/uninfe/autorizar/confirmar",
             method: 'post',
             dataType: 'json',
             data: {chaveDeAcesso:chaveDeAcesso}
         }).done(function (data){  
-            console.log(data);  
             if(data == 'success')
             {
                 $("#apiModal .modal-body p").slideUp(850);
                 $("#apiModal .modal-body p").text('NFC-e enviada com sucesso!   ').slideDown(850);
                 $("#apiModal .modal-body").append('<i class="fas fa-thumbs-up fa-2x " style="color:#0fe206"></i>').slideDown(700);
-                $('.chart').data('easyPieChart').update(100).options.barColor = '#0fe206';
+                $('.chart').data('easyPieChart').update(100).options.barColor = '#0fe206';            
                 $("#apiModal .modal-footer .action").text('Imprimir NFC-e').show();
+                //DANFE
+                let DANFE = true;
+                $.ajax({
+                    method: 'post',
+                    url: 'http://localhost/geradorXml/App/public/api/DANFE',
+                    dataType: 'json',
+                    data:{DANFE:DANFE}
+                }).done(function(data){
+                });
             } 
             if(data == 'error')
             {
-                setTimeout( function () { getNF(); }, 1500);
-                setTimeout( function () { alert('Erro ao autorizar NFC-e'); location = location;}, 25000);
+                setTimeout( function () { confirmarAutorizacao(); }, 1000);
+                //MSG aparecendo mesmo data == 'success'
+                // setTimeout( function () { alert('Erro ao autorizar NFC-e, VERIFICAR OS ARQUIVOS DE LOGS, MOSTRAR O ERRO NA TELA'); location = location;}, 30000);
             }
         });     
     }
@@ -93,6 +104,9 @@ $(document).ready(function(){
             
         }
     }
+    $(document).on('click','.inputReset',function(){
+        $("#inputSearchProduto_XmlGerar").val('');
+    });
     $("#inputSearchProduto_XmlGerar").on('keyup', function (e){
         e.preventDefault();       
         if (e.keyCode === 13) 
@@ -145,7 +159,8 @@ $(document).ready(function(){
                     ).appendTo('#tableListarProduto_XmlGerar tbody').html();                        
                     }
                 });
-            }
+            }            
+            $("#inputSearchProduto_XmlGerar").val('');
         }
     });    
     //#rowFormaPagamento
@@ -209,6 +224,8 @@ $(document).ready(function(){
                     $('#container').find('input[name="inputBairro"]').val(data[0].bairro);
                     $('#container').find('input[name="inputCEP"]').val(data[0].CEP);
                     $('#container').find('input[name="inputFone"]').val(data[0].fone);
+                    $('#container').find('input[name="inputMunicipio"]').val(data[0].municipio);
+                    $('#container').find('input[name="inputUF"]').val(data[0].UF);
                 });
             }     
         } 
@@ -222,8 +239,7 @@ $(document).ready(function(){
     }).done(function(data){
         emissor = ajax.responseJSON;
     });
-    $("#buttonFinalizarVenda").click(function(){
-        //Coletar todos inpts        
+    $("#buttonFinalizarVenda").click(function(){//Coletar todos inpts        
         var input = {};
         $("input").each(function() {
             input[$(this).attr("name")] = $(this).val();
@@ -237,22 +253,23 @@ $(document).ready(function(){
             });
         }
         //Tabela HTML dos produtos convertida em JSON
-        let produto = convertTableToJson();
-        let valorTotal = calcularValorTotal();
+        var produto = convertTableToJson();
+        var valorTotal = calcularValorTotal();
         //Text Area com as informações adicionais da NFC-e
-        let textArea = $("#textAreaAdicional").val();
+        var textArea = $("#textAreaAdicional").val();
         // Array para ser transformado em JSON
-        let array = [];
+        var array = [];
         array[0] = removeEmpty(input);
         array[1] = removeEmpty(select);
         array[2] = textArea;
         array[3] = valorTotal;
         array[4] = emissor[0];
-        let json = JSON.stringify(array);
+        var json = JSON.stringify(array);
+        //Enviar JSON para rota de criação da DANFE
         // Alimentar o XML para autorização
         $.ajax({
             method:'post',
-            url:'http://localhost/geradorXml/App/public/api/autorizarNFCe',
+            url:'http://localhost/geradorXml/App/public/api/uninfe/autorizar',
             dataType: 'json',
             data:{json:json, produto:produto}
         }).done(function (data)
@@ -276,14 +293,14 @@ $(document).ready(function(){
                         // Size of the pie chart in px. It will always be a square.
                         size: 110,
                         // Time in milliseconds for a eased animation of the bar growing, or false to deactivate.
-                        animate: 25000,
+                        animate: 30000,
                         // Callback function that is called at the start of any animation (only if animate is not false).
                         onStart: $.noop,
                         // Callback function that is called at the end of any animation (only if animate is not false).
                         onStop: $.noop
                     });               
                 }); 
-                getNF();
+                confirmarAutorizacao();
             }
         });
     });

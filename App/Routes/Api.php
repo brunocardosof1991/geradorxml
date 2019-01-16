@@ -7,6 +7,7 @@ use App\Model\Cliente;
 use App\Model\Produto;
 use App\Model\NF;
 use App\Model\Emissor;
+use App\Model\DANFE;
 
 $app = new \Slim\App([
     'settings' => [
@@ -38,20 +39,92 @@ $app->add(function ($req, $res, $next) {
             {                
                 unlink('chaveDeAcesso.txt');
             }
+            //Arquivo com o inicio e fim da numeração inutilizada
+            if(glob("inicioFim.json"))
+            {                
+                unlink('inicioFim.json');
+            }
         });
-        $app->post('/inutilizar', function(Request $request, Response $response)
+        $app->post('/DANFE', function(Request $request, Response $response)
+        {
+            $info = file_get_contents("info.json");
+            $infoArray = json_decode($info ,true);
+            $produto = file_get_contents("produto.json");
+            $produtoArray = json_decode($produto,true);
+            $qrcode = file_get_contents("qrcode.txt");
+            $array = array('info'=>$infoArray,'produto'=>$produtoArray,'qrcode'=>$qrcode);
+            echo json_encode($array);
+        });
+        $app->post('/uninfe/inutilizar', function(Request $request, Response $response)
         { 
             $xml = new Xml();
             $inicio = $request->getParam('inicio');
             $fim = $request->getParam('fim');
             $just = $request->getParam('just');
+            $inutilizacao = array
+            (
+                'inicio' => $inicio,
+                'fim' => $fim
+            );
             $xml->inutilizarXml($inicio,$fim,$just);
-            echo json_encode('{"success": "Numeracao Inutilizada"}');
+            //Codigo IBGE ESTADO + ANO + CNPJ Emissor + Modelo da NOTA FISCAL + serie + inicio e fim
+            $file = $xml->ide['cUF'].date('y').$xml->emit['CNPJ'].$xml->ide['mod'].$xml->ide['serie'].$inicio.$fim;
+            file_put_contents('chaveDeAcesso.txt',$file);
+            file_put_contents('inicioFim.json',json_encode($inutilizacao));
+            echo json_encode('{"success"}');
             echo exec('move c:\xampp\htdocs\geradorXml\App\public\*-ped-inu.xml c:\Unimake\UniNFe\12291758000105\nfce\Envio > nul');
         });
+        $app->post('/uninfe/inutilizar/confirmar', function(Request $request, Response $response)
+        { 
+            $data = new DateTime('now', new DateTimeZone( 'America/Sao_Paulo'));
+            $YM = substr_replace($data->format('Y-m'), '', -3, -2);
+            //Coletar a chave de acesso salva na rota /autirzarXml 
+            $chave = file_get_contents("chaveDeAcesso.txt");
+            $chave .= '-procInutNFe.xml';
+            $xmlAutorizado = glob("C:/Unimake/UniNFe/12291758000105/nfce/Enviado/Autorizados/$YM/$chave");
+            $xmlAutorizado2 = end($xmlAutorizado);
+            $xmlAutorizadoToString = print_r($xmlAutorizado2,true);
+            $data = array();
+            //Se a NFC-e foi cancelada...
+            if(!empty($xmlAutorizadoToString)) {
+                $xml = new Xml();
+                $data = 'success';
+            } else {        
+                $data = 'error';
+            }
+            echo json_encode($data);
+        });
+        $app->post('/uninfe/inutilizar/confirmar/salvar', function(Request $request, Response $response)
+        { 
+            $data = new DateTime('now', new DateTimeZone( 'America/Sao_Paulo'));
+            $YM = substr_replace($data->format('Y-m'), '', -3, -2);
+            $chaveInutilizado = file_get_contents("chaveDeAcesso.txt");
+            $arrayInicioFimNumeracao = file_get_contents("inicioFim.json");
+            $chaveInutilizado =$chaveInutilizado.'-procInutNFe.xml';
+            $xmlInutilizado = glob("C:/Unimake/UniNFe/12291758000105/nfce/Enviado/Autorizados/$YM/$chaveInutilizado");   
+            $xmlInutilizado2 = end($xmlInutilizado);
+            $xmlInutilizadoToString = print_r($xmlInutilizado2,true);
+            $data = array();
+            //Se a NFC-e foi cancelada...
+            if(!empty($xmlInutilizadoToString)) {  
+                $xmlInutilizado2 = 'file:///'.$xmlInutilizado2;
+                $json = file_get_contents('inicioFim.json');
+                $jsonToArray = json_decode($json,true);
+                $inicio = $jsonToArray['inicio'];
+                $fim = $jsonToArray['fim'];
+                $NF = new NF();
+                $NF->salvarInutilizacao($xmlInutilizado2,$inicio,$fim);
+                echo exec('del /f "chaveDeAcesso.txt"');
+                echo exec('del /f "inicioFim.json"');
+                $data = 'success';
+            } else {        
+                $data = 'error';
+            }
+            echo json_encode($data);
+        });  
         // Rota para a criação do XML de cancelamento
         // NF/fetch.js
-        $app->post('/cancelarNFCe', function(Request $request, Response $response)
+        $app->post('/uninfe/cancelar', function(Request $request, Response $response)
         {
             $xml = new Xml();
             $protocolo = $request->getParam('protocolo');
@@ -61,8 +134,7 @@ $app->add(function ($req, $res, $next) {
             file_put_contents('chaveDeAcesso.txt',substr_replace($chave,'', 0, 3));
             echo exec('move c:\xampp\htdocs\geradorXml\App\public\*-ped-eve.xml c:\Unimake\UniNFe\12291758000105\nfce\Envio > nul');
         });
-        //Rota para verificar <cStat>135</cStat><xMotivo>Evento registrado e vinculado a NF-e</xMotivo>
-        $app->post('/cancelarNFCe/true', function(Request $request, Response $response)
+        $app->post('/uninfe/cancelar/confirmar', function(Request $request, Response $response)
         { 
             $data = new DateTime('now', new DateTimeZone( 'America/Sao_Paulo'));
             $YM = substr_replace($data->format('Y-m'), '', -3, -2);
@@ -76,7 +148,46 @@ $app->add(function ($req, $res, $next) {
             //Se a NFC-e foi cancelada...
             if(!empty($xmlAutorizadoToString)) {
                 $xml = new Xml();
-                //$xml->salvarNFCancelada($protocolo);
+                $data = 'success';
+            } else {        
+                $data = 'error';
+            }
+            echo json_encode($data);
+        });
+        $app->post('/uninfe/cancelar/confirmar/salvar', function(Request $request, Response $response)
+        { 
+            $data = new DateTime('now', new DateTimeZone( 'America/Sao_Paulo'));
+            $YM = substr_replace($data->format('Y-m'), '', -3, -2);
+            $chaveCancelado = file_get_contents("chaveDeAcesso.txt");
+            $chaveCancelado = 'NFe'.$chaveCancelado.'-procNFe.xml';
+            $xmlCancelado = glob("C:/Unimake/UniNFe/12291758000105/nfce/Enviado/Autorizados/$YM/$chaveCancelado");   
+            $xmlCancelado2 = end($xmlCancelado);
+            $xmlCanceladoToString = print_r($xmlCancelado2,true);
+                                    //\\
+            $chaveAutorizado = file_get_contents("chaveDeAcesso.txt");
+            $chaveAutorizado .= '_110111_01-procEventoNFe.xml';
+            $xmlAutorizado = glob("C:/Unimake/UniNFe/12291758000105/nfce/Enviado/Autorizados/$YM/$chaveAutorizado");
+            $xmlAutorizado2 = end($xmlAutorizado);
+            $xmlAutorizadoToString = print_r($xmlAutorizado2,true);
+            $data = array();
+            //Se a NFC-e foi cancelada...
+            if(!empty($xmlAutorizadoToString) && !empty($xmlCanceladoToString)) {
+                //Colocar toda NFC-e Autorizada em uma variável (Pegar o link do QR-Code)
+                $NFCe = file_get_contents($xmlCancelado2);
+                //Coletar o qrcode da NFC-e autorizada
+                //Começo da coleta
+                $from = "<qrCode>";
+                //Fim da coleta
+                $to = "</qrCode>";
+                function getQRCode($NFCe,$from,$to)
+                {
+                    $sub = substr($NFCe, strpos($NFCe,$from)+strlen($from),strlen($NFCe));
+                    return substr($sub,0,strpos($sub,$to));
+                } 
+                $qrCode = getQRCode($NFCe,$from,$to);
+                $NF = new NF();
+                $xmlCancelado2 = 'file:///'.$xmlCancelado2;
+                $NF->salvarNFCancelada($xmlCancelado2,$qrCode);
                 echo exec('del /f "chaveDeAcesso.txt"');
                 $data = 'success';
             } else {        
@@ -85,7 +196,7 @@ $app->add(function ($req, $res, $next) {
             echo json_encode($data);
         });  
         //Rota para a criação do XML de autorização
-        $app->post('/autorizarNFCe', function(Request $request, Response $response)
+        $app->post('/uninfe/autorizar', function(Request $request, Response $response)
         {
             $file1Array = json_decode($request->getParam('json'),true);
             $produto = json_decode($request->getParam('produto'),true);
@@ -100,6 +211,8 @@ $app->add(function ($req, $res, $next) {
             $xml->enderDest['xBairro'] = $file1Array[0]['inputBairro'];
             $xml->enderDest['CEP'] = $file1Array[0]['inputCEP'];
             $xml->enderDest['fone'] = $file1Array[0]['inputFone'];
+            $xml->enderDest['xMun'] = $file1Array[0]['inputMunicipio'];
+            $xml->enderDest['UF'] = $file1Array[0]['inputUF'];
             //Forma de Pagamento
             if($file1Array[1]['payment'] == 01 || $file1Array[1]['payment']== 02)
             {
@@ -118,6 +231,8 @@ $app->add(function ($req, $res, $next) {
             $informacoesAdicionais = $file1Array[2];
             try {
                 file_put_contents('chaveDeAcesso.txt',$xml->gerarChaveDeAcesso());
+                file_put_contents('info.json',json_encode($file1Array,true));
+                file_put_contents('produto.json',json_encode($produto,true));
                 $xml->autorizarXML($informacoesAdicionais,$produto);
                 //$xml->saidaProduto($produto);
                 echo json_encode('{"success": "XML Autorizado"}');                
@@ -128,7 +243,7 @@ $app->add(function ($req, $res, $next) {
         });//END /autorizarNFCe
         //Rota para verificar se o xml foi autorizado && salvar NF no banco de dados c/ protocolo de autorização
         // As informações salva no banco de dados serão úteis para o cancelamento da NFC-e
-        $app->post('/autorizarNFCe/true', function(Request $request, Response $response)
+        $app->post('/uninfe/autorizar/confirmar', function(Request $request, Response $response)
         { 
             $data = new DateTime('now', new DateTimeZone( 'America/Sao_Paulo'));
             $YM = substr_replace($data->format('Y-m'), '', -3, -2);
@@ -152,8 +267,18 @@ $app->add(function ($req, $res, $next) {
                 {
                     $sub = substr($NFCe, strpos($NFCe,$fromP)+strlen($fromP),strlen($NFCe));
                     return substr($sub,0,strpos($sub,$toP));
-                }  
+                }//Começo da coleta
+                $from = "<qrCode>";
+                //Fim da coleta
+                $to = "</qrCode>";
+                function getQRCode($NFCe,$from,$to)
+                {
+                    $sub = substr($NFCe, strpos($NFCe,$from)+strlen($from),strlen($NFCe));
+                    return substr($sub,0,strpos($sub,$to));
+                } 
+                $qrCode = getQRCode($NFCe,$from,$to);  
                 $protocolo = getProtocolo($NFCe,$fromP,$toP);
+                file_put_contents('qrcode.txt',$qrCode);
                 $xml = new Xml();
                 $xml->salvarNF($protocolo);
                 echo exec('del /f "chaveDeAcesso.txt"');
@@ -209,7 +334,7 @@ $app->add(function ($req, $res, $next) {
                 $produto = new Produto();
                 $produto = $produto->get($id);
             });    
-            // Consultar um Produto especifico pela descrição
+            // Consultar um Produto especifico pela Descrição
             $app->get('/descricao/{descricao}', function(Request $request, Response $response){
                 $descricao = $request->getAttribute('descricao'); // return NotFound for non existent route
                 $produto = new Produto();
@@ -243,6 +368,11 @@ $app->add(function ($req, $res, $next) {
                 $emissor = new Emissor();
                 $emissor = $emissor->get();
             });   
+            // Adicionar Ide
+            $app->post('/ide', function(Request $request, Response $response){
+                $emissor = new Emissor();
+                $emissor = $emissor->addIde($request);
+            });    
             // Adicionar Emissor
             $app->post('/add', function(Request $request, Response $response){
                 $emissor = new Emissor();
@@ -267,6 +397,15 @@ $app->add(function ($req, $res, $next) {
             $app->get('/', function(Request $request, Response $response){
                 $NF = new NF();
                 $NF = $NF->getAll();
+            });
+            //Consultar NFC-e Cancelada    
+            $app->get('/cancelada', function(Request $request, Response $response){
+                $NF = new NF();
+                $NF = $NF->getAllCanceladas();
+            });    
+            $app->get('/inutilizado', function(Request $request, Response $response){
+                $NF = new NF();
+                $NF = $NF->getAllInutilizadas();
             });    
             // Consultar uma NF especifica
             $app->get('/{id}', function(Request $request, Response $response){

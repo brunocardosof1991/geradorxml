@@ -1,0 +1,93 @@
+<div id="accordion" class="col-md-12 mx-auto mt-5 mb-5">
+    <div class="card text-center bg-light">
+        <div class="card-header bg-dark" id="headingOne">
+            <h5 class="mb-0 text-center">
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false"
+                    aria-controls="collapseOne">
+                    <span class="badge badge-danger">Inutilizar</span>
+                </button>
+            </h5>
+        </div>
+        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+            <div class="card-body">
+                <div class="row" id="rowInutilizar">
+                    <div class="col-md-8 mx-auto bg-dark" id="col-inutilizar">
+                        <form method="post" id="formInutilizar">
+                            <div class="form-group">
+                                <label for="exampleFormControlInput1" class="text-white">Inicio da Numeração</label>
+                                <input type="number" class="form-control" id="inputInicio" name="inputInicio"
+                                    placeholder="Inicio da Numeração">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleFormControlInput1" class="text-white">Fim da Numeração</label>
+                                <input type="number" class="form-control" id="inputFim" name="inputFim" placeholder="Fim da Numeração">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleFormControlInput1" class="text-white">Justificativa</label>
+                                <input type="text" class="form-control" id="inputJust" name="inputJust" placeholder="Digite uma justificativa">
+                            </div>
+                            <div class="form-group">
+                                <input type="button" class="btn btn-success" id="inutilizarNumeracao" value="Inutilizar">
+                                <input type="reset" class="btn btn-danger" value="Limpar">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div><!-- END #collapseOne -->
+    </div><!-- END .card-->
+    <div class="card text-center bg-light">
+        <div class="card-header bg-dark" id="headingTwo">
+            <h5 class="mb-0 text-center">
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false"
+                    aria-controls="collapseTwo">
+                    <span class="badge badge-success">Numerção Inutilizada</span>
+                </button>
+            </h5>
+        </div>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+            <div class="card-body">
+                <table class="table table-hover table-bordered mx-auto text-center js-table-data display " id="tableListarInutilizacao"
+                    style="max-width:100px;">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>XML</th>
+                            <th>Inicio Numeração</th>
+                            <th>Fim Numeração</th>
+                            <th>Data da Inutilização</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div><!-- END #collapseTwo -->
+    </div><!-- END .card-->
+    <div class="card text-center bg-light">
+        <div class="card-header bg-dark" id="headingTwo">
+            <h5 class="mb-0 text-center">
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree"
+                    aria-expanded="false" aria-controls="collapseThree">
+                    <span class="badge badge-warning">NFC-e Canceladas</span>
+                </button>
+            </h5>
+        </div>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+            <div class="card-body">
+                <table class="table table-hover table-bordered mx-auto text-center js-table-data display" id="tableListarNFCancelada">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>XML</th>
+                            <th>NFC-e</th>
+                            <th>Data do Cancelamento</th>
+                            <th>Imprimir</th>
+                            <th>Compartilhar</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div><!-- END #collapseThree -->
+    </div><!-- END .card-->
+</div><!-- END .accordion  -->

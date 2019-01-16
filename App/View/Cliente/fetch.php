@@ -50,8 +50,9 @@
                                     <th scope="col">CPF/CNPJ</th>
                                     <th scope="col">Endereço</th>
                                     <th scope="col">Número</th>
-                                    <th scope="col">Complemento</th>
                                     <th scope="col">Bairro</th>
+                                    <th scope="col">Município</th>
+                                    <th scope="col">UF</th>
                                     <th scope="col">CEP</th>
                                     <th scope="col">Telefone</th>
                                     <th scope="col">Excluir</th>

@@ -32,6 +32,21 @@ html, body {
  
  :-ms-input-placeholder {  
     text-align: center; 
+ } 
+ table
+ {
+ border-bottom: 1px Solid Black;         
+ border-right: 1px Solid Black;         
+ border-collapse : collapse;  
+ }
+ table td, table th  
+ {    
+ border-left: 1px Solid Black;         
+ border-top: 1px Solid Black;              
+ border-bottom:none;    
+ border-right:none;
+ max-width: 250px;
+ word-wrap: break-word;
  }
  @media screen and (max-width: 1199px) {
    thead { display: none; }

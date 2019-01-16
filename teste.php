@@ -1,5 +1,268 @@
-<?php
-use App\Model\Xml;
-require_once $_SERVER['DOCUMENT_ROOT'] . 'vendor/autoload.php';
 
-object(Slim\Http\Request)#106 (15) { ["method":protected]=> string(3) "GET" ["originalMethod":protected]=> string(3) "GET" ["uri":protected]=> object(Slim\Http\Uri)#94 (9) { ["scheme":protected]=> string(4) "http" ["user":protected]=> string(0) "" ["password":protected]=> string(0) "" ["host":protected]=> string(9) "localhost" ["port":protected]=> NULL ["basePath":protected]=> string(22) "/geradorXml/App/public" ["path":protected]=> string(24) "api/produto/descricao/HD" ["query":protected]=> string(0) "" ["fragment":protected]=> string(0) "" } ["requestTarget":protected]=> NULL ["queryParams":protected]=> NULL ["cookies":protected]=> array(0) { } ["serverParams":protected]=> array(49) { ["REDIRECT_MIBDIRS"]=> string(24) "C:/xampp/php/extras/mibs" ["REDIRECT_MYSQL_HOME"]=> string(16) "\xampp\mysql\bin" ["REDIRECT_OPENSSL_CONF"]=> string(31) "C:/xampp/apache/bin/openssl.cnf" ["REDIRECT_PHP_PEAR_SYSCONF_DIR"]=> string(10) "\xampp\php" ["REDIRECT_PHPRC"]=> string(10) "\xampp\php" ["REDIRECT_TMP"]=> string(10) "\xampp\tmp" ["REDIRECT_STATUS"]=> string(3) "200" ["MIBDIRS"]=> string(24) "C:/xampp/php/extras/mibs" ["MYSQL_HOME"]=> string(16) "\xampp\mysql\bin" ["OPENSSL_CONF"]=> string(31) "C:/xampp/apache/bin/openssl.cnf" ["PHP_PEAR_SYSCONF_DIR"]=> string(10) "\xampp\php" ["PHPRC"]=> string(10) "\xampp\php" ["TMP"]=> string(10) "\xampp\tmp" ["HTTP_HOST"]=> string(9) "localhost" ["HTTP_USER_AGENT"]=> string(78) "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:64.0) Gecko/20100101 Firefox/64.0" ["HTTP_ACCEPT"]=> string(46) "application/json, text/javascript, */*; q=0.01" ["HTTP_ACCEPT_LANGUAGE"]=> string(35) "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3" ["HTTP_ACCEPT_ENCODING"]=> string(13) "gzip, deflate" ["HTTP_REFERER"]=> string(53) "http://localhost/geradorXml/App/View/Venda/vender.php" ["HTTP_X_REQUESTED_WITH"]=> string(14) "XMLHttpRequest" ["HTTP_CONNECTION"]=> string(10) "keep-alive" ["PATH"]=> string(588) "C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\Docker\Docker\Resources\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\PuTTY\;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\xampp\php;C:\ProgramData\ComposerSetup\bin;C:\Users\Bruno\AppData\Local\Microsoft\WindowsApps;C:\Users\Bruno\AppData\Roaming\npm;C:\Users\Bruno\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Bruno\AppData\Roaming\Composer\vendor\bin" ["SystemRoot"]=> string(10) "C:\WINDOWS" ["COMSPEC"]=> string(27) "C:\WINDOWS\system32\cmd.exe" ["PATHEXT"]=> string(53) ".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC" ["WINDIR"]=> string(10) "C:\WINDOWS" ["SERVER_SIGNATURE"]=> string(94) "
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.40/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.33/vfs_fonts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+<html lang='en'>
+<head>
+  <meta charset='utf-8'>
+  <title>pdfmake Example</title>
+  <!-- Source: https://github.com/bpampuch/pdfmake -->
+</head>
+<body>
+  <script>
+$(()=>{
+    
+                //DANFE
+                let DANFE = true;
+                $.ajax({
+                    method: 'post',
+                    url: 'http://localhost/geradorXml/App/public/api/DANFE',
+                    dataType: 'json',
+                    data:{DANFE:DANFE}
+                }).done(function(data){
+                    // Object of object to array of object
+                    let arrayDANFE = Object.keys(data).map(key => data[key]); 
+                    var docDefinition = {
+                        pageSize: 'A4',
+                        pageMargins: [ 50, 10, 50, 10 ],
+                        content: [
+                            {
+                                    text: 'CNPJ: '+arrayDANFE[0][4].CNPJ+' '+arrayDANFE[0][4].xNome,
+                                    alignment: 'left'
+                            },
+                            {
+                                text: arrayDANFE[0][4].xLgr+' '+arrayDANFE[0][4].nro+', '+arrayDANFE[0][4].xBairro+', '+arrayDANFE[0][4].xMun+', '+arrayDANFE[0][4].UF,
+                                alignment: 'left'
+                            },
+                            {
+                                text: 'Documento Auxiliar da Nota Fiscal de Consumidor Eletrônica\n\n',
+                                alignment: 'left'
+                            },
+                            {
+                                alignment: 'left',
+                                columns:[
+                                    {
+                                        text: 'Código'
+                                    },
+                                    {
+                                        text: 'Descrição'
+                                    },
+                                    {
+                                        text: 'Qnt e UN'
+                                    },
+                                    {
+                                        text: 'Vl Unit'
+                                    },
+                                    {
+                                        text: 'Vl Total'
+                                    }
+                                ]
+                            },
+                            {
+                                alignment: 'left',
+                                columns:[
+                                    {
+                                        text: arrayDANFE[1][0].id
+                                    },
+                                    {
+                                        text: arrayDANFE[1][0].descricao
+                                    },
+                                    {
+                                        text: arrayDANFE[1][0].quantidade + '   '+ 'UN'
+                                    },
+                                    {
+                                        text: arrayDANFE[1][0].preco
+                                    },
+                                    {
+                                        text: arrayDANFE[1][0].preco * arrayDANFE[1][0].quantidade
+                                    }
+                                ]
+                            },
+                            {
+                                columns:[
+                                    {
+                                        alignment: 'left',
+                                        text: 'Qtde. total de itens'
+                                    },
+                                    {
+                                        alignment: 'right',
+                                        text: 'Qtde. total de itens'
+                                    }
+                                ],
+                            },                            
+                            {
+                                columns:[
+                                    {
+                                        alignment: 'left',
+                                        text: 'Valor total R$'
+                                    },
+                                    {
+                                        alignment: 'right',
+                                        text: 'Valor total R$'
+                                    }
+                                ]
+                            },
+                            {
+                                columns:[
+                                    {
+                                        alignment: 'left',
+                                        text: 'Desconto R$'
+                                    },
+                                    {
+                                        alignment: 'right',
+                                        text: 'Desconto R$'
+                                    }
+                                ]
+                            },
+                            {
+                                columns:[
+                                    {
+                                        alignment: 'left',
+                                        text: 'Frete R$'
+                                    },
+                                    {
+                                        alignment: 'right',
+                                        text: 'Frete R$'
+                                    },
+                                ]
+                            },
+                            {
+                                columns:[
+                                    {
+                                        alignment: 'left',
+                                        text: 'Valor total R$'
+                                    },
+                                    {
+                                        alignment: 'right',
+                                        text: 'Valor total R$'
+                                    },
+                                ]
+                            },
+                            {
+                                columns:[
+                                    {          
+                                        alignment: 'left',                              
+                                        text: 'Valor a Pagar R$',
+                                        bold: true
+                                    },
+                                    {          
+                                        alignment: 'right',                              
+                                        text: 'Valor a Pagar R$',
+                                        bold: true
+                                    },
+                                ]
+                            },
+                            {
+                                columns:[
+                                    {          
+                                        alignment: 'left',                              
+                                        text: '\nFORMA PAGAMENTO'
+                                    },
+                                    {          
+                                        alignment: 'right',                              
+                                        text: '\nVALOR PAGO R$'
+                                    },
+                                ]
+                            },
+                            {
+                                columns:[
+                                    {          
+                                        alignment: 'left',                              
+                                        text: 'EX: Cartão de Crédito'
+                                    },
+                                    {          
+                                        alignment: 'right',                              
+                                        text: '1.050,00'
+                                    },
+                                ]
+                            },
+                            {
+                                text: '\nConsulta pela Chave de Acesso',
+                                alignment: 'center',
+                                bold: true
+                            },
+                            {
+                                text: arrayDANFE[2],
+                                alignment: 'center'
+                            },
+                            {
+                                width: '*',
+                                alignment: 'center', 
+                                text:
+                                [
+                                    {                                            
+                                        text: '\nCONSUMIDOR ',
+                                        bold: true
+                                    },
+                                    {                                            
+                                        text: 'CPF: ',
+                                    },
+                                    {
+                                        text: arrayDANFE[0][0].inputRegistro
+                                    },
+                                    {
+                                        text: ' - '
+                                    },
+                                    {
+                                        text: arrayDANFE[0][0].inputName
+                                    },
+                                    {
+                                        text: ' - '
+                                    },
+                                    {
+                                        text: arrayDANFE[0][0].inputEndereco
+                                    },
+                                    {
+                                        text: ', '
+                                    },
+                                    {
+                                        text: arrayDANFE[0][0].inputNumero
+                                    },
+                                    {
+                                        text: ', '
+                                    },
+                                    {
+                                        text: arrayDANFE[0][0].inputBairro
+                                    },
+                                    {
+                                        text: ', '
+                                    },
+                                    {
+                                        text: arrayDANFE[0][0].inputMunicipio
+                                    },
+                                    {
+                                        text: ' - '
+                                    },
+                                    {
+                                        text: arrayDANFE[0][0].inputUF
+                                    },
+                                ], 
+                            },
+                            {
+                                width: '*',
+                                alignment: 'center', 
+                                text:
+                                [
+                                    {                                            
+                                        text: '\NFC-e nº ',
+                                        bold: true
+                                    },
+                                ], 
+                            },
+                            {
+                                width: '*',
+                                alignment: 'center',  
+                                qr: arrayDANFE[2],
+                                fit: 130,
+                            },  
+                        ]
+                    }  
+                    pdfMake.createPdf(docDefinition).download();
+                    //console.log(arrayDANFE[0]);
+                });
+});
+  </script>
+</body>
+</html>

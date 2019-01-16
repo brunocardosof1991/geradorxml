@@ -14,8 +14,9 @@ $(document).ready(function () {
         { data: "CNPJ" },
         { data: "endereco" },
         { data: "numero" },
-        { data: "complemento" },
         { data: "bairro" },
+        { data: "municipio" },
+        { data: "UF" },
         { data: "CEP" },
         { data: "fone" },
         { data: "Editar" },
@@ -39,6 +40,7 @@ $(document).ready(function () {
         var id = $(this).closest('tr').children('td:eq(0)').text();
         var nome = $(this).closest('tr').children('td:eq(1)').text();
         let $confirm = confirm("Tem certeza que deseja excluir o/a cliente "+nome);
+        alert(id);
         if($confirm)         
         {    
             $.ajax({

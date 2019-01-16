@@ -54,10 +54,12 @@ class Cliente {
         $numero = $request->getParam('numero');
         $complemento = $request->getParam('complemento');
         $bairro = $request->getParam('bairro');
+        $municipio = $request->getParam('municipio');
+        $UF = $request->getParam('UF');
         $CEP = $request->getParam('CEP');
         $fone = $request->getParam('fone');
-        $sql = "INSERT INTO cliente (nome,CNPJ,endereco,numero,complemento,bairro,CEP,fone) VALUES
-        (:nome,:CNPJ,:endereco,:numero,:complemento,:bairro,:CEP,:fone)";
+        $sql = "INSERT INTO cliente (nome,CNPJ,endereco,numero,complemento,bairro,municipio,UF,CEP,fone) VALUES
+        (:nome,:CNPJ,:endereco,:numero,:complemento,:bairro,:municipio,:UF,:CEP,:fone)";
         try{
             $connection = $this->connection->PDOConnect();
             $stmt = $connection->prepare($sql);
@@ -67,6 +69,8 @@ class Cliente {
             $stmt->bindParam(':numero',    $numero);
             $stmt->bindParam(':complemento',       $complemento);
             $stmt->bindParam(':bairro',      $bairro);
+            $stmt->bindParam(':municipio',      $municipio);
+            $stmt->bindParam(':UF',      $UF);
             $stmt->bindParam(':CEP',      $CEP);
             $stmt->bindParam(':fone',      $fone);
             $stmt->execute();
@@ -125,7 +129,7 @@ class Cliente {
             $stmt = $connection->prepare($sql);
             $stmt->execute();
             $connection = null;
-            echo '{"success": "Cliente Deletado"}';
+            echo json_encode('{"success": "Cliente Deletado"}');
         } catch(PDOException $e){
             echo '{"error": '.$e->getMessage().'}';
         }        

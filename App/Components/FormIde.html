@@ -1,46 +1,43 @@
 <form>
     <div class="form-group">
-        <label for="exampleFormControlSelect1">Natureza da Operação</label>
-        <select class="form-control" id="exampleFormControlSelect1">
+        <label for="exampleFormControlSelect1" id="cUF">Código da UF</label>
+        <select class="form-control cUF" id="exampleFormControlSelect1">
+            <option>...</option>
+            <option value="43">RS</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlSelect1" id="natOp">Natureza da Operação</label>
+        <select class="form-control natOp" id="exampleFormControlSelect1">
             <option>...</option>
             <option>Venda de mercadorias</option>
         </select>
     </div>
     <div class="form-group">
-        <label for="exampleFormControlSelect1">Finalidade da NFC-e</label>
-        <select class="form-control" id="exampleFormControlSelect1">
+        <label for="exampleFormControlSelect1" id="mod">Código do Modelo do Documento Fiscal</label>
+        <select class="form-control mod" id="exampleFormControlSelect1">
             <option>...</option>
-            <option value="1">Normal</option>
-            <option value="2">Complementar</option>
-            <option value="3">Ajuste</option>
-            <option value="4">Devolução</option>
+            <option value="55">NF-e emitida em substituição ao modelo 1 ou 1A</option>
+            <option value="65">NFC-e, utilizada nas operações de venda no varejo (a critério da UF aceitar este modelo de documento)</option>
         </select>
     </div>
     <div class="form-group">
-        <label for="exampleFormControlSelect1">Indicador de presença do comprador</label>
-        <select class="form-control" id="exampleFormControlSelect1">
+        <label for="exampleFormControlSelect1" id="serie">Série do Documento Fiscal</label>
+        <select class="form-control serie" id="exampleFormControlSelect1">
             <option>...</option>
-            <option value="0">Não se aplica</option>
-            <option value="1">Operação presencial</option>
-            <option value="2">Operação não presencial, pela Internet</option>
-            <option value="3">Operação não presencial, Teleatendimento</option>
-            <option value="4">NFC-e em operação com entrega a domicílio</option>
-            <option value="9">Operação não presencial, outros</option>
+            <option value="001">001</option>
         </select>
     </div>
     <div class="form-group">
-        <label for="exampleFormControlSelect1">Processo de emissão da NFC-e</label>
-        <select class="form-control" id="exampleFormControlSelect1">
+        <label for="exampleFormControlSelect1" id="tpNF">Tipo de Operação</label>
+        <select class="form-control tpNF" id="exampleFormControlSelect1">
             <option>...</option>
-            <option value="0">Emissão com aplicativo do contribuinte</option>
-            <option value="1">Emissão avulsa pelo Fisco</option>
-            <option value="2">Emissão avulsa, pelo contribuinte com seu certificado digital, através do site do Fisco</option>
-            <option value="3">Emissão pelo contribuinte com aplicativo fornecido pelo Fisco</option>
+            <option value="1">Saída</option>
         </select>
     </div>
     <div class="form-group">
-        <label for="exampleFormControlSelect1">Identificador de local de destino da operação</label>
-        <select class="form-control" id="exampleFormControlSelect1">
+        <label for="exampleFormControlSelect1" id="idDest">Identificador de local de destino da operação</label>
+        <select class="form-control idDest" id="exampleFormControlSelect1">
             <option>...</option>
             <option value="1">Operação interna</option>
             <option value="2">Operação interestadual</option>
@@ -48,8 +45,15 @@
         </select>
     </div>
     <div class="form-group">
-        <label for="exampleFormControlSelect1">Formato de Impressão do DANFE</label>
-        <select class="form-control" id="exampleFormControlSelect1">
+        <label for="exampleFormControlSelect1" id="cMunFG">Código do Município de Ocorrência do Fato Gerador</label>
+        <select class="form-control cMunFG" id="exampleFormControlSelect1">
+            <option>...</option>
+            <option value="4314902">RS</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlSelect1" id="tpImp">Formato de Impressão do DANFE</label>
+        <select class="form-control tpImp" id="exampleFormControlSelect1">
             <option>...</option>
             <option value="0">Sem geração de DANFE</option>
             <option value="1">DANFE normal, Retrato</option>
@@ -60,8 +64,8 @@
         </select>
     </div>
     <div class="form-group">
-        <label for="exampleFormControlSelect1">Tipo de Emissão da NF-e</label>
-        <select class="form-control" id="exampleFormControlSelect1">
+        <label for="exampleFormControlSelect1" id="tpEmis">Tipo de Emissão da NF-e</label>
+        <select class="form-control tpEmis" id="exampleFormControlSelect1">
             <option>...</option>
             <option value="1">Emissão normal (não em contingência)</option>
             <option value="2">Contingência FS-IA, com impressão do DANFE em formulário de segurança</option>
@@ -73,23 +77,55 @@
         </select>
     </div>
     <div class="form-group">
-        <label for="exampleFormControlSelect1">Identificação do Ambiente</label>
-        <select class="form-control" id="exampleFormControlSelect1">
+        <label for="exampleFormControlSelect1" id="tpAmb">Identificação do Ambiente</label>
+        <select class="form-control tpAmb" id="exampleFormControlSelect1">
             <option>...</option>
             <option value="1">Produção</option>
             <option value="2">Homologação</option>
         </select>
     </div>
     <div class="form-group">
-        <label for="exampleFormControlSelect1">Código do Modelo do Documento Fiscal</label>
-        <select class="form-control" id="exampleFormControlSelect1">
+        <label for="exampleFormControlSelect1" id="finNFe">Finalidade da NFC-e</label>
+        <select class="form-control finNFe" id="exampleFormControlSelect1">
             <option>...</option>
-            <option value="55">NF-e emitida em substituição ao modelo 1 ou 1A</option>
-            <option value="65">NFC-e, utilizada nas operações de venda no varejo (a critério da UF aceitar este modelo de documento)</option>
+            <option value="1">Normal</option>
+            <option value="2">Complementar</option>
+            <option value="3">Ajuste</option>
+            <option value="4">Devolução</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlSelect1" id="indFinal">Indica operação com Consumidor final</label>
+        <select class="form-control indFinal" id="exampleFormControlSelect1">
+            <option>...</option>
+            <option value="0">Normal</option>
+            <option value="1">Consumidor final;</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlSelect1" id="indPres">Indicador de presença do comprador</label>
+        <select class="form-control indPres" id="exampleFormControlSelect1">
+            <option>...</option>
+            <option value="0">Não se aplica</option>
+            <option value="1">Operação presencial</option>
+            <option value="2">Operação não presencial, pela Internet</option>
+            <option value="3">Operação não presencial, Teleatendimento</option>
+            <option value="4">NFC-e em operação com entrega a domicílio</option>
+            <option value="9">Operação não presencial, outros</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="exampleFormControlSelect1" id="procEmi">Processo de emissão da NFC-e</label>
+        <select class="form-control procEmi" id="exampleFormControlSelect1">
+            <option>...</option>
+            <option value="0">Emissão com aplicativo do contribuinte</option>
+            <option value="1">Emissão avulsa pelo Fisco</option>
+            <option value="2">Emissão avulsa, pelo contribuinte com seu certificado digital, através do site do Fisco</option>
+            <option value="3">Emissão pelo contribuinte com aplicativo fornecido pelo Fisco</option>
         </select>
     </div>
     <div class="form-group">
             <i class="far fa-save fa-3x mr-1" title="Salvar" id='salvarConfig' style='cursor:pointer;color:green'></i>
-            <i class="fas fa-ban fa-3x ml-1" title="Resetar" id='salvarConfig' style='cursor:pointer;color:red'></i>
+            <i class="fas fa-ban fa-3x ml-1" title="Resetar" id='resetConfig' style='cursor:pointer;color:red'></i>
     </div>
 </form>

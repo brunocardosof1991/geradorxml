@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-dark mb-2" id="navbar">
+<nav class="navbar navbar-expand-lg navbar-light bg-dark mb-5" id="navbar">
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -24,6 +24,7 @@
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownBlog">
                 <a class="dropdown-item" href="http://localhost/geradorXml/App/View/NF/fetch.php">Listar NFC-e</a>
+                <a class="dropdown-item" href="http://localhost/geradorXml/App/View/NF/eventos.php">Eventos NFC-e</a>
             </div>
         </li>
         <li class="nav-item dropdown">

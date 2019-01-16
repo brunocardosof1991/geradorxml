@@ -15,7 +15,7 @@ class Xml
     private $tpEvento = 110111;
     private $nSeqEvento = 1;
     //<ide>
-    private $ide = array
+    public $ide = array
     (
         'cUF' => 43,
         'cNF' => 'DEFAULT',
@@ -38,7 +38,7 @@ class Xml
         'verProc' => '1.0.0'
     );
     //<emit>
-    private $emit = array
+    public $emit = array
     (
         'CNPJ' => NULL,
         'xNome' => NULL,
@@ -49,7 +49,7 @@ class Xml
         'CRT' => NULL
     );
     //<enderEmit>
-    private $enderEmit = array
+    public $enderEmit = array
     (
         'xLgr' => NULL,
         'nro' => NULL,
@@ -78,8 +78,8 @@ class Xml
         'xCpl' => '',
         'xBairro' => '',
         'cMun' => 4314902,
-        'xMun' => 'Porto Alegre',
-        'UF' => 'RS',
+        'xMun' => '',
+        'UF' => '',
         'CEP' => '',
         'cPais' => 1058,
         'xPais' => 'Brasil',
@@ -98,9 +98,9 @@ class Xml
         'cAut' => 'DEFAULT'
     );
     private $connection = '';
-    private $ICMSSN102 = array();
-    private $PIS = array ();
-    private $COFINS = array();
+    public $ICMSSN102 = array();
+    public $PIS = array ();
+    public $COFINS = array();
     function __construct() {
         $this->connection = new Conexao();
         $this->ICMS = ICMS::$ICMSSN102;
@@ -526,12 +526,13 @@ class Xml
     }
     function cancelarXml($protocolo, $chave) 
     {
+        $table = 'nfCancelada';
         $dom = new DOMDocument('1.0', 'utf-8');
         $envEvento = $dom->appendChild($dom->createElement('envEvento'));
         $envEvento->setAttributeNode(new DOMAttr('versao', '1.00'));
         $envEvento->setAttributeNode(new DOMAttr('xmlns', 'http://www.portalfiscal.inf.br/nfe'));
             $idLote = $envEvento->appendChild($dom->createElement('idLote'));
-            $idLote->appendChild($dom->createTextNode($this->getId($table = 'nfCancelada')));
+            $idLote->appendChild($dom->createTextNode($this->getId($table)));
             $evento = $envEvento->appendChild($dom->createElement('evento'));
             $evento->setAttributeNode(new DOMAttr('versao', '1.00'));
             $evento->setAttributeNode(new DOMAttr('xmlns', 'http://www.portalfiscal.inf.br/nfe'));

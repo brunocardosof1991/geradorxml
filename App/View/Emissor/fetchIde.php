@@ -9,7 +9,7 @@
         <script src="../../../js/external/jquery/jquery.js"></script>     
 
         <!-- ************** -->
-        <script type="module" src="../../../js/Emissor/fetch.js"></script>
+        <script type="module" src="../../../js/Emissor/ide.js"></script>
         <script type="text/javascript" src="../../../js/tableResponsive.js"></script>
 
         <!-- Folha de estilo da página -->

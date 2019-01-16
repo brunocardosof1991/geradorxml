@@ -174,9 +174,6 @@ $(document).ready(function(){
             });          
         }
 	});
-	$(document).on('click','#salvarConfig',function(){
-		alert('Configurar');
-	});
     //Botao fechar modalNFC-e, redirecionar para vendas.php
     $(".modalApi_fechar").on('click',function() {
         location = location;
