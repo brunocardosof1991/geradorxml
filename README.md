@@ -14,6 +14,11 @@ Frontend JavaScript, jQuery
 1.0.0
 
 ##Instalação
+Instalar o software da Unimake - UniNFe
+
+Criar o CSC e o ID Token no site do Sefaz
+
+Passo a passo da configuração em - http://wiki.unimake.com.br/index.php/Manuais:UniNFe
 
 ##API Endpoints
 Grupo: Cliente 
