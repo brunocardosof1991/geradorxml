@@ -1,9 +1,13 @@
 ##Gerador XML
 Esse é um gerador XML para autorizar NFC-e em ambiente de homologação com o sefaz, usando o software UniNFe da Unimake para assinatura digital do XML.
-Esse projeto esta usando: 
+Esse projeto esta usando:
+
 Arquitetura Restfull Api; 
+
 Backend PHP; 
+
 SGBD MySQL; 
+
 Frontend JavaScript, jQuery
 
 ##Versão
@@ -44,6 +48,18 @@ Grupo: NF
 
     $ DELETE /api/nf/delete/{id}
 
+    $ POST /api/uninfe/cancelar
+
+    $ POST /api/uninfe/cancelar/confirmar
+
+    $ POST /api/uninfe/cancelar/confirmar/salvar
+
+    $ POST api/uninfe/inutilizar
+
+    $ POST api/uninfe/inutilizar/confirmar
+
+    $ POST api/uninfe/inutilizar/confirmar/salvar
+
 Grupo: Produto 
 
     $ GET /api/produto/
@@ -64,7 +80,9 @@ Grupo: Venda
 
     $ GET /api/emissor/
 
-    $ POST /api/api/autorizarXml
+    $ POST /api/uninfe/autorizar
 
-    $ POST /api/api/autorizarXml/true
+    $ POST /api/uninfe/autorizar/confirmar
+
+    $POST /api/uninfe/autorizar/salvar
     
