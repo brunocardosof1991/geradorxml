@@ -17,24 +17,24 @@ class Xml
     //<ide>
     public $ide = array
     (
-        'cUF' => 43,
-        'cNF' => 'DEFAULT',
-        'natOp' => 'Venda de mercadorias',
-        'mod' => '65',
-        'serie' => '001',
-        'nNF' => 'DEFAULT',
-        'dhEmi' => 'DEFAULT',
-        'tpNF' => '1',
-        'idDest' => '1',
-        'cMunFG' => '4314902',
-        'tpImp' => '5',
-        'tpEmis' => '1',
-        'cDV' => 'DEFAULT',
-        'tpAmb' => '2',
-        'finNFe' => '1',
-        'indFinal' => '1',
-        'indPres' => '1',
-        'procEmi' => '0',
+        'cUF' => NULL,
+        'cNF' => NULL,
+        'natOp' => NULL,
+        'mod' => NULL,
+        'serie' => NULL,
+        'nNF' => NULL,
+        'dhEmi' => NULL,
+        'tpNF' => NULL,
+        'idDest' => NULL,
+        'cMunFG' => NULL,
+        'tpImp' => NULL,
+        'tpEmis' => NULL,
+        'cDV' => NULL,
+        'tpAmb' => NULL,
+        'finNFe' => NULL,
+        'indFinal' => NULL,
+        'indPres' => NULL,
+        'procEmi' => NULL,
         'verProc' => '1.0.0'
     );
     //<emit>
@@ -65,37 +65,37 @@ class Xml
     //<dest>
     public $dest = array
     (
-        'ID' => '',
-        'CNPJ' => '',
-        'xNome' => '',
+        'ID' => NULL,
+        'CNPJ' => NULL,
+        'xNome' => NULL,
         'indIEDest' => 9
     );
         //<enderDest>
     public $enderDest = array
     (
-        'xLgr' => '',
-        'nro' => '',
-        'xCpl' => '',
-        'xBairro' => '',
+        'xLgr' => NULL,
+        'nro' => NULL,
+        'xCpl' => NULL,
+        'xBairro' => NULL,
         'cMun' => 4314902,
-        'xMun' => '',
-        'UF' => '',
-        'CEP' => '',
+        'xMun' => NULL,
+        'UF' => NULL,
+        'CEP' => NULL,
         'cPais' => 1058,
         'xPais' => 'Brasil',
-        'fone' => ''
+        'fone' => NULL
     );
     public $detPag = array
     (
-        'tPag' => 'DEFAULT',
-        'vPag' => 'DEFAULT'
+        'tPag' => NULL,
+        'vPag' => NULL
     );
     public $card = array
     (
-        'tpIntegra' => 'DEFAULT',
-        'CNPJ' => 'DEFAULT',
-        'tBand' => 'DEFAULT',
-        'cAut' => 'DEFAULT'
+        'tpIntegra' => NULL,
+        'CNPJ' => NULL,
+        'tBand' => NULL,
+        'cAut' => NULL
     );
     private $connection = '';
     public $ICMSSN102 = array();
@@ -106,7 +106,7 @@ class Xml
         $this->ICMS = ICMS::$ICMSSN102;
         $this->PIS = PIS::$PISAliq;
         $this->COFINS = COFINS::$COFINSAliq;
-        //Emissor - Emissor fora da rota faz mais sentido
+        //Startar Emissor com o cadastrado no Banco de Dados
         $this->emit['CNPJ'] = $this->gerarEmit()[0]['CNPJ'];
         $this->emit['xNome'] = $this->gerarEmit()[0]['xNome'];
         $this->emit['xFant'] = $this->gerarEmit()[0]['xFant'];
@@ -124,6 +124,21 @@ class Xml
         $this->enderEmit['cPais'] = $this->gerarEmit()[0]['cPais'];
         $this->enderEmit['xPais'] = $this->gerarEmit()[0]['xPais'];
         $this->enderEmit['fone'] = $this->gerarEmit()[0]['fone'];
+        //Startar Identificação da NFC-e com o cadastrado no Banco de Dados
+        $this->ide['cUF'] = $this->gerarIde()[0]['cUF'];
+        $this->ide['natOp'] = $this->gerarIde()[0]['natOp'];
+        $this->ide['mod'] = $this->gerarIde()[0]['mod'];
+        $this->ide['serie'] = $this->gerarIde()[0]['serie'];
+        $this->ide['tpNF'] = $this->gerarIde()[0]['tpNF'];
+        $this->ide['idDest'] = $this->gerarIde()[0]['idDest'];
+        $this->ide['cMunFG'] = $this->gerarIde()[0]['cMunFG'];
+        $this->ide['tpImp'] = $this->gerarIde()[0]['tpImp'];
+        $this->ide['tpEmis'] = $this->gerarIde()[0]['tpEmis'];
+        $this->ide['tpAmb'] = $this->gerarIde()[0]['tpAmb'];
+        $this->ide['finNFe'] = $this->gerarIde()[0]['finNFe'];
+        $this->ide['indFinal'] = $this->gerarIde()[0]['indFinal'];
+        $this->ide['indPres'] = $this->gerarIde()[0]['indPres'];
+        $this->ide['procEmi'] = $this->gerarIde()[0]['procEmi'];
     }
     //<ide><idLote></idLote></ide>
     private function getId($table) 
@@ -180,6 +195,19 @@ class Xml
     private function gerarEmit()
     {
         $sql = "SELECT * FROM emissor";    
+        try{
+            $connection = $this->connection->PDOConnect();    
+            $stmt = $connection->query($sql);
+            $emit = $stmt->fetchAll(PDO::FETCH_ASSOC);           
+            return $emit;
+            $connection = null;
+        }catch(PDOException $e){
+            echo '{"Erro": {"text": '.$e->getMessage().'}';
+        }
+    }
+    public function gerarIde()
+    {
+        $sql = "SELECT * FROM ide";    
         try{
             $connection = $this->connection->PDOConnect();    
             $stmt = $connection->query($sql);
@@ -382,33 +410,33 @@ class Xml
                 $det->setAttributeNode(new DOMAttr('nItem', 1 + $i));
                     $prod = $det->appendChild($dom->createElement('prod'));
                     $cProd = $prod->appendChild($dom->createElement('cProd'));
-                    $cProd->appendChild($dom->createTextNode($arrayProduto[$i]['id']));
+                    $cProd->appendChild($dom->createTextNode($arrayProduto[$i]['Codigo']));
                     $cEAN = $prod->appendChild($dom->createElement('cEAN'));
                     $cEAN->appendChild($dom->createTextNode('SEM GTIN'));
                     $xProd = $prod->appendChild($dom->createElement('xProd'));
-                    $xProd->appendChild($dom->createTextNode($arrayProduto[$i]['descricao']));
+                    $xProd->appendChild($dom->createTextNode($arrayProduto[$i]['Descricao']));
                     $NCM = $prod->appendChild($dom->createElement('NCM'));
                     $NCM->appendChild($dom->createTextNode($arrayProduto[$i]['ncm']));
                     $CFOP = $prod->appendChild($dom->createElement('CFOP'));
                     $CFOP->appendChild($dom->createTextNode($arrayProduto[$i]['CFOP']));
                     $uCom = $prod->appendChild($dom->createElement('uCom'));
-                    $uCom->appendChild($dom->createTextNode('UN'));
+                    $uCom->appendChild($dom->createTextNode($arrayProduto[$i]['UN']));
                     $qCom = $prod->appendChild($dom->createElement('qCom'));
-                    $qCom->appendChild($dom->createTextNode($arrayProduto[$i]['quantidade']));
+                    $qCom->appendChild($dom->createTextNode($arrayProduto[$i]['Qtd']));
                     $vUnCom = $prod->appendChild($dom->createElement('vUnCom'));
-                    $vUnCom->appendChild($dom->createTextNode($arrayProduto[$i]['preco']));
+                    $vUnCom->appendChild($dom->createTextNode($arrayProduto[$i]['Vl Unit']));
                     $vProd = $prod->appendChild($dom->createElement('vProd'));
                     //Calcular valor total do produto - valor * quantidade\\
                     //Permitir somente duas casas depois da vírgula    printf('%.2f', round(1001.8, 2)) \\
-                    $vProd->appendChild($dom->createTextNode(sprintf('%.2f', round($arrayProduto[$i]['preco'] * $arrayProduto[$i]['quantidade'],2))));
+                    $vProd->appendChild($dom->createTextNode(sprintf('%.2f', round($arrayProduto[$i]['Vl Unit'] * $arrayProduto[$i]['Qtd'],2))));
                     $cEANTrib = $prod->appendChild($dom->createElement('cEANTrib'));
                     $cEANTrib->appendChild($dom->createTextNode('SEM GTIN'));
                     $uTrib = $prod->appendChild($dom->createElement('uTrib'));
-                    $uTrib->appendChild($dom->createTextNode('UN'));
+                    $uTrib->appendChild($dom->createTextNode($arrayProduto[$i]['UN']));
                     $qTrib = $prod->appendChild($dom->createElement('qTrib'));
-                    $qTrib->appendChild($dom->createTextNode($arrayProduto[$i]['quantidade']));
+                    $qTrib->appendChild($dom->createTextNode($arrayProduto[$i]['Qtd']));
                     $vUnTrib = $prod->appendChild($dom->createElement('vUnTrib'));
-                    $vUnTrib->appendChild($dom->createTextNode($arrayProduto[$i]['preco']));
+                    $vUnTrib->appendChild($dom->createTextNode($arrayProduto[$i]['Vl Unit']));
                     $indTot = $prod->appendChild($dom->createElement('indTot'));
                     $indTot->appendChild($dom->createTextNode(1));
                 //Tag <imposto>    

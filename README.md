@@ -89,5 +89,4 @@ Grupo: Venda
 
     $ POST /api/uninfe/autorizar/confirmar
 
-    $POST /api/uninfe/autorizar/salvar
-    
+    $ POST /api/uninfe/autorizar/salvar

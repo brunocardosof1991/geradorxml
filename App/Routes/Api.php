@@ -47,12 +47,38 @@ $app->add(function ($req, $res, $next) {
         });
         $app->post('/DANFE', function(Request $request, Response $response)
         {
+            $dhEmi = file_get_contents("dhEmi.txt");
+            //O que substituir
+            $search = ["T","-02:00"];
+            //Pelo que substituir
+            $replace = ["",""];
+            $str_replace = str_replace($search,$replace,$dhEmi);
+            //Pegar somente a data da string
+            $data = substr($str_replace,0,10);
+            //Pegar somente a hora da string
+            $hora = substr($str_replace,10,18);
+            //Separar a data para poder inverter
+            $explode = explode("-", $data);
+            //Montar novamente a string com data no formato dia/mes/ano 
+            $dhEmi = $explode[2].'-'.$explode[1].'-'.$explode[0].' '.$hora;
             $info = file_get_contents("info.json");
             $infoArray = json_decode($info ,true);
             $produto = file_get_contents("produto.json");
             $produtoArray = json_decode($produto,true);
             $qrcode = file_get_contents("qrcode.txt");
-            $array = array('info'=>$infoArray,'produto'=>$produtoArray,'qrcode'=>$qrcode);
+            $nNF = file_get_contents("nNF.txt");
+            $protocolo = file_get_contents("protocolo.txt");
+            $serie = file_get_contents("serie.txt");
+            $array = array
+            (
+                'info'=>$infoArray,
+                'produto'=>$produtoArray,
+                'qrcode'=>$qrcode,
+                'nNF'=>$nNF,
+                'protocolo'=>$protocolo,
+                'dhEmi'=>$dhEmi,
+                'serie'=>$serie
+            );
             echo json_encode($array);
         });
         $app->post('/uninfe/inutilizar', function(Request $request, Response $response)
@@ -200,6 +226,19 @@ $app->add(function ($req, $res, $next) {
         {
             $file1Array = json_decode($request->getParam('json'),true);
             $produto = json_decode($request->getParam('produto'),true);
+            foreach ( $produto as $k=>$v )
+            {
+              $produto[$k] ['Descricao'] = $produto[$k] ['descricao'];
+              $produto[$k] ['Codigo'] = $produto[$k] ['id'];
+              $produto[$k] ['Qtd'] = $produto[$k] ['quantidade'];
+              $produto[$k] ['Vl Unit'] = $produto[$k] ['preco'];
+              $produto[$k] ['Vl Total'] = $produto[$k] ['total'];
+              unset($produto[$k]['descricao']);
+              unset($produto[$k]['id']);
+              unset($produto[$k]['quantidade']);
+              unset($produto[$k]['preco']);
+              unset($produto[$k]['total']);
+            }
             $xml = new Xml();
             //Destinatário
             $xml->dest['ID'] = $file1Array[0]['clientID'];
@@ -258,7 +297,34 @@ $app->add(function ($req, $res, $next) {
             if(!empty($xmlAutorizadoToString)) {
                 //Colocar toda NFC-e em uma variável
                 $NFCe = file_get_contents($xmlAutorizado2);
-                //Coletar o protocolo da NFC-e autorizada
+                //Coletar informações da NFC-e autorizada para preenchimento da DANFE
+                //Começo da coleta
+                $fromS = "<serie>";
+                //Fim da coleta
+                $toS = "</serie>";
+                function getSerie($NFCe,$fromS,$toS)
+                {
+                    $sub = substr($NFCe, strpos($NFCe,$fromS)+strlen($fromS),strlen($NFCe));
+                    return substr($sub,0,strpos($sub,$toS));
+                }
+                //Começo da coleta
+                $fromD = "<dhEmi>";
+                //Fim da coleta
+                $toD = "</dhEmi>";
+                function getdhEmi($NFCe,$fromD,$toD)
+                {
+                    $sub = substr($NFCe, strpos($NFCe,$fromD)+strlen($fromD),strlen($NFCe));
+                    return substr($sub,0,strpos($sub,$toD));
+                }
+                //Começo da coleta
+                $fromN = "<nNF>";
+                //Fim da coleta
+                $toN = "</nNF>";
+                function getnNF($NFCe,$fromN,$toN)
+                {
+                    $sub = substr($NFCe, strpos($NFCe,$fromN)+strlen($fromN),strlen($NFCe));
+                    return substr($sub,0,strpos($sub,$toN));
+                }
                 //Começo da coleta
                 $fromP = "<nProt>";
                 //Fim da coleta
@@ -267,7 +333,7 @@ $app->add(function ($req, $res, $next) {
                 {
                     $sub = substr($NFCe, strpos($NFCe,$fromP)+strlen($fromP),strlen($NFCe));
                     return substr($sub,0,strpos($sub,$toP));
-                }//Começo da coleta
+                }
                 $from = "<qrCode>";
                 //Fim da coleta
                 $to = "</qrCode>";
@@ -278,7 +344,14 @@ $app->add(function ($req, $res, $next) {
                 } 
                 $qrCode = getQRCode($NFCe,$from,$to);  
                 $protocolo = getProtocolo($NFCe,$fromP,$toP);
+                $nNF = getnNF($NFCe,$fromN,$toN);
+                $dhEmi = getdhEmi($NFCe,$fromD,$toD);
+                $serie = getSerie($NFCe,$fromS,$toS);
                 file_put_contents('qrcode.txt',$qrCode);
+                file_put_contents('protocolo.txt',$protocolo);
+                file_put_contents('nNF.txt',$nNF);
+                file_put_contents('dhEmi.txt',$dhEmi);
+                file_put_contents('serie.txt',$serie);
                 $xml = new Xml();
                 $xml->salvarNF($protocolo);
                 echo exec('del /f "chaveDeAcesso.txt"');
@@ -376,12 +449,12 @@ $app->add(function ($req, $res, $next) {
             // Adicionar Emissor
             $app->post('/add', function(Request $request, Response $response){
                 $emissor = new Emissor();
-                $emissor = $emissor->add();
+                $emissor = $emissor->add($request);
             });    
             // Atualizar Emissor
             $app->put('/update/{id}', function(Request $request, Response $response){
                 $emissor = new Emissor();
-                $emissor = $emissor->update();
+                $emissor = $emissor->update($request);
             });    
             // Deletar Emissor
             $app->delete('/delete/{id}', function(Request $request, Response $response){

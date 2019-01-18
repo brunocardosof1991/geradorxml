@@ -22,76 +22,59 @@ $(()=>{
                     dataType: 'json',
                     data:{DANFE:DANFE}
                 }).done(function(data){
-                    // Object of object to array of object
-                    let arrayDANFE = Object.keys(data).map(key => data[key]); 
-                    var docDefinition = {
-                        pageSize: 'A4',
-                        pageMargins: [ 50, 10, 50, 10 ],
-                        content: [
-                            {
-                                    text: 'CNPJ: '+arrayDANFE[0][4].CNPJ+' '+arrayDANFE[0][4].xNome,
-                                    alignment: 'left'
-                            },
-                            {
-                                text: arrayDANFE[0][4].xLgr+' '+arrayDANFE[0][4].nro+', '+arrayDANFE[0][4].xBairro+', '+arrayDANFE[0][4].xMun+', '+arrayDANFE[0][4].UF,
-                                alignment: 'left'
-                            },
-                            {
-                                text: 'Documento Auxiliar da Nota Fiscal de Consumidor Eletrônica\n\n',
-                                alignment: 'left'
-                            },
-                            {
-                                alignment: 'left',
-                                columns:[
-                                    {
-                                        text: 'Código'
-                                    },
-                                    {
-                                        text: 'Descrição'
-                                    },
-                                    {
-                                        text: 'Qnt e UN'
-                                    },
-                                    {
-                                        text: 'Vl Unit'
-                                    },
-                                    {
-                                        text: 'Vl Total'
-                                    }
-                                ]
-                            },
-                            {
-                                alignment: 'left',
-                                columns:[
-                                    {
-                                        text: arrayDANFE[1][0].id
-                                    },
-                                    {
-                                        text: arrayDANFE[1][0].descricao
-                                    },
-                                    {
-                                        text: arrayDANFE[1][0].quantidade + '   '+ 'UN'
-                                    },
-                                    {
-                                        text: arrayDANFE[1][0].preco
-                                    },
-                                    {
-                                        text: arrayDANFE[1][0].preco * arrayDANFE[1][0].quantidade
-                                    }
-                                ]
-                            },
-                            {
+                // Object of object to array of object
+                var arrayDANFE = Object.keys(data).map(key => data[key]);
+                console.log(arrayDANFE);
+                //console.log(myNewArray);
+                function buildTableBody(data, columns) {
+                    var body = [];
+                    body.push(columns);
+                    data.forEach(function(row) {
+                        var dataRow = [];
+                        columns.forEach(function(column) {
+                            dataRow.push(row[column].toString());
+                        })
+                        body.push(dataRow);
+                    });
+                    return body;
+                }
+                function table(data, columns) {
+                    return {
+                        table: {
+                            headerRows: 1,
+                            body: buildTableBody(data, columns)                        },
+                        layout: 'noBorders'
+                    };
+                }
+                var dd = {
+                    pageSize: 'A4',
+                    pageMargins: [ 50, 10, 50, 10 ],
+                    content: [
+                        {
+                            text: 'CNPJ: '+arrayDANFE[0][4].CNPJ+' '+arrayDANFE[0][4].xNome,
+                            alignment: 'left'
+                        },
+                        {
+                            text: arrayDANFE[0][4].xLgr+' '+arrayDANFE[0][4].nro+', '+arrayDANFE[0][4].xBairro+', '+arrayDANFE[0][4].xMun+', '+arrayDANFE[0][4].UF,
+                            alignment: 'left'
+                        },
+                        {
+                            text: 'Documento Auxiliar da Nota Fiscal de Consumidor Eletrônica\n\n',
+                            alignment: 'left'
+                        },                        
+                        table(arrayDANFE[1], ['Codigo', 'Descricao','Qtd','UN','Vl Unit','Vl Total']),                        
+                        {
                                 columns:[
                                     {
                                         alignment: 'left',
-                                        text: 'Qtde. total de itens'
+                                        text: '\nQtde. total de itens'
                                     },
                                     {
                                         alignment: 'right',
-                                        text: 'Qtde. total de itens'
+                                        text: '\nQtde. total de itens'
                                     }
                                 ],
-                            },                            
+                            },                             
                             {
                                 columns:[
                                     {
@@ -100,7 +83,7 @@ $(()=>{
                                     },
                                     {
                                         alignment: 'right',
-                                        text: 'Valor total R$'
+                                        text: arrayDANFE[0][3]
                                     }
                                 ]
                             },
@@ -125,18 +108,6 @@ $(()=>{
                                     {
                                         alignment: 'right',
                                         text: 'Frete R$'
-                                    },
-                                ]
-                            },
-                            {
-                                columns:[
-                                    {
-                                        alignment: 'left',
-                                        text: 'Valor total R$'
-                                    },
-                                    {
-                                        alignment: 'right',
-                                        text: 'Valor total R$'
                                     },
                                 ]
                             },
@@ -246,21 +217,48 @@ $(()=>{
                                 text:
                                 [
                                     {                                            
-                                        text: '\NFC-e nº ',
+                                        text: '\nNFC-e nº ',
                                         bold: true
                                     },
-                                ], 
+                                    {                                            
+                                        text: arrayDANFE[3],
+                                        bold: true
+                                    },
+                                    {                                            
+                                        text: '    Série ',
+                                        bold: true
+                                    },
+                                    {                                            
+                                        text: '00'+arrayDANFE[6],
+                                        bold: true
+                                    },
+                                    {                                            
+                                        text: '    '+arrayDANFE[5],
+                                        bold: true
+                                    },
+                                ]
+                            },
+                            {
+                                text: '\nProtocolo de Autorização: '+arrayDANFE[4],
+                                alignment: 'center'
+                            },
+                            {
+                                text: '\nData da Autorização: '+arrayDANFE[5],
+                                alignment: 'center'
+                            },
+                            {
+                                text: '\n',
+                                alignment: 'center'
                             },
                             {
                                 width: '*',
                                 alignment: 'center',  
                                 qr: arrayDANFE[2],
                                 fit: 130,
-                            },  
-                        ]
-                    }  
-                    pdfMake.createPdf(docDefinition).download();
-                    //console.log(arrayDANFE[0]);
+                            },      
+                    ]
+                }
+                //pdfMake.createPdf(dd).download();
                 });
 });
   </script>

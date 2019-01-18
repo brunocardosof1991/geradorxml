@@ -28,22 +28,22 @@ class Emissor {
     {
         $this->connection = new Conexao();
     }
+    public function getIde()
+    {      
+        $sql = "SELECT * FROM ide";    
+        try{
+            $connection = $this->connection->PDOConnect();    
+            $stmt = $connection->query($sql);
+            $emissor = $stmt->fetchAll(PDO::FETCH_OBJ);
+            echo json_encode($emissor);
+            $connection = null;
+        }catch(PDOException $e){
+            echo json_encode('{"error": '.$e->getMessage().'}');
+        }
+
+    }
     public function addIde($request)
-    {   
-        var_dump($request->getParam('cUF'));
-        var_dump($request->getParam('natOp'));
-        var_dump($request->getParam('mod'));
-        var_dump($request->getParam('serie'));
-        var_dump($request->getParam('tpNF'));
-        var_dump($request->getParam('idDest'));
-        var_dump($request->getParam('cMunFG'));
-        var_dump($request->getParam('tpImp'));
-        var_dump($request->getParam('tpEmis'));
-        var_dump($request->getParam('tpAmb'));
-        var_dump($request->getParam('finNFe'));
-        var_dump($request->getParam('indFinal'));
-        var_dump($request->getParam('indPres'));
-        var_dump($request->getParam('procEmi'));
+    {       
         $cUF = $request->getParam('cUF');
         $natOp = $request->getParam('natOp');
         $mod = $request->getParam('mod');
@@ -57,16 +57,31 @@ class Emissor {
         $finNFe = $request->getParam('finNFe');
         $indFinal = $request->getParam('indFinal');
         $indPres = $request->getParam('indPres');
-        $procEmi = $request->getParam('procEmi');
-        $sql = "INSERT INTO ide (cUF,natOp,mod,serie,tpNF,idDest,cMunFG,tpImp,tpEmis,tpAmb,finNFe,indFinal,indPres,procEmi) VALUES 
-        ($cUF,'".$natOp."',$mod,$serie,$tpNF,$idDest,$cMunFG,$tpImp,$tpEmis,$tpAmb,$finNFe,$indFinal,$indPres,$procEmi)";   
+        $procEmi = $request->getParam('procEmi');      
+        $sql = "INSERT INTO ide (cUF,natOp,`mod`,serie,tpNF,idDest,cMunFG,tpImp,tpEmis,tpAmb,finNFe,indFinal,indPres,procEmi) VALUES 
+        (:cUF,:natOp,:mod,:serie,:tpNF,:idDest,:cMunFG,:tpImp,:tpEmis,:tpAmb,:finNFe,:indFinal,:indPres,:procEmi)";
         try{
-            $connection = $this->connection->PDOConnect();      
-            $stmt = $connection->prepare($sql);      
-            $stmt->execute();    
-            echo json_encode('{"success": "Ide Adicionado"}');    
+            $connection = $this->connection->PDOConnect();
+            $stmt = $connection->prepare($sql);
+            $stmt->bindParam(':cUF',  $cUF);
+            $stmt->bindParam(':natOp',      $natOp);
+            $stmt->bindParam(':mod',      $mod);
+            $stmt->bindParam(':serie',    $serie);
+            $stmt->bindParam(':tpNF',       $tpNF);
+            $stmt->bindParam(':idDest',      $idDest);
+            $stmt->bindParam(':cMunFG',      $cMunFG);
+            $stmt->bindParam(':tpImp',      $tpImp);
+            $stmt->bindParam(':tpEmis',      $tpEmis);
+            $stmt->bindParam(':tpAmb',      $tpAmb);
+            $stmt->bindParam(':finNFe',      $finNFe);
+            $stmt->bindParam(':indFinal',      $indFinal);
+            $stmt->bindParam(':indPres',      $indPres);
+            $stmt->bindParam(':procEmi',      $procEmi);
+            $stmt->execute();
+            $connection = null;
+            echo json_encode('{"success": "Ide Adicionado"}');
         } catch(PDOException $e){
-            echo json_encode('{"error": '.$e->getMessage().'}');
+            echo '{"error": '.$e->getMessage().'}';
         }
     }
     public function get()
@@ -84,7 +99,6 @@ class Emissor {
     }
     public function add($request)
     {
-        $id = $request->getParam('id');
         $CNPJ = $request->getParam('CNPJ');
         $xNome = $request->getParam('xNome');
         $xLgr = $request->getParam('xLgr');
@@ -102,12 +116,11 @@ class Emissor {
         $IM = $request->getParam('IM');    
         $CRT = $request->getParam('CRT');    
         $CNAE = $request->getParam('CNAE');    
-        $sql = "INSERT INTO emissor (id,CNPJ,xNome,xLgr,xFant,nro,xBairro,cMun,xMun,UF,CEP,cPais,xPais,fone,IE,IM,crt,cnae) VALUES
-        (:id,:CNPJ,:xNome,:xLgr,:xFant,:nro,:xBairro,:cMun,:xMun,:UF,:CEP,:cPais,:xPais,:fone,:IE,:IM,:CRT,:CNAE)";    
+        $sql = "INSERT INTO emissor (CNPJ,xNome,xLgr,xFant,nro,xBairro,cMun,xMun,UF,CEP,cPais,xPais,fone,IE,IM,CRT,CNAE) VALUES
+        (:CNPJ,:xNome,:xLgr,:xFant,:nro,:xBairro,:cMun,:xMun,:UF,:CEP,:cPais,:xPais,:fone,:IE,:IM,:CRT,:CNAE)";    
         try{
             $connection = $this->connection->PDOConnect();      
-            $stmt = $connection->prepare($sql);    
-            $stmt->bindParam(':id', $id);
+            $stmt = $connection->prepare($sql);  
             $stmt->bindParam(':CNPJ',  $CNPJ);
             $stmt->bindParam(':xNome',      $xNome);
             $stmt->bindParam(':xLgr',      $xLgr);

@@ -36,7 +36,7 @@
     </head>
     <body>   
     <?php require_once '../Menu.php'; ?> 
-        <div class="container mb-5" id="container">
+        <div class="container mb-5" id="container">     
             <div id="accordion" class="col-md-12 mx-auto mt-5 mb-5">
                 <div class="card text-center bg-light" id="cardCadastrarProduto">
                     <div class="card-header bg-dark" id="headingOne">
@@ -61,12 +61,13 @@
                                     <table class="table table-hover table-bordered mt-3 mx-auto text-center" id="tableListarProduto_XmlGerar">
                                         <thead class="thead-dark">
                                             <tr>
-                                                <th>ID</th>
+                                                <th>Código</th>
                                                 <th>Descrição</th>
                                                 <th style="display: none;">ncm</th>
-                                                <th>Preço</th>
+                                                <th>Vl Unit</th>
                                                 <th style="display: none;">CFOP</th>
                                                 <th>Quantidade</th>
+                                                <th>UN</th>
                                                 <th>Excluir</th>
                                             </tr>
                                         </thead>
@@ -243,5 +244,6 @@
         </div> <!-- END .container -->   
         <?php require_once '../../Components/Modal.html'; ?>          
         <?php require_once '../../View/Footer.php'; ?>
+    </div>
     </body>
 </html>

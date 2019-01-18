@@ -46,7 +46,7 @@
                         <div class="card-body">
                             <div class="row" id="rowEmissorBody">
                                 <div class="col-md-6">
-                                    <p style="display:none;" id="pID">ID</p>
+                                    <p style="display:none;" id="pID"></p>
                                     <p id="pCNPJ">CNPJ: <span id="spanCNPJ" class="badge badge-primary"> </span></p>
                                     <p id="pNomeFantasia">Nome Fantasia: <span id="spanNomeFantasia" class="badge badge-primary">></span></p>
                                     <p id="pRazaoSocial">Razão Social: <span id="spanRazaoSocial" class="badge badge-primary">></span></p>

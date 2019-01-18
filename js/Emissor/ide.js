@@ -1,9 +1,9 @@
 $(document).ready(function(){
-    $(document).on('click','#salvarConfig',function(){        
+    $(document).on('click','#salvarConfig',function(e){ 
+		e.preventDefault();       
         var ide = $('select.form-control').map(function(){
             return this.value
         }).get();
-        console.log(ide);
         let cUF = ide[0];
         let natOp = ide[1];
         let mod = ide[2];
@@ -20,10 +20,12 @@ $(document).ready(function(){
         let procEmi = ide[13];
     $.ajax({
         method:'post',
-        url:'http://localhost/geradorxml/app/public/api/emissor/ide',
+        url:'http://localhost/geradorXml/App/public/api/emissor/ide',
         dataType: 'json',
         data: {cUF:cUF, natOp:natOp, mod:mod, serie:serie, tpNF:tpNF, idDest:idDest, cMunFG:cMunFG, tpImp:tpImp, tpEmis:tpEmis, tpAmb:tpAmb, 
             finNFe:finNFe, indFinal:indFinal, indPres:indPres, procEmi:procEmi}
-    });
+        }).done(function(data){
+            console.log(data);
+        });
     });
 });
