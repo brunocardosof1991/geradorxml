@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    console.log(localStorage);    
     function SaveDataToLocalStorage(data)
     {
         var a = JSON.parse(localStorage.getItem("session") || "[]");
@@ -6,6 +7,187 @@ $(document).ready(function () {
         a.push(data);
         // Re-serialize the array back into a string and store it in localStorage
         localStorage.setItem('session', JSON.stringify(a));
+    }
+    function btnDinheiro()
+    {
+        $('#divCartao').hide();
+        $("#apiModal").draggable({ handle: ".modal-header" });   
+        $('#pagamento option[value="02"]').hide();
+        $('#pagamento option[value="03"]').hide();
+        $('#pagamento option[value="04"]').hide();
+        $('#pagamento option[value="05"]').hide();
+        $('#pagamento option[value="10"]').hide();
+        $('#pagamento option[value="11"]').hide();
+        $('#pagamento option[value="12"]').hide();
+        $('#pagamento option[value="13"]').hide();
+        $('#pagamento option[value="99"]').hide();
+        $('#pagamento option[value="01"]').show();
+        $("#apiModal .modal-body .chart").remove(); 
+        $("#apiModal .modal-body p").remove(); 
+        $("h1").remove(); 
+        $("#apiModal .modal-title").text('Pagamento em Dinheiro');
+        //Resetar Modal
+        $('#apiModal').on('shown.bs.modal', function (e) {
+            $(this)
+              .find("input,textarea,select")
+                 .val('')
+                 .end()
+              .find("input[type=checkbox], input[type=radio]")
+                 .prop("checked", "")
+                 .end();
+        });    
+        $("#apiModal").modal('show');
+        $("#apiModal .modal-body").append($('#divDinheiro').show());
+        $("#apiModal .modal-footer .action").text('Cadastrar Pagamento').show();
+        if(!$( "#checkboxDesconto" ).is( ":checked" ))
+        {$('#divinputDesconto').hide();}
+        $("#apiModal .modal-footer .action").on('click', function (e){
+            let dinheiro = $('#inputDinheiro').val();
+            let desconto = $('#inputDesconto').val();
+            let troco = $('#inputTroco').val();
+            if($( "#checkboxDesconto" ).is( ":checked" )) {
+                let json = {'formaPagamento': 'dinheiro', 'dinheiro': dinheiro,'troco': troco,'desconto':desconto};
+                SaveDataToLocalStorage(json);
+                calcDesconto();
+                calcTroco();
+                alert('Forma de Pagamento Adicionada');
+                $("#apiModal").modal('hide'); 
+            } else {
+                let json = {'formaPagamento': 'dinheiro', 'dinheiro': dinheiro,'troco': troco};
+                SaveDataToLocalStorage(json);
+                calcTroco();
+                alert('Forma de Pagamento Adicionada');
+                $("#apiModal").modal('hide'); 
+            }
+        });
+    }
+    function btnDebito ()
+    {        
+        $("#modalDebito").draggable({ handle: ".modal-header" });  
+        $('#divDinheiro').hide();
+        $('#pagamento option[value="01"]').hide();
+        $('#pagamento option[value="02"]').hide();
+        $('#pagamento option[value="03"]').hide();
+        $('#pagamento option[value="05"]').hide();
+        $('#pagamento option[value="10"]').hide();
+        $('#pagamento option[value="11"]').hide();
+        $('#pagamento option[value="12"]').hide();
+        $('#pagamento option[value="13"]').hide();
+        $('#pagamento option[value="99"]').hide();
+        $('#pagamento option[value="04"]').show();
+        $("#modalDebito .modal-body").append($('#divCartao').show());
+        //Resetar Modal
+        $('#modalDebito').on('shown.bs.modal', function (e) {
+            $(this)
+              .find("input,textarea,select")
+                 .val('')
+                 .end()
+              .find("input[type=checkbox], input[type=radio]")
+                 .prop("checked", "")
+                 .end();
+        });   
+        $("#modalDebito").modal('show');
+        $("#modalDebito .modal-footer .action").text('Cadastrar Pagamento').show(); 
+        $("#modalVisualizarPagamentos").on('shown.bs.modal', function () {
+            $('#pagamento').show();
+        });    
+        $("#modalDebito .modal-footer .action").on('click',function(e){
+            e.preventDefault();
+            let payment = $('#pagamento').val();
+            let bandeira = $('#bandeira').val();
+            let credCartao = $('#credenciadora').val();
+            let intPag = $('#intPagamento').val();        
+            let codigo = $('#inputCS').val(); 
+            let dinheiro = $('#inputDinheiro').val(); 
+            var json = {'formaPagamento': 'debito','dinheiro':dinheiro,'payment': payment, 'bandeira': bandeira,'credCartao': credCartao,'intPag':intPag,'codigo':codigo}; 
+            SaveDataToLocalStorage(json);
+            alert('Forma de Pagamento Adicionada');
+            $("#modalDebito").modal('hide'); 
+        });
+    }
+    function btnCredito ()
+    {        
+        $("#modalCredito").draggable({ handle: ".modal-header" });  
+        $('#formDinheiro').hide();    
+        $('#pagamento option[value="01"]').hide();
+        $('#pagamento option[value="02"]').hide();
+        $('#pagamento option[value="04"]').hide();
+        $('#pagamento option[value="05"]').hide();
+        $('#pagamento option[value="10"]').hide();
+        $('#pagamento option[value="11"]').hide();
+        $('#pagamento option[value="12"]').hide();
+        $('#pagamento option[value="13"]').hide();
+        $('#pagamento option[value="99"]').hide();
+        $('#pagamento option[value="03"]').show();
+        $("#modalCredito .modal-body").append($('#divCartao').show());
+        $("#modalCredito").modal('show');
+        //Resetar Modal
+        $('#modalCredito').on('shown.bs.modal', function (e) {
+            e.preventDefault();
+            $(this)
+              .find("input,textarea,select")
+                 .val('')
+                 .end()
+              .find("input[type=checkbox], input[type=radio]")
+                 .prop("checked", "")
+                 .end();
+        });
+        $("#modalCredito .modal-footer .action").text('Cadastrar Pagamento').show();     
+        $("#modalCredito .modal-footer .action").on('click',function(e){
+            e.preventDefault();
+            let payment = $('#pagamento').val();
+            let bandeira = $('#bandeira').val();
+            let credCartao = $('#credenciadora').val();
+            let intPag = $('#intPagamento').val();        
+            let codigo = $('#inputCS').val(); 
+            let dinheiro = $('#inputDinheiro').val(); 
+            var json = {'formaPagamento': 'credito','dinheiro':dinheiro,'payment': payment, 'bandeira': bandeira,'credCartao': credCartao,'intPag':intPag,'codigo':codigo}; 
+            SaveDataToLocalStorage(json);
+            alert('Forma de Pagamento Adicionada');
+            $("#modalCredito").modal('hide'); 
+        });
+    }
+    function btnAlimentacao()
+    {        
+        $("#modalAlimentacao").draggable({ handle: ".modal-header" });  
+        $('#divCartao').hide();    
+        $('#pagamento option[value="01"]').hide();
+        $('#pagamento option[value="02"]').hide();
+        $('#pagamento option[value="03"]').hide();
+        $('#pagamento option[value="04"]').hide();
+        $('#pagamento option[value="05"]').hide();
+        $('#pagamento option[value="11"]').hide();
+        $('#pagamento option[value="12"]').hide();
+        $('#pagamento option[value="13"]').hide();
+        $('#pagamento option[value="99"]').hide();
+        $('#pagamento option[value="10"]').show();
+        $("#modalAlimentacao .modal-body").append($('#divCartao').show());
+        $("#modalAlimentacao").modal('show');
+        //Resetar Modal
+        $('#modalAlimentacao').on('shown.bs.modal', function (e) {
+            e.preventDefault();
+            $(this)
+              .find("input,textarea,select")
+                 .val('')
+                 .end()
+              .find("input[type=checkbox], input[type=radio]")
+                 .prop("checked", "")
+                 .end();
+        });
+        $("#modalAlimentacao .modal-footer .action").text('Cadastrar Pagamento').show();     
+        $("#modalAlimentacao .modal-footer .action").on('click',function(e){
+            e.preventDefault();
+            let payment = $('#pagamento').val();
+            let bandeira = $('#bandeira').val();
+            let credCartao = $('#credenciadora').val();
+            let intPag = $('#intPagamento').val();        
+            let codigo = $('#inputCS').val(); 
+            let dinheiro = $('#inputDinheiro').val(); 
+            var json = {'formaPagamento': 'alimentacao','dinheiro':dinheiro,'payment': payment, 'bandeira': bandeira,'credCartao': credCartao,'intPag':intPag,'codigo':codigo}; 
+            SaveDataToLocalStorage(json);
+            alert('Forma de Pagamento Adicionada');
+            $("#modalCredito").modal('hide'); 
+        });
     }
     function calcDesconto()
     {   
@@ -95,12 +277,9 @@ $(document).ready(function () {
         $("#modalVisualizarPagamentos .modal-title").text('Visualizar Formas de Pagamento');
         $("#modalVisualizarPagamentos").modal('show');
         $("#modalVisualizarPagamentos .modal-body").append(table).show();
-        $("#modalVisualizarPagamentos .modal-footer").append('<i class="fas fa-trash fa-2x" id="excluirPagamento" style="cursor:pointer;color:red" title="Excluir Formas de Pagamento"></i>').show();
 
         let a = JSON.parse(localStorage.getItem('session'));
-        console.log(a);
-
-        $.each(a,function(i,v){
+        $.each(a,function(i,v){         
             var tr = 
                 $('<tr>')
                 .append(
@@ -110,133 +289,141 @@ $(document).ready(function () {
         }); 
         /* Sem esse código, no segundo click em #visualizarFormaPagamento (Sem refresh da pagina), a tabela será multiplicada, 
         aparecendo duas no modal */
-        $(".modal").on('hidden.bs.modal', function () {
+        $("#modalVisualizarPagamentos").on('hidden.bs.modal', function () {
             $('#tablePagamentos').detach();
             $('#excluirPagamento').detach();
         });
-        $(document).on('click','#excluirPagamento',function(){     
-            console.log(a[0]);
-            let pagamento = $(this).closest('tr').children('td:eq(0)').text();   
-            let $confirm = confirm("Tem certeza que deseja excluir as formas de pagamento?");
-            if($confirm)         
-            {
-
-                $(this).closest('tr').detach();
-                localStorage.removeItem('session');
-            }
+        $(document).on('click','#resetarLS',function()
+        {  
+            localStorage.clear();
+            alert('localStorage Cleaned')
         });
     });
-    //Multiplas formas de pagamento   
-    //No dinheiro com desconto
+    //Multiplas formas de pagamento
+    // Card Dinheiro
     $(document).on('click','#btnDinheiro',function(e){
         e.preventDefault();
+        let b;      
+        if(localStorage.length !== 0)
+        {b = JSON.parse(localStorage.getItem('session'));}
         if(localStorage.getItem("session") === null)
         {
-                $('#formCartao').hide();
-                $("#apiModal").draggable({ handle: ".modal-header" });   
-                $('#pagamento option[value="02"]').hide();
-                $('#pagamento option[value="03"]').hide();
-                $('#pagamento option[value="04"]').hide();
-                $('#pagamento option[value="05"]').hide();
-                $('#pagamento option[value="10"]').hide();
-                $('#pagamento option[value="11"]').hide();
-                $('#pagamento option[value="12"]').hide();
-                $('#pagamento option[value="13"]').hide();
-                $('#pagamento option[value="99"]').hide();
-                $('#pagamento option[value="01"]').show();
-                $("#apiModal .modal-body .chart").remove(); 
-                $("#apiModal .modal-body p").remove(); 
-                $("h1").remove(); 
-                $("#apiModal .modal-title").text('Pagamento em Dinheiro');
-                //Resetar Modal
-                $('#apiModal').on('shown.bs.modal', function (e) {
-                    $(this)
-                      .find("input,textarea,select")
-                         .val('')
-                         .end()
-                      .find("input[type=checkbox], input[type=radio]")
-                         .prop("checked", "")
-                         .end();
-                });    
-                $("#apiModal").modal('show');
-                $("#apiModal .modal-body").append($('#divDinheiro').show());
-                $("#apiModal .modal-footer .action").text('Cadastrar Pagamento').show();
-                if(!$( "#checkboxDesconto" ).is( ":checked" ))
-                {$('#divinputDesconto').hide();}
-                $("#apiModal .modal-footer .action").on('click', function (e){
-                    let dinheiro = $('#inputDinheiro').val();
-                    let desconto = $('#inputDesconto').val();
-                    let troco = $('#inputTroco').val();
-                    if($( "#checkboxDesconto" ).is( ":checked" )) {
-                        let json = {'formaPagamento': 'dinheiro', 'dinheiro': dinheiro,'troco': troco,'desconto':desconto};
-                        SaveDataToLocalStorage(json);
-                        calcDesconto();
-                        calcTroco();
-                        alert('Forma de Pagamento Adicionada');
-                        $("#apiModal").modal('hide'); 
-                    } else {
-                        let json = {'formaPagamento': 'dinheiro', 'dinheiro': dinheiro,'troco': troco};
-                        SaveDataToLocalStorage(json);
-                        calcTroco();
-                        alert('Forma de Pagamento Adicionada');
-                        $("#apiModal").modal('hide'); 
-                    }
-                });
-        } else {
-            alert('Forma de Pagamento no Dinheiro já cadastrada')
+            btnDinheiro();
+        } else if(b[0].formaPagamento === 'dinheiro'){
+            alert('Forma de Pagamento no Dinheiro Já Cadastrada')
+        } else if(b[0].formaPagamento !== 'dinheiro'){
+            alert('Forma de Pagamento no Dinheiro Deve ser Cadastrada Primeira')
         }
         });
+    // Card Cartão de Crédito
     $(document).on('click','#btnCredito',function(e){
         e.preventDefault();
-        $('#formDinheiro').hide();
-        $("#modalCredito").draggable({ handle: ".modal-header" });      
-        $('#pagamento option[value="01"]').hide();
-        $('#pagamento option[value="02"]').hide();
-        $('#pagamento option[value="04"]').hide();
-        $('#pagamento option[value="05"]').hide();
-        $('#pagamento option[value="10"]').hide();
-        $('#pagamento option[value="11"]').hide();
-        $('#pagamento option[value="12"]').hide();
-        $('#pagamento option[value="13"]').hide();
-        $('#pagamento option[value="99"]').hide();
-        $('#pagamento option[value="03"]').show();
-        $("#modalCredito .modal-body").append($('#formCartao').show());
-        $("#modalCredito").modal('show');
-        //Resetar Modal
-        $('#modalCredito').on('shown.bs.modal', function (e) {
-            e.preventDefault();
-            $(this)
-              .find("input,textarea,select")
-                 .val('')
-                 .end()
-              .find("input[type=checkbox], input[type=radio]")
-                 .prop("checked", "")
-                 .end();
-        });
-        $("#modalCredito .modal-footer .action").text('Cadastrar Pagamento').show();     
-        $("#modalCredito .modal-footer .action").on('click',function(e){
-            e.preventDefault();
-            let payment = $('#pagamento').val();
-            let bandeira = $('#bandeira').val();
-            let credCartao = $('#credenciadora').val();
-            let intPag = $('#intPagamento').val();        
-            let codigo = $('#inputCS').val(); 
-            let dinheiro = $('#inputDinheiro').val(); 
-            var json = {'formaPagamento': 'credito','dinheiro':dinheiro,'payment': payment, 'bandeira': bandeira,'credCartao': credCartao,'intPag':intPag,'codigo':codigo}; 
-            SaveDataToLocalStorage(json);
-        });
+        var creditoFilter;
+        let b;
+        if(localStorage.length !== 0)
+        {      
+            b = JSON.parse(localStorage.getItem('session'));      
+            creditoFilter = b.filter(function (el) {
+                return el.formaPagamento === 'credito';
+            });
+            
+        }
+        if(localStorage.length === 0)
+        {
+            let $confirm = confirm("Essa venda terá dinheiro em espécie OU Cartão de Débito?");
+            if($confirm)         
+            {
+                alert('Então comece pela forma de pagamento em Dinheiro ou Débito!');
+            } else{                
+                btnCredito();
+            }
+        } else if(localStorage.length === 1 && b[0].formaPagamento === 'credito' )
+        {
+            alert('Forma de Pagamento no Cartão de Crédito Já Cadastrada');
+        }else if(localStorage.length === 1 && creditoFilter.length === 1)
+        {
+            alert('Forma de Pagamento no Cartão de Crédito Já Cadastrada');
+        }
+        else if(localStorage.length === 1 && b[0].formaPagamento === 'dinheiro')
+        {
+            btnCredito();
+        }else if(localStorage.length === 1 && b[0].formaPagamento === 'debito')
+        {
+            btnCredito();
+        }
     });
+    //Card Debito
     $(document).on('click','#btnDebito',function(e){
-        $('#rowDinheiro').hide();
-        $('#pagamento option[value="01"]').hide();
-        $('#pagamento option[value="02"]').hide();
-        $('#pagamento option[value="03"]').hide();
-        $('#pagamento option[value="05"]').hide();
-        $('#pagamento option[value="10"]').hide();
-        $('#pagamento option[value="11"]').hide();
-        $('#pagamento option[value="12"]').hide();
-        $('#pagamento option[value="13"]').hide();
-        $('#pagamento option[value="99"]').hide();
-        $('#pagamento option[value="04"]').show();
-    });   
+        e.preventDefault();
+        var debitoFilter;
+        let b;
+        if(localStorage.length !== 0)
+        {      
+            b = JSON.parse(localStorage.getItem('session'));      
+            debitoFilter = b.filter(function (el) {
+                return el.formaPagamento === 'debito';
+            });
+            
+        }
+        if(localStorage.length === 0)
+        {
+            let $confirm = confirm("Essa venda terá dinheiro em espécie também?");
+            if($confirm)         
+            {
+                alert('Então comece pela forma de pagamento em Dinheiro!');
+            } else {
+                btnDebito();
+            }
+        } else if(localStorage.length === 1 && b[0].formaPagamento === 'debito' )
+        {
+            alert('Forma de Pagamento no Cartão de Débito Já Cadastrada');
+        }
+        else if(localStorage.length === 1 && b[0].formaPagamento === 'dinheiro' && debitoFilter.length < 1)
+        {
+            btnDebito();
+        }else if(localStorage.length === 1 && debitoFilter.length === 1)
+        {
+            alert('Forma de Pagamento no Cartão de Crédito Já Cadastrada');
+        }
+    });
+    //Card Alimentação
+    $(document).on('click','#btnAlimentacao',function(){
+        e.preventDefault();
+        var creditoFilter;
+        let b;
+        if(localStorage.length !== 0)
+        {      
+            b = JSON.parse(localStorage.getItem('session'));      
+            creditoFilter = b.filter(function (el) {
+                return el.formaPagamento === 'credito';
+            });
+            
+        }
+        if(localStorage.length === 0)
+        {
+            let $confirm = confirm("Essa venda terá dinheiro em espécie OU Cartão de Débito?");
+            if($confirm)         
+            {
+                alert('Então comece pela forma de pagamento em Dinheiro ou Débito!');
+            } else{                
+                btnAlimentacao();
+            }
+        } else if(localStorage.length === 1 && b[0].formaPagamento === 'credito' )
+        {
+            alert('Forma de Pagamento no Vale Alimentação Já Cadastrada');
+        }else if(localStorage.length === 1 && creditoFilter.length === 1)
+        {
+            alert('Forma de Pagamento no Vale Alimentação Já Cadastrada');
+        }
+        else if(localStorage.length === 1 && b[0].formaPagamento === 'dinheiro')
+        {
+            btnAlimentacao();
+        }else if(localStorage.length === 1 && b[0].formaPagamento === 'debito')
+        {
+            btnAlimentacao();
+        }else if(localStorage.length === 1 && b[0].formaPagamento === 'credito')
+        {
+            btnAlimentacao();
+        }        
+    });  
 });
