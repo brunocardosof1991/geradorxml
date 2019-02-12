@@ -13,7 +13,8 @@ Frontend JavaScript, jQuery
 ##Instalação<br />
 Instalar o software da Unimake para assinatura do XML- UniNFe<br />
 Instalar o software da Unimake para geração do DANFE- UniDANFE<br />
-http://www.unimake.com.br/uninfe/
+http://www.unimake.com.br/uninfe/<br />
+Certificado Digital A1<br />
 
 ##Criar o CSC e o ID Token no site do Sefaz:<br />
 Passo a passo das configurações em - http://wiki.unimake.com.br/index.php/Manuais:UniNFe<br />
