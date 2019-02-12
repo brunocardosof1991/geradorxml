@@ -2,103 +2,153 @@
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">CPF/CNPJ</label>
         <div class="col-sm-10">
-            <input type="number" class="form-control" id="inputCNPJ" name="inputCNPJ" placeholder="CPF/CNPJ">
+            <input type="text" class="form-control" id="inputCNPJ" placeholder="CPF/CNPJ">
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">Nome Fantasia</label>
         <div class="col-sm-10">
             <input type="text" class="form-control" id="inputFantasia" name="inputFantasia" placeholder="Nome Fantasia">
+            <span id="nome_fantasia-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">Razão Social</label>
         <div class="col-sm-10">
             <input type="text" class="form-control" id="inputSocial" name="inputSocial" placeholder="Razão Social">
+            <span id="razao_social-feedback"></span>
+        </div>
+    </div>
+    <div class="form-group row mt-4">
+        <label class="col-sm-2 col-form-label">CEP</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="inputCEP" name="inputCEP" placeholder="CEP">
+            <span id="CEP-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">Endereço</label>
         <div class="col-sm-10">
             <input type="text" class="form-control" id="inputEndereco" name="inputEndereco" placeholder="Endereço">
+            <span id="endereco-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">Número</label>
         <div class="col-sm-10">
-            <input type="number" class="form-control" id="inputNumero" name="inputNumero" placeholder="Número">
+            <input type="text" class="form-control" id="inputNumero" name="inputNumero" placeholder="Número">
+            <span id="numero-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">Bairro</label>
         <div class="col-sm-10">
             <input type="text" class="form-control" id="inputBairro" name="inputBairro" placeholder="Bairro">
-        </div>
-    </div>
-    <div class="form-group row mt-4">
-        <label class="col-sm-2 col-form-label">Telefone</label>
-        <div class="col-sm-10">
-            <input type="number" class="form-control" id="inputTelefone" name="inputTelefone" placeholder="Telefone">
-        </div>
-    </div>
-    <div class="form-group row mt-4">
-        <label class="col-sm-2 col-form-label">CEP</label>
-        <div class="col-sm-10">
-            <input type="number" class="form-control" id="inputCEP" name="inputCEP" placeholder="CEP">
+            <span id="bairro-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">Cidade</label>
         <div class="col-sm-10">
             <input type="text" class="form-control" id="inputCidade" name="inputCidade" placeholder="Cidade">
+            <span id="cidade-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">UF</label>
         <div class="col-sm-10">
-            <input type="text" class="form-control" id="inputUF" name="inputUF" placeholder="UF">
+            <select class="form-control" id="inputUF">                
+                <option value="AC">Acre</option>
+                <option value="AL">Alagoas</option>
+                <option value="AP">Amapá</option>
+                <option value="AM">Amazonas</option>
+                <option value="BA">Bahia</option>
+                <option value="CE">Ceará</option>
+                <option value="DF">Distrito Federal</option>
+                <option value="ES">Espirito Santo</option>
+                <option value="GO">Goiás</option>
+                <option value="MA">Maranhão</option>
+                <option value="MS">Mato Grosso do Sul</option>
+                <option value="MT">Mato Grosso</option>
+                <option value="MG">Minas Gerais</option>
+                <option value="PA">Pará</option>
+                <option value="PB">Paraíba</option>
+                <option value="PR">Paraná</option>
+                <option value="PE">Pernambuco</option>
+                <option value="PI">Piauí</option>
+                <option value="RJ">Rio de Janeiro</option>
+                <option value="RN">Rio Grande do Norte</option>
+                <option value="RS">Rio Grande do Sul</option>
+                <option value="RO">Rondônia</option>
+                <option value="RR">Roraima</option>
+                <option value="SC">Santa Catarina</option>
+                <option value="SP">São Paulo</option>
+                <option value="SE">Sergipe</option>
+                <option value="TO">Tocantins</option>
+            </select>
+            <span id="UF-feedback"></span>
+        </div>
+    </div>
+    <div class="form-group row mt-4">
+        <label class="col-sm-2 col-form-label">Telefone</label>
+        <div class="col-sm-10">
+            <input type="text" class="form-control" id="inputTelefone" name="inputTelefone" placeholder="Telefone">
+            <span id="telefone-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">Pais</label>
         <div class="col-sm-10">
             <input type="text" class="form-control" id="inputPais" name="inputPais" placeholder="Pais">
+            <span id="pais-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">Código Pais</label>
         <div class="col-sm-10">
-            <input type="number" class="form-control" id="inputCPais" name="inputCPais" placeholder="Código Pais">
+            <select class="form-control" id="inputCPais">
+                <option value="1058">Brasil</option>
+            </select>
+            <span id="cPais-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">Código Município</label>
         <div class="col-sm-10">
-            <input type="number" class="form-control" id="inputCMunicipio" name="inputCMunicipio" placeholder="Código Município">
+            <input type="text" class="form-control" id="inputCMunicipio" name="inputCMunicipio" placeholder="Código Município">
+            <span id="cMunicipio-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">CNAE</label>
         <div class="col-sm-10">
-            <input type="number" class="form-control" id="inputCNAE" name="inputCNAE" placeholder="CNAE">
+            <input type="text" class="form-control" id="inputCNAE" name="inputCNAE" placeholder="CNAE">
+            <span id="CNAE-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">CRT</label>
         <div class="col-sm-10">
-            <input type="number" class="form-control" id="inputCRT" name="inputCRT" placeholder="CRT">
+            <select class="form-control" id="inputCRT">
+                <option value="1">Simples Nacional</option>
+                <option value="2">Simples Nacional - Excesso de Sublimite de Receita Bruta</option>
+                <option value="3">Regime Normal</option>
+            </select>
+            <span id="CRT-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-4">
         <label class="col-sm-2 col-form-label">IM</label>
         <div class="col-sm-10">
-            <input type="number" class="form-control" id="inputIM" name="inputIM" placeholder="IM">
+            <input type="text" class="form-control" id="inputIM" name="inputIM" placeholder="IM">
+            <span id="IM-feedback"></span>
         </div>
     </div>
     <div class="form-group row mt-2 mb-2">
         <label class="col-sm-2 col-form-label">IE</label>
         <div class="col-sm-10">
-            <input type="number" class="form-control" id="inputIE" name="inputIE" placeholder="IE">
+            <input type="text" class="form-control" id="inputIE" name="inputIE" placeholder="IE">
+            <span id="IE-feedback"></span>
         </div>
     </div>
 </form>

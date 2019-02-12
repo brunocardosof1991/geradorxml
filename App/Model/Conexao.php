@@ -50,5 +50,4 @@ class Conexao {
             $this->fechar($link);
         }
     }
-
 }

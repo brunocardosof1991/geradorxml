@@ -1,4 +1,5 @@
-$(document).ready(function(){ 
+$(document).ready(function(){  
+    let ls; //localStorage
     //Verificar na pasta /Enviado/Autorizado da UniNFe se foi autorizado a NF
     //Função chamada na promise done do click no botao Finalizar Venda
     //Essa função contêm a criação da DANFE. Motivo: Só sera criado a DANFE se tudo ocorrer bem na autorização
@@ -6,7 +7,7 @@ $(document).ready(function(){
     {
         let chaveDeAcesso = true;
         $.ajax({
-            url: "http://localhost/geradorXml/App/public/api/uninfe/autorizar/confirmar",
+            url: "http://localhost/geradorXml/App/Controller/UniNFe/Autorizar/Confirmar.php",
             method: 'post',
             dataType: 'json',
             data: {chaveDeAcesso:chaveDeAcesso}
@@ -14,18 +15,14 @@ $(document).ready(function(){
             if(data == 'success')
             {
                 $("#apiModal .modal-body p").slideUp(850);
-                $("#apiModal .modal-body p").text('NFC-e enviada com sucesso!   ').slideDown(850);
+                $("#apiModal .modal-body p").text('NFC-e enviada com sucesso!').slideDown(850);
                 $("#apiModal .modal-body").append('<i class="fas fa-thumbs-up fa-2x " style="color:#0fe206"></i>').slideDown(700);
-                $('.chart').data('easyPieChart').update(100).options.barColor = '#0fe206';            
-                $("#apiModal .modal-footer .action").text('Imprimir NFC-e').show();
-                //DANFE
-                let DANFE = true;
+                $('.chart').data('easyPieChart').update(100).options.barColor = '#0fe206';    
+                //Salvar Venda no Banco de Dados
                 $.ajax({
-                    method: 'post',
-                    url: 'http://localhost/geradorXml/App/public/api/DANFE',
-                    dataType: 'json',
-                    data:{DANFE:DANFE}
-                }).done(function(data){
+                    method:'get',
+                    url:'http://localhost/geradorXml/App/public/api/venda/salvar',
+                    dataType:'json'
                 });
             } 
             if(data == 'error')
@@ -93,9 +90,71 @@ $(document).ready(function(){
     //Ao clicar em Forma de Pagamento, a tabela HTML será convertida em json &&
     //Será feito o calculo do valor total dos produtos com as funções:
     //convertTableToJson() calcularValorTotal()
-    $("#btnCollapseFormaPagamento_GerarXML").on('click',function(){ 
-        convertTableToJson();
-        $("#jumbotronProdutos #divValorTotal_GerarXml").find("#spanValorTotal").text(calcularValorTotal());
+    //Collapse Formas de Pagamento
+    $("#collapseFormaPagamento").on('click',function(e){
+        if(convertTableToJson().length === 2)
+        {
+            alert('Selecione Algum Produto!');
+            e.stopPropagation(); 
+        } else
+        {
+            convertTableToJson();
+            $("#jumbotronProdutos #divValorTotal_GerarXml").find("#spanValorTotal").text(calcularValorTotal());
+        }
+    });
+    //Collapse Destinatario
+    $("#collapseDestinatario").on('click',function(e){
+        if($("#textAreaAdicional").text() !== '')
+        {$("#textAreaAdicional").text('')}
+        if(localStorage.length === 0)
+        {
+            alert('Selecione Alguma Forma de Pagamento!');
+            e.stopPropagation(); 
+        } 
+        if(localStorage.length > 0)
+        {
+            let creditoFilter = 0;
+            ls = JSON.parse(localStorage.getItem('session')); 
+            creditoFilter = ls.filter(function (el) {
+                return el.formaPagamento;
+            });
+            if(ls.length > 1 &&(creditoFilter[0].formaPagamento === 'credito' || creditoFilter[1].formaPagamento === 'credito'))
+            {
+                if(creditoFilter[0].formaPagamento === 'credito')
+                {
+                    let parcelas = creditoFilter[0].parcelas;
+                    let valorParcelas = creditoFilter[0].valorParcelas;
+                    $("#textAreaAdicional").append(`
+                    Crédito: 
+                    Numero de Parcelas: ${parcelas}x 
+                    Valor das Parcelas: R$${valorParcelas} | 
+                    ${creditoFilter[1].formaPagamento}:
+                    Valor: R$${creditoFilter[1].dinheiro}
+                    `);                    
+                }
+                if(creditoFilter[1].formaPagamento === 'credito')
+                {
+                    let parcelas = creditoFilter[1].parcelas;
+                    let valorParcelas = creditoFilter[1].valorParcelas;
+                    $("#textAreaAdicional").append(`
+                    Crédito: 
+                    Numero de Parcelas: ${parcelas}x 
+                    Valor das Parcelas: R$${valorParcelas} | 
+                    ${creditoFilter[0].formaPagamento}:
+                    Valor: R$${creditoFilter[0].dinheiro}
+                    `);                    
+                }
+            }
+            if(creditoFilter[0].formaPagamento !== 'credito' && creditoFilter[1].formaPagamento !== 'credito')
+            {
+                $("#textAreaAdicional").append(`
+                ${creditoFilter[0].formaPagamento}:
+                Valor: R$${creditoFilter[0].dinheiro} | 
+                ${creditoFilter[1].formaPagamento}:
+                Valor: R$${creditoFilter[1].dinheiro} 
+                `);    
+            }
+        }
     });
     function excluirProdutoTabela()        
     {
@@ -107,13 +166,13 @@ $(document).ready(function(){
         }
     }
     $(document).on('click','.inputReset',function(){
-        $("#inputSearchProduto_XmlGerar").val('');
+        $("#inputBuscarProduto").val('');
     });
-    $("#inputSearchProduto_XmlGerar").on('keyup', function (e){
+    $("#inputBuscarProduto").on('keyup', function (e){
         e.preventDefault();       
         if (e.keyCode === 13) 
         {
-            let produto = $("#inputSearchProduto_XmlGerar").val();
+            let produto = $("#inputBuscarProduto").val();
             if (!isNaN(produto)) 
             {
                 $.ajax({
@@ -126,15 +185,15 @@ $(document).ready(function(){
                         alert("Produto não existe");
                     } else 
                     {
-                        $("<tr>").append(
+                        $('<tr>').append(
                         $("<td>").text(data[0].id),
                         $("<td>").text(data[0].descricao),
                         $("<td>").text(data[0].ncm).hide(),
                         $("<td>").text(data[0].preco_custo),
                         $("<td>").text(data[0].CFOP).hide(),
-                        $('<td>').append("<input type='number' class='form-control' id='inputQuantidadeProduto_XmlGerar'/>"),
-                        $('<td>').append('<div class="form-group">        <select class="form-control" id="exampleFormControlSelect1">        <option value="AMPOLA">AMPOLA</option>        <option value="BALDE">BALDE</option>        <option value="BANDEJ">BANDEJ</option>        <option value="BARRA">BARRA</option>        <option value="BISNAG">BISNAGA</option>        <option value="BLOCO">BLOCO</option>        <option value="BOBINA">BOBINA</option>        <option value="BOMBEAR">BOMBONA</option>        <option value="CAPSULAS">CÁPSULAS</option>        <option value="CARRINHO">CARTELA</option>        <option value="CENTO">CENTO</option>        <option value="CJ">CONJUNTO</option>        <option value="CM">CM</option>        <option value="CM2">CENTIMETRO QUADRADO</option>        <option value="CX">CAIXA</option>        <option value="CX2">CAIXA COM 2 UNIDADES</option>        <option value="CX5">CAIXA COM 5 UNIDADES</option>        <option value="CX10">CAIXA COM 10 UNIDADES</option>        <option value="CX15">CAIXA COM 15 UNIDADES</option>        <option value="CX20">CAIXA COM 20 UNIDADES</option>        <option value="CX25">CAIXA COM 25 UNIDADES</option>        <option value="CX50">CAIXA COM 50 UNIDADES</option>        <option value="CX100">CAIXA COM 100 UNIDADES</option>        <option value="DISP">EXIBIÇÃO</option>        <option value="DUZIA">DUZIA</option>        <option value="EMBAL">EMBALAGEM</option>        <option value="FARDO">FARDO</option>        <option value="FOLHA">FOLHA</option>        <option value="FRASCO">FRASCO</option>        <option value="GALAO">GALÃO</option>        <option value="GF">GARRAFA</option>        <option value="GRAMAS">GRAMAS</option>        <option value="JOGO">JOGO</option>        <option value="KG">QUILOGRAMA</option>        <option value="KIT">KIT</option>        <option value="LATA">LATA</option>        <option value="LITRO">LITRO</option>        <option value="M">M</option>        <option value="M2">M2</option>        <option value="M3">M3</option>        <option value="MILHEI">MILHEIRO</option>        <option value="ML">MILILITRO</option>        <option value="MWH">MEGAWATT HORA</option>        <option value="PACOTE">PACOTE</option>        <option value="PALETE">PALETE</option>        <option value="PARES">PARES</option>        <option value="PC">PEÇA</option>        <option value="AMIGO">AMIGO</option>        <option value="K">QUILATE</option>        <option value="RESMA">RESMA</option>        <option value="ROLO">ROLO</option>        <option value="SACO">SACO</option>        <option value="SACOLA">SACOLA</option>        <option value="TAMBOR">TAMBOR</option>        <option value="TANQUE">TANQUE</option>        <option value="TON">TONELADA</option>        <option value="TUBO">TUBO</option>        <option value="UN">UNIDADE</option>        <option value="VASIL">VASILHAME</option>        <option value="VIDRO">VIDRO</option>        </select>        </div>'),
-                        $('<td>').append('<i class="fas fa-trash fa-2x"></i>').css({'cursor':'pointer', 'color':'#FF0516'}).click(excluirProdutoTabela)
+                        $('<div class="form-group"><input type="number" class="form-control mb-3 mt-1" id="inputQuantidadeProduto_XmlGerar" placeholder="Quantidade"></div>').appendTo(('<td>')).html(),
+                        $('<div class="form-group">        <select class="form-control" id="exampleFormControlSelect1">        <option value="AMPOLA">...</option>        <option value="AMPOLA">AMPOLA</option>        <option value="BALDE">BALDE</option>        <option value="BANDEJ">BANDEJ</option>        <option value="BARRA">BARRA</option>        <option value="BISNAG">BISNAGA</option>        <option value="BLOCO">BLOCO</option>        <option value="BOBINA">BOBINA</option>        <option value="BOMBEAR">BOMBONA</option>        <option value="CAPSULAS">CÁPSULAS</option>        <option value="CARRINHO">CARTELA</option>        <option value="CENTO">CENTO</option>        <option value="CJ">CONJUNTO</option>        <option value="CM">CM</option>        <option value="CM2">CENTIMETRO QUADRADO</option>        <option value="CX">CAIXA</option>        <option value="CX2">CAIXA COM 2 UNIDADES</option>        <option value="CX5">CAIXA COM 5 UNIDADES</option>        <option value="CX10">CAIXA COM 10 UNIDADES</option>        <option value="CX15">CAIXA COM 15 UNIDADES</option>        <option value="CX20">CAIXA COM 20 UNIDADES</option>        <option value="CX25">CAIXA COM 25 UNIDADES</option>        <option value="CX50">CAIXA COM 50 UNIDADES</option>        <option value="CX100">CAIXA COM 100 UNIDADES</option>        <option value="DISP">EXIBIÇÃO</option>        <option value="DUZIA">DUZIA</option>        <option value="EMBAL">EMBALAGEM</option>        <option value="FARDO">FARDO</option>        <option value="FOLHA">FOLHA</option>        <option value="FRASCO">FRASCO</option>        <option value="GALAO">GALÃO</option>        <option value="GF">GARRAFA</option>        <option value="GRAMAS">GRAMAS</option>        <option value="JOGO">JOGO</option>        <option value="KG">QUILOGRAMA</option>        <option value="KIT">KIT</option>        <option value="LATA">LATA</option>        <option value="LITRO">LITRO</option>        <option value="M">M</option>        <option value="M2">M2</option>        <option value="M3">M3</option>        <option value="MILHEI">MILHEIRO</option>        <option value="ML">MILILITRO</option>        <option value="MWH">MEGAWATT HORA</option>        <option value="PACOTE">PACOTE</option>        <option value="PALETE">PALETE</option>        <option value="PARES">PARES</option>        <option value="PC">PEÇA</option>        <option value="AMIGO">AMIGO</option>        <option value="K">QUILATE</option>        <option value="RESMA">RESMA</option>        <option value="ROLO">ROLO</option>        <option value="SACO">SACO</option>        <option value="SACOLA">SACOLA</option>        <option value="TAMBOR">TAMBOR</option>        <option value="TANQUE">TANQUE</option>        <option value="TON">TONELADA</option>        <option value="TUBO">TUBO</option>        <option value="UN">UNIDADE(s)</option>        <option value="VASIL">VASILHAME</option>        <option value="VIDRO">VIDRO</option>        </select>        </div>').appendTo(('<td>')).html(),
+                        $('<td>').append('<i class="fas fa-trash fa-2x" title="Excluir"></i>').css({'cursor':'pointer', 'color':'#FF0516'}).click(excluirProdutoTabela)
                     ).appendTo('#tableListarProduto_XmlGerar tbody').html();                        
                     }
                 });
@@ -145,65 +204,27 @@ $(document).ready(function(){
                     url: 'http://localhost/geradorXml/App/public/api/produto/descricao/'+produto,
                     dataType: 'json'
                 }).done(function(data) {
-                    console.log(data);
                     if(data == '') 
                     {
                         alert("Produto não existe");
                     } else 
                     {
-                        $("<tr>").append(
+                        $('<tr').append(
                         $("<td>").text(data[0].id),
                         $("<td>").text(data[0].descricao),
                         $("<td>").text(data[0].ncm).hide(),
                         $("<td>").text(data[0].preco_custo),
                         $("<td>").text(data[0].CFOP).hide(),
-                        $('<td>').append("<input type='number' class='form-control' id='inputQuantidadeProduto_XmlGerar'/>"),
-                        $('<td>').append('<div class="form-group">        <select class="form-control" id="exampleFormControlSelect1">        <option value="AMPOLA">AMPOLA</option>        <option value="BALDE">BALDE</option>        <option value="BANDEJ">BANDEJ</option>        <option value="BARRA">BARRA</option>        <option value="BISNAG">BISNAGA</option>        <option value="BLOCO">BLOCO</option>        <option value="BOBINA">BOBINA</option>        <option value="BOMBEAR">BOMBONA</option>        <option value="CAPSULAS">CÁPSULAS</option>        <option value="CARRINHO">CARTELA</option>        <option value="CENTO">CENTO</option>        <option value="CJ">CONJUNTO</option>        <option value="CM">CM</option>        <option value="CM2">CENTIMETRO QUADRADO</option>        <option value="CX">CAIXA</option>        <option value="CX2">CAIXA COM 2 UNIDADES</option>        <option value="CX5">CAIXA COM 5 UNIDADES</option>        <option value="CX10">CAIXA COM 10 UNIDADES</option>        <option value="CX15">CAIXA COM 15 UNIDADES</option>        <option value="CX20">CAIXA COM 20 UNIDADES</option>        <option value="CX25">CAIXA COM 25 UNIDADES</option>        <option value="CX50">CAIXA COM 50 UNIDADES</option>        <option value="CX100">CAIXA COM 100 UNIDADES</option>        <option value="DISP">EXIBIÇÃO</option>        <option value="DUZIA">DUZIA</option>        <option value="EMBAL">EMBALAGEM</option>        <option value="FARDO">FARDO</option>        <option value="FOLHA">FOLHA</option>        <option value="FRASCO">FRASCO</option>        <option value="GALAO">GALÃO</option>        <option value="GF">GARRAFA</option>        <option value="GRAMAS">GRAMAS</option>        <option value="JOGO">JOGO</option>        <option value="KG">QUILOGRAMA</option>        <option value="KIT">KIT</option>        <option value="LATA">LATA</option>        <option value="LITRO">LITRO</option>        <option value="M">M</option>        <option value="M2">M2</option>        <option value="M3">M3</option>        <option value="MILHEI">MILHEIRO</option>        <option value="ML">MILILITRO</option>        <option value="MWH">MEGAWATT HORA</option>        <option value="PACOTE">PACOTE</option>        <option value="PALETE">PALETE</option>        <option value="PARES">PARES</option>        <option value="PC">PEÇA</option>        <option value="AMIGO">AMIGO</option>        <option value="K">QUILATE</option>        <option value="RESMA">RESMA</option>        <option value="ROLO">ROLO</option>        <option value="SACO">SACO</option>        <option value="SACOLA">SACOLA</option>        <option value="TAMBOR">TAMBOR</option>        <option value="TANQUE">TANQUE</option>        <option value="TON">TONELADA</option>        <option value="TUBO">TUBO</option>        <option value="UN">UNIDADE</option>        <option value="VASIL">VASILHAME</option>        <option value="VIDRO">VIDRO</option>        </select>        </div>'),
-                        $('<td>').append('<i class="fas fa-trash fa-2x"></i>').css({'cursor':'pointer', 'color':'#FF0516'}).click(excluirProdutoTabela)
+                        $('<td>').append('<div class="form-group"><input type="number" class="form-control mb-3 mt-1" id="inputQuantidadeProduto_XmlGerar" placeholder="Quantidade"></div>'),
+                        $('<td>').append('<div class="form-group">        <select class="form-control" id="exampleFormControlSelect1">        <option value="AMPOLA">...</option>        <option value="AMPOLA">AMPOLA</option>        <option value="BALDE">BALDE</option>        <option value="BANDEJ">BANDEJ</option>        <option value="BARRA">BARRA</option>        <option value="BISNAG">BISNAGA</option>        <option value="BLOCO">BLOCO</option>        <option value="BOBINA">BOBINA</option>        <option value="BOMBEAR">BOMBONA</option>        <option value="CAPSULAS">CÁPSULAS</option>        <option value="CARRINHO">CARTELA</option>        <option value="CENTO">CENTO</option>        <option value="CJ">CONJUNTO</option>        <option value="CM">CM</option>        <option value="CM2">CENTIMETRO QUADRADO</option>        <option value="CX">CAIXA</option>        <option value="CX2">CAIXA COM 2 UNIDADES</option>        <option value="CX5">CAIXA COM 5 UNIDADES</option>        <option value="CX10">CAIXA COM 10 UNIDADES</option>        <option value="CX15">CAIXA COM 15 UNIDADES</option>        <option value="CX20">CAIXA COM 20 UNIDADES</option>        <option value="CX25">CAIXA COM 25 UNIDADES</option>        <option value="CX50">CAIXA COM 50 UNIDADES</option>        <option value="CX100">CAIXA COM 100 UNIDADES</option>        <option value="DISP">EXIBIÇÃO</option>        <option value="DUZIA">DUZIA</option>        <option value="EMBAL">EMBALAGEM</option>        <option value="FARDO">FARDO</option>        <option value="FOLHA">FOLHA</option>        <option value="FRASCO">FRASCO</option>        <option value="GALAO">GALÃO</option>        <option value="GF">GARRAFA</option>        <option value="GRAMAS">GRAMAS</option>        <option value="JOGO">JOGO</option>        <option value="KG">QUILOGRAMA</option>        <option value="KIT">KIT</option>        <option value="LATA">LATA</option>        <option value="LITRO">LITRO</option>        <option value="M">M</option>        <option value="M2">M2</option>        <option value="M3">M3</option>        <option value="MILHEI">MILHEIRO</option>        <option value="ML">MILILITRO</option>        <option value="MWH">MEGAWATT HORA</option>        <option value="PACOTE">PACOTE</option>        <option value="PALETE">PALETE</option>        <option value="PARES">PARES</option>        <option value="PC">PEÇA</option>        <option value="AMIGO">AMIGO</option>        <option value="K">QUILATE</option>        <option value="RESMA">RESMA</option>        <option value="ROLO">ROLO</option>        <option value="SACO">SACO</option>        <option value="SACOLA">SACOLA</option>        <option value="TAMBOR">TAMBOR</option>        <option value="TANQUE">TANQUE</option>        <option value="TON">TONELADA</option>        <option value="TUBO">TUBO</option>        <option value="UN">UNIDADE(s)</option>        <option value="VASIL">VASILHAME</option>        <option value="VIDRO">VIDRO</option>        </select>        </div>'),
+                        $('<td class="mx-auto my-auto">').append('<i class="fas fa-trash fa-2x" title="Excluir"></i>').css({'cursor':'pointer', 'color':'#FF0516'}).click(excluirProdutoTabela)
                     ).appendTo('#tableListarProduto_XmlGerar tbody').html();                        
                     }
                 });
             }            
-            $("#inputSearchProduto_XmlGerar").val('');
+            $("#inputBuscarProduto").val('');
         }
     });    
-    //#rowFormaPagamento
-    $("#payment").change(function () {
-        let formaPagamento = $("#payment").val();
-        if(formaPagamento == 1 || formaPagamento == 2 ) 
-        {
-            $("#divTEFPOS").hide();
-            $("#divCredCartao").hide();
-            $("#divBandeira").hide();
-            $("#divAutorizacaoCartao").hide();
-            $("#rowFormaPagamento").addClass("w-100");
-
-            $("#divFormaPagamento").addClass("mx-auto");
-            $("#divinputDinheiro").show().addClass("mx-auto");
-            $("#divinputDesconto").show().addClass("mx-auto");
-            $("#divinputTroco").show().addClass("mr-auto");
-            $("#divinputRegistro").show().addClass("mx-auto");
-            $("#divinputNomeCliente").show().addClass("mx-auto");
-            //Calcular Troco
-            $('#inputDinheiro').focusout(function () {                    
-                let val1 = calcularValorTotal();
-                let val2 = $("#inputDinheiro").val();
-                let result = val2 - val1;
-                let resultParsed = parseFloat((result).toFixed(2));      
-                $("#inputTroco").val(resultParsed).css({"color":"#ff1a1a", "font-weight":"Bold"});
-            });
-        } else {
-            $("#divTEFPOS").show();
-            $("#divCredCartao").show();
-            $("#divBandeira").show();
-            $("#divAutorizacaoCartao").show();
-            $("#divinputDinheiro").hide();
-            $("#divinputDesconto").hide();
-            $("#divinputTroco").hide();
-            $("#divinputRegistro").show();
-            $("#divinputNomeCliente").show();
-        }
-    });
     //Enviar ID/NOME do cliente
     $('#inputName').on('keyup',function(e) {
         if (e.keyCode === 13) 
@@ -219,7 +240,6 @@ $(document).ready(function(){
                     url: 'http://localhost/geradorXml/App/public/api/cliente/'+user_id,
                     dataType: 'json'
                 }).done(function(data) {
-                    $('#container').find('input[name="clientID"]').val(data[0].id);
                     $('#container').find('input[name="inputName"]').val(data[0].nome);
                     $('#container').find('input[name="inputRegistro"]').val(data[0].CNPJ);
                     $('#container').find('input[name="inputEndereco"]').val(data[0].endereco);
@@ -243,7 +263,7 @@ $(document).ready(function(){
     }).done(function(data){
         emissor = ajax.responseJSON;
     });
-    $("#buttonFinalizarVenda").click(function(){//Coletar todos inpts        
+    $(document).one('click','#buttonFinalizarVenda',function(){//Coletar todos inpts        
         var input = {};
         $("input").each(function() {
             input[$(this).attr("name")] = $(this).val();
@@ -265,8 +285,7 @@ $(document).ready(function(){
         var array = [];
         array[0] = removeEmpty(input);
         delete array[0].undefined
-        array[1] = removeEmpty(select);
-        delete array[1].undefined
+        array[1] = removeEmpty(ls);
         array[2] = textArea;
         array[3] = valorTotal;
         array[4] = emissor[0];
@@ -275,16 +294,18 @@ $(document).ready(function(){
         // Alimentar o XML para autorização
         $.ajax({
             method:'post',
-            url:'http://localhost/geradorXml/App/public/api/uninfe/autorizar',
+            url:'http://localhost/geradorXml/App/Controller/UniNFe/Autorizar/Autorizar.php',
             dataType: 'json',
             data:{json:json, produto:produto}
         }).done(function (data)
         {
-            if(data == '{"success": "XML Autorizado"}')
+            if(data !== '')
             {
+                $("#btnFechar").show(); 
+                $("#apiModal .modal-body p").show(); 
+                $("h1").show(); 
                 $("#apiModal").modal('show');
                 $("#apiModal .modal-title").text('Autorização NFC-e');
-                $("#apiModal").on('shown.bs.modal', function() {    
                     $('.chart').easyPieChart({
                         // The color of the curcular bar. You can pass either a css valid color string like rgb, rgba hex or string colors. But you can also pass a function that accepts the current percentage as a value to return a dynamically generated color.
                         barColor: '#e60000',
@@ -303,15 +324,31 @@ $(document).ready(function(){
                         // Callback function that is called at the start of any animation (only if animate is not false).
                         onStart: $.noop,
                         // Callback function that is called at the end of any animation (only if animate is not false).
-                        onStop: $.noop
-                    });               
-                }); 
+                        onStop: function(){
+                            if($("#apiModal .modal-body p").text() !== 'NFC-e enviada com sucesso!')
+                            {   
+                                //Coletar o motivo do erro da inutilização, TAG <xMotivo>
+                                let autorizar = true;
+                                $.ajax({
+                                    method:'post',
+                                    url:'http://localhost/geradorXml/App/Controller/UniNFe/Error.php',
+                                    dataType:'json',
+                                    data:{autorizar:autorizar}
+                                }).done(function(data){                                
+                                let $confirm = confirm(data);
+                                if($confirm)
+                                {       
+                                    location = location;
+                                } 
+                                });
+                            }
+                        }
+                    });       
                 confirmarAutorizacao();
             }
         });
     });
-    //Botao fechar modalNFC-e, redirecionar para vendas.php
-    $(".modalApi_fechar").on('click',function() {
+    $(document).on("click","#btnFechar",function(){        
         location = location;
-    });     
+    });
 });

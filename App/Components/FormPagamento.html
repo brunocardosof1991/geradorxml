@@ -1,0 +1,89 @@
+<div id="divPagamento" style="display:none"> 
+    <div class="form-group col-md-12" style="display:none">
+        <label for="exampleFormControlSelect1">Forma de Pagamento</label>
+        <select id="pagamento" class="form-control">
+            <option value="01">Dinheiro</option>
+            <option value="02">Cheque</option>
+            <option value="03">Cartão de Crédito</option>
+            <option value="04">Cartão de Débito</option>
+            <option value="05">Crédito Loja</option>
+            <option value="10">Vale Alimentção</option>  
+            <option value="11">Vale Refeição</option>
+            <option value="12">Vale Presente</option>
+            <option value="13">Vale Combustível</option>
+            <option value="99">Outros</option>
+        </select>
+    </div>
+    <div class="form-group col-md-12">
+        <label for="exampleFormControlInput1">Forma de Pagamento</label>
+        <input type="text" class="form-control" id="pagamentoInput" readonly>    
+    </div>    
+    <div class="form-group col-md-12" id="divinputDinheiroC">
+        <label for="exampleFormControlInput1">Dinheiro R$</label>
+        <input type="text" class="form-control" id="inputDinheiroC" placeholder="..." step="any">
+    </div> 
+    <div class="form-group col-md-12" style="display:none" id="parcela" style="display:none">
+        <label for="exampleFormControlSelect1">Parcelas</label>
+        <select id="selectParcela" class="form-control">
+            <option value="1">1x</option>
+            <option value="2">2x</option>
+            <option value="3">3x</option>
+            <option value="4">4x</option>
+            <option value="5">5x</option>
+            <option value="6">6x</option>  
+            <option value="7">7x</option>
+            <option value="8">8x</option>
+            <option value="9">9x</option>
+            <option value="10">10x</option>
+        </select>
+    </div> 
+    <div class="form-group col-md-12" id="valorParcelas" style="display:none">
+        <label for="exampleFormControlInput1">Valor Parcelas</label>
+        <input type="text" class="form-control" id="inputValorParcelas" readonly step="any">
+    </div> 
+    <div class="form-group col-md-12" id="divinputDescontoC" style="display:none">
+        <label for="exampleFormControlInput1">Desconto</label>
+        <input type="text" class="form-control" id="inputDescontoC" placeholder="..." step="any">
+    </div> 
+    <div class="form-group col-md-12" id="divBandeira">
+        <label for="exampleFormControlSelect1">Bandeira do Cartão</label>
+        <select id="bandeira" class="form-control bandeira">
+            <option value="01">Visa</option>
+            <option value="02">Mastercard</option>
+            <option value="03">American Express</option>
+            <option value="04">Sorocred</option>
+            <option value="05">Diners Club</option>
+            <option value="06">Elo</option>
+            <option value="07">Hipercard</option>
+            <option value="08">Aura</option>
+            <option value="09">Cabal</option>
+            <option value="99">Outros</option>
+        </select>
+    </div>
+    <div class="form-group col-md-12" id="divCredenciadora">
+        <label for="exampleFormControlSelect1">Credenciadora do Cartão</label>
+        <select id="credenciadora" class="form-control" >
+            <option value="03106213000271">Administradora de Cartões Sicredi Ltda.(RS)</option>
+            <option value="59438325000101">BANCO BRADESCO CARTÔES S/A - AMERICAM EXPRESS</option>
+            <option value="62421979000129">BANCO GE-CAPITAL</option>
+            <option value="58160789000128">BANCO SAFRA S/A</option>
+            <option value="61071387000161">Unicard Banco Múltiplo S/A - TRICARD</option>
+            <option value="00604122000197">TRIVALE Administração Ltda</option>
+            <option value="01027058000191">Cielo</option>
+            <option value="33479023000180">Diners</option>
+            <option value="07965479000140">Amex</option>
+            <option value="01425787000104">RedeCard</option>
+        </select>
+    </div>
+    <div class="form-group col-md-12" id="divintPag">
+        <label for="exampleFormControlSelect1">Integração de Pagamento</label>
+        <select id="intPagamento" class="form-control">
+                <option value="1">TEF</option>
+                <option value="2">POS</option>
+        </select>
+    </div>
+    <div class="form-group col-md-12" id="divAutorizacaoCartao" >
+      <label for="exampleFormControlInput1">Código de Segurança</label>
+      <input type="text" class="form-control" id="inputCS" placeholder="...">
+    </div> 
+</div>

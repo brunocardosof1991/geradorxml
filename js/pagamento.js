@@ -1,17 +1,10 @@
 $(document).ready(function () {
     //Array com as formas de pagamento
-    let ls = JSON.parse(localStorage.getItem('session'));
-
-    $(document).on('click','#cleanLS',function(){
-        localStorage.clear();
-        alert('localStorage Cleaned');
-        location.reload()
-    });    
+    let ls = JSON.parse(localStorage.getItem('session')); 
     //Limitar a venda em somente duas formas de pagamento
     //Descobrir como utilizar o array do localStorage para + de 2 formas de pagamento
     function limitarVenda()
     {
-        /* let ls; */
         if(localStorage.length > 0) 
         {
             ls = JSON.parse(localStorage.getItem('session'));
@@ -46,6 +39,7 @@ $(document).ready(function () {
 
         }
     }
+    //Dinheiro & Cheque
     function cadastrarPagamento(payment,formaPagamento)
     {     
             let dinheiro = $('#inputDinheiroC').val(); 
@@ -53,7 +47,7 @@ $(document).ready(function () {
             let desconto = $('#inputDescontoC').val();
             //Se o input desconto não estiver vazio, significa que o checkbox desconto foi marcado
             if($('#inputDescontoC').val() !== '') {
-                var json = {'formaPagamento': formaPagamento,'dinheiro':dinheiro,'payment': payment,'desconto':desconto};
+                let json = {'formaPagamento': formaPagamento,'dinheiro':dinheiro,'payment': payment,'desconto':desconto};
                 calcDesconto();
                 calcTroco(dinheiro); 
                 SaveDataToLocalStorage(json);
@@ -63,7 +57,7 @@ $(document).ready(function () {
                     color: '#FF0000'
                 },1000);
             } else if($('#inputDescontoC').val() === '') {
-                var json = {'formaPagamento': formaPagamento,'dinheiro':dinheiro,'payment': payment};
+                let json = {'formaPagamento': formaPagamento,'dinheiro':dinheiro,'payment': payment};
                 calcTroco(dinheiro); 
                 SaveDataToLocalStorage(json);
                 alert('Forma de Pagamento Adicionada');
@@ -73,8 +67,11 @@ $(document).ready(function () {
                 },1000);
             }
     }
+    //Cartões
     function cadastrarPagamentoTEF(paymentTEF,formaPagamentoTEF)
-    {                 
+    {         
+        let parcelas = 0;        
+        let valorParcelas = 0;        
         let bandeira = $('#bandeira').val();
         let credCartao = $('#credenciadora').val();
         let intPag = $('#intPagamento').val();        
@@ -82,8 +79,13 @@ $(document).ready(function () {
         let dinheiro = $('#inputDinheiroC').val(); 
         dinheiro = dinheiro.replace(/,/g, '.');
         let desconto = $('#inputDescontoC').val();
+        if(formaPagamentoTEF === 'credito')
+        {
+            parcelas = $("#selectParcela").val();
+            valorParcelas = $("#inputValorParcelas").val();
+        }
         if($('#inputDescontoC').val() !== '') {
-            var json = {'formaPagamento': formaPagamentoTEF,'dinheiro':dinheiro,'payment': paymentTEF, 'bandeira': bandeira,'credCartao': credCartao,'intPag':intPag,'codigo':codigo,'desconto':desconto};
+            let json = {'formaPagamento': formaPagamentoTEF,'dinheiro':dinheiro,'payment': paymentTEF, 'bandeira': bandeira,'credCartao': credCartao,'intPag':intPag,'codigo':codigo,'desconto':desconto,'parcelas':parcelas,'valorParcelas':valorParcelas};
             calcDesconto();
             calcTroco(dinheiro); 
             SaveDataToLocalStorage(json);
@@ -93,7 +95,7 @@ $(document).ready(function () {
                 color: '#FF0000'
             },1000);
         } else if($('#inputDescontoC').val() === ''){
-            var json = {'formaPagamento': formaPagamentoTEF,'dinheiro':dinheiro,'payment': paymentTEF, 'bandeira': bandeira,'credCartao': credCartao,'intPag':intPag,'codigo':codigo};
+            let json = {'formaPagamento': formaPagamentoTEF,'dinheiro':dinheiro,'payment': paymentTEF, 'bandeira': bandeira,'credCartao': credCartao,'intPag':intPag,'codigo':codigo,'parcelas':parcelas,'valorParcelas':valorParcelas};
             calcTroco(dinheiro); 
             SaveDataToLocalStorage(json);
             alert('Forma de Pagamento Adicionada');
@@ -106,7 +108,7 @@ $(document).ready(function () {
     //Salvar as formas de pagamento no localStorage
     function SaveDataToLocalStorage(data)
     {
-        var ls = JSON.parse(localStorage.getItem("session") || "[]");
+        let ls = JSON.parse(localStorage.getItem("session") || "[]");
         // Push the new data (whether it be an object or anything else) onto the array
         ls.push(data);
         // Re-serialize the array back into a string and store it in localStorage
@@ -117,6 +119,7 @@ $(document).ready(function () {
         let formaPagamento = 'dinheiro';
         //Necessário para o preenchimento do XML
         let payment = '01';
+        $("#pagamentoInput").attr('placeholder','Dinheiro');
         limitarVenda();
         validarInputDesconto();
         //Botao Visualizar Formas de Pagamento: Retornar a cor preta
@@ -130,21 +133,9 @@ $(document).ready(function () {
         $('#divCredenciadora').hide();
         $('#divintPag').hide();
         $('#divAutorizacaoCartao').hide();
-        //Iniciar o modal com select pagamento dinheiro
-        $('#pagamento').val('01');
-        //Esconder o restante dos options 
-        $('#pagamento option[value="02"]').hide();
-        $('#pagamento option[value="03"]').hide();
-        $('#pagamento option[value="04"]').hide();
-        $('#pagamento option[value="05"]').hide();
-        $('#pagamento option[value="10"]').hide();
-        $('#pagamento option[value="11"]').hide();
-        $('#pagamento option[value="12"]').hide();
-        $('#pagamento option[value="13"]').hide();
-        $('#pagamento option[value="99"]').hide();
         //Adicionar ao body do modal o formPagamentoDinheiro
         $("#modalDinheiro .modal-body").append($('#divPagamento').show());
-        /* Caso dinheiro seje escolhido como segunda forma de pagamento, adicionar automaticamente
+        /* Casoa venda seja em duas formas de pagamento, adicionar automaticamente
         ao input dinheiro, o valor restante*/
         if($("#spanRestante").text() !== '')
         {
@@ -190,6 +181,8 @@ $(document).ready(function () {
         let formaPagamento = 'cheque';
         //Necessário para o preenchimento do XML 
         let payment = '02';
+        //Renomear placeholder do input Forma de Pagamento
+        $("#pagamentoInput").attr('placeholder','Cheque')
         limitarVenda();
         validarInputDesconto();
         //Botao Visualizar Formas de Pagamento: Retornar a cor preta
@@ -203,18 +196,6 @@ $(document).ready(function () {
         $('#divCredenciadora').hide();
         $('#divintPag').hide();
         $('#divAutorizacaoCartao').hide();
-        //Iniciar o modal com select pagamento dinheiro
-        $('#pagamento').val('02');
-        //Esconder o restante dos options 
-        $('#pagamento option[value="01"]').hide();
-        $('#pagamento option[value="03"]').hide();
-        $('#pagamento option[value="04"]').hide();
-        $('#pagamento option[value="05"]').hide();
-        $('#pagamento option[value="10"]').hide();
-        $('#pagamento option[value="11"]').hide();
-        $('#pagamento option[value="12"]').hide();
-        $('#pagamento option[value="13"]').hide();
-        $('#pagamento option[value="99"]').hide();
         //Adicionar ao body do modal o formPagamentoDinheiro
         $("#modalCheque .modal-body").append($('#divPagamento').show());
         /* Caso dinheiro seje escolhido como segunda forma de pagamento, adicionar automaticamente
@@ -263,6 +244,7 @@ $(document).ready(function () {
         let formaPagamentoTEF = 'debito';
         //Necessário para o preenchimento do XML 
         let paymentTEF = '04';
+        $("#pagamentoInput").attr('placeholder','Debito');
         limitarVenda(); 
         validarInputDesconto();
         //Botao Visualizar Formas de Pagamento: Retornar a cor preta
@@ -274,17 +256,6 @@ $(document).ready(function () {
         $('#divCredenciadora').show();
         $('#divintPag').show();
         $('#divAutorizacaoCartao').show();
-        $('#pagamento').val('04'); 
-        $('#pagamento option[value="01"]').hide();
-        $('#pagamento option[value="02"]').hide();
-        $('#pagamento option[value="03"]').hide();
-        $('#pagamento option[value="04"]').show();
-        $('#pagamento option[value="05"]').hide();
-        $('#pagamento option[value="10"]').hide();
-        $('#pagamento option[value="11"]').hide();
-        $('#pagamento option[value="12"]').hide();
-        $('#pagamento option[value="13"]').hide();
-        $('#pagamento option[value="99"]').hide();
         $("#modalDebito .modal-body").append($('#divPagamento').show());
         if($("#spanRestante").text() !== '')
         {
@@ -329,6 +300,7 @@ $(document).ready(function () {
         let formaPagamentoTEF = 'credito';
         //Necessário para o preenchimento do XML 
         let paymentTEF = '03';
+        $("#pagamentoInput").attr('placeholder','Credito');
         limitarVenda();
         validarInputDesconto();
         //Botao Visualizar Formas de Pagamento: Retornar a cor preta
@@ -340,17 +312,6 @@ $(document).ready(function () {
         $('#divCredenciadora').show();
         $('#divintPag').show();
         $('#divAutorizacaoCartao').show();
-        $('#pagamento').val('03'); 
-        //$('#pagamento option[value="03"]').show();
-        $('#pagamento option[value="01"]').hide();
-        $('#pagamento option[value="02"]').hide();
-        $('#pagamento option[value="04"]').hide();
-        $('#pagamento option[value="05"]').hide();
-        $('#pagamento option[value="10"]').hide();
-        $('#pagamento option[value="11"]').hide();
-        $('#pagamento option[value="12"]').hide();
-        $('#pagamento option[value="13"]').hide();
-        $('#pagamento option[value="99"]').hide();
         $("#modalCredito .modal-body").append($('#divPagamento').show());
         if($("#spanRestante").text() !== '')
         {
@@ -402,6 +363,7 @@ $(document).ready(function () {
         let formaPagamentoTEF = 'alimentacao';
         //Necessário para o preenchimento do XML 
         let paymentTEF = '10';
+        $("#pagamentoInput").attr('placeholder','Alimentação');
         limitarVenda();
         validarInputDesconto();    
         //Botao Visualizar Formas de Pagamento: Retornar a cor preta
@@ -413,16 +375,6 @@ $(document).ready(function () {
         $('#divCredenciadora').show();
         $('#divintPag').show();
         $('#divAutorizacaoCartao').show();
-        $('#pagamento').val('10'); 
-        $('#pagamento option[value="01"]').hide();
-        $('#pagamento option[value="02"]').hide();
-        $('#pagamento option[value="03"]').hide();
-        $('#pagamento option[value="04"]').hide();
-        $('#pagamento option[value="05"]').hide();
-        $('#pagamento option[value="11"]').hide();
-        $('#pagamento option[value="12"]').hide();
-        $('#pagamento option[value="13"]').hide();
-        $('#pagamento option[value="99"]').hide();
         $("#modalAlimentacao .modal-body").append($('#divPagamento').show());
         if($("#spanRestante").text() !== '')
         {
@@ -467,6 +419,7 @@ $(document).ready(function () {
         let formaPagamentoTEF = 'debito';
         //Necessário para o preenchimento do XML 
         let paymentTEF = '11';
+        $("#pagamentoInput").attr('placeholder','Refeição');
         limitarVenda();   
         validarInputDesconto();   
         //Botao Visualizar Formas de Pagamento: Retornar a cor preta
@@ -478,16 +431,6 @@ $(document).ready(function () {
         $('#divCredenciadora').show();
         $('#divintPag').show();
         $('#divAutorizacaoCartao').show();
-        $('#pagamento').val('11'); 
-        $('#pagamento option[value="01"]').hide();
-        $('#pagamento option[value="02"]').hide();
-        $('#pagamento option[value="03"]').hide();
-        $('#pagamento option[value="04"]').hide();
-        $('#pagamento option[value="05"]').hide();
-        $('#pagamento option[value="10"]').hide();
-        $('#pagamento option[value="12"]').hide();
-        $('#pagamento option[value="13"]').hide();
-        $('#pagamento option[value="99"]').hide();
         $("#modalRefeicao .modal-body").append($('#divPagamento').show());
         if($("#spanRestante").text() !== '')
         {
@@ -700,15 +643,14 @@ $(document).ready(function () {
         `;  
         $("#modalVisualizarPagamentos .modal-title").text('Visualizar Formas de Pagamento');
         $("#modalVisualizarPagamentos").modal('show');
-        $("#modalVisualizarPagamentos .modal-body").append(table).show();
-
-        let a = JSON.parse(localStorage.getItem('session'));
-        $.each(a,function(i,v){         
-            var tr = 
+        $("#modalVisualizarPagamentos .modal-body").append(table).show();        
+        ls = JSON.parse(localStorage.getItem('session'));  
+        $.each(ls,function(key,value){         
+            let tr = 
                 $('<tr>')
                 .append(
-                $('<td>').text(v.formaPagamento),
-                $('<td>').text(v.dinheiro))
+                $('<td>').text(value.formaPagamento),
+                $('<td>').text(value.dinheiro))
                 .appendTo('#tablePagamentos').html();
         }); 
         /* Sem esse código, no segundo click em #visualizarFormaPagamento (Sem refresh da pagina), a tabela será multiplicada, 
@@ -735,12 +677,11 @@ $(document).ready(function () {
     //Filtrar forma de pagamento
     // Card Dinheiro
     $(document).on('click','#btnDinheiro',function(e){
-        var creditoFilter;
-        let b;
+        let creditoFilter;
         if(localStorage.length !== 0)
         {      
-            b = JSON.parse(localStorage.getItem('session'));      
-            creditoFilter = b.filter(function (el) {
+            ls = JSON.parse(localStorage.getItem('session'));      
+            creditoFilter = ls.filter(function (el) {
                 return el.formaPagamento === 'dinheiro';
             });
             
@@ -753,24 +694,23 @@ $(document).ready(function () {
                 color: '#FF0000'
             },1000);
         }
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'debito')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'debito')
         {btnDinheiro();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'credito')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'credito')
         {btnDinheiro();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'refeicao')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'refeicao')
         {btnDinheiro();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'cheque')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'cheque')
         {btnDinheiro();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'alimentacao')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'alimentacao')
         {btnDinheiro();}
         });
     $(document).on('click','#btnCheque',function(e){
-        var creditoFilter;
-        let b;
+        let creditoFilter;
         if(localStorage.length !== 0)
         {      
-            b = JSON.parse(localStorage.getItem('session'));      
-            creditoFilter = b.filter(function (el) {
+            ls = JSON.parse(localStorage.getItem('session'));      
+            creditoFilter = ls.filter(function (el) {
                 return el.formaPagamento === 'cheque';
             });
             
@@ -783,25 +723,24 @@ $(document).ready(function () {
                 color: '#FF0000'
             },1000);
         }
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'debito')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'debito')
         {btnCheque();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'credito')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'credito')
         {btnCheque();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'refeicao')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'refeicao')
         {btnCheque();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'dinheiro')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'dinheiro')
         {btnCheque();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'alimentacao')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'alimentacao')
         {btnCheque();}
         });
     // Card Cartão de Crédito
     $(document).on('click','#btnCredito',function(e){
-        var creditoFilter;
-        let b;
+        let creditoFilter;
         if(localStorage.length !== 0)
         {      
-            b = JSON.parse(localStorage.getItem('session'));      
-            creditoFilter = b.filter(function (el) {
+            ls = JSON.parse(localStorage.getItem('session'));      
+            creditoFilter = ls.filter(function (el) {
                 return el.formaPagamento === 'credito';
             });
             
@@ -814,25 +753,24 @@ $(document).ready(function () {
                 color: '#FF0000'
             },1000);
         }
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'dinheiro')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'dinheiro')
         {btnCredito();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'debito')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'debito')
         {btnCredito();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'alimentacao')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'alimentacao')
         {btnCredito();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'refeicao')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'refeicao')
         {btnCredito();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'cheque')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'cheque')
         {btnCredito();}
     });
     //Card Debito
     $(document).on('click','#btnDebito',function(e){
-        var debitoFilter;
-        let b;
+        let debitoFilter;
         if(localStorage.length !== 0)
         {      
-            b = JSON.parse(localStorage.getItem('session'));      
-            debitoFilter = b.filter(function (el) {
+            ls = JSON.parse(localStorage.getItem('session'));      
+            debitoFilter = ls.filter(function (el) {
                 return el.formaPagamento === 'debito';
             });
             
@@ -844,25 +782,25 @@ $(document).ready(function () {
             $("#visualizarFormaPagamento").animate({
                 color: '#FF0000'
             },1000);
-        }else if(localStorage.length === 1 && b[0].formaPagamento === 'credito')
+        }
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'credito')
         {btnDebito();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'dinheiro')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'dinheiro')
         {btnDebito();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'alimentacao')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'alimentacao')
         {btnDebito();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'refeicao')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'refeicao')
         {btnDebito();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'cheque')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'cheque')
         {btnDebito();}
     });
     //Card Alimentação
     $(document).on('click','#btnAlimentacao',function(e){
-        var creditoFilter;
-        let b;
+        let creditoFilter;
         if(localStorage.length !== 0)
         {      
-            b = JSON.parse(localStorage.getItem('session'));      
-            creditoFilter = b.filter(function (el) {
+            ls = JSON.parse(localStorage.getItem('session'));      
+            creditoFilter = ls.filter(function (el) {
                 return el.formaPagamento === 'alimentacao';
             });
             
@@ -875,25 +813,24 @@ $(document).ready(function () {
                 color: '#FF0000'
             },1000);
         }
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'dinheiro')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'dinheiro')
         {btnAlimentacao();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'debito')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'debito')
         {btnAlimentacao();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'credito')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'credito')
         {btnAlimentacao();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'refeicao')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'refeicao')
         {btnAlimentacao();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'cheque')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'cheque')
         {btnAlimentacao();}           
     });  
     //Card Refeição
     $(document).on('click','#btnRefeicao',function(e){
-        var creditoFilter;
-        let b;
+        let creditoFilter;
         if(localStorage.length !== 0)
         {      
-            b = JSON.parse(localStorage.getItem('session'));      
-            creditoFilter = b.filter(function (el) {
+            ls = JSON.parse(localStorage.getItem('session'));      
+            creditoFilter = ls.filter(function (el) {
                 return el.formaPagamento === 'refeicao';
             });
             
@@ -906,15 +843,15 @@ $(document).ready(function () {
                 color: '#FF0000'
             },1000);
         }
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'dinheiro')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'dinheiro')
         {btnRefeicao();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'debito')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'debito')
         {btnRefeicao();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'credito')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'credito')
         {btnRefeicao();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'alimentacao')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'alimentacao')
         {btnRefeicao();}
-        else if(localStorage.length === 1 && b[0].formaPagamento === 'cheque')
+        else if(localStorage.length === 1 && ls[0].formaPagamento === 'cheque')
         {btnRefeicao();}              
     });  
 });

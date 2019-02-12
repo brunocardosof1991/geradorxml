@@ -1,3 +1,9 @@
+<?php
+session_start();
+if(!isset($_SESSION['usuario'])){
+   header("Location:http://localhost/geradorXml/App/View/Login/Login.php");
+}
+?>
 <!DOCTYPE html>
 <html>
     <head> 
@@ -8,31 +14,36 @@
         <!-- JQUERY-->
         <script src="../../../js/external/jquery/jquery.js"></script>       
 
-        <!-- ************** -->
+        <!-- CustomJS -->
         <script type="module" src="../../../js/NF/fetch.js"></script>
         <script type="text/javascript" src="../../../js/tableResponsive.js"></script>
         <script type="module" src="../../../js/main.js"></script>
-
+        <script src="../../../js/logout.js"></script>
+        <!-- QRCode -->
+        <script type="text/javascript" src="../../../js/external/jquery/jquery.qrcode.js"></script>
+        <script type="text/javascript" src="../../../js/external/jquery/qrcode.js"></script>
+        <!-- DataTable-->   
+        <script src="../../../js/datatables.js"></script> 
+        <link href="../../../css/datatables.css" type="text/css" rel="stylesheet"> 
         <!-- Folha de estilo da página -->
         <link href="../../../css/style.css" type="text/css" rel="stylesheet">
-
-        <!-- Icones fonte awesome -->
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
-
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-        <!-- ================================================================================================ -->
+        <!-- DataTable-->   
+        <script src="../../../js/datatables.js"></script> 
+        <link href="../../../css/datatables.css" type="text/css" rel="stylesheet">    
+        <!-- Folha de estilo da página -->
+        <link href="../../../css/style.css" type="text/css" rel="stylesheet">
+        <!-- fonte awesome -->
+        <link href="../../../fontawesome-free-5.6.3/css/all.css" rel="stylesheet">
+        <!-- Bootstrap-->
+        <script src="../../../js/bootstrap/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="../../../css/bootstrap/bootstrap.min.css">
+        <!-- Barra de progressp -->
+        <script src="../../../easy-pie-chart-master/dist/jquery.easypiechart.js"></script>
         <script>
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip();
             });
         </script>        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.6/jquery.easypiechart.js"></script>
-        <!-- ======================== LINK BOOTSTRAP CSS 4.1 ================================================== -->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-        <!-- ================================================================================================== -->
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
-  
-        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
     </head>
     <body>     
     <?php require_once '../Menu.php'; ?> 
@@ -43,10 +54,10 @@
                     <table class="table table-hover table-bordered mx-auto text-center js-table-data display" id="tableListarNF">
                             <thead class="thead-dark">
                                 <tr>
-                                    <th>ID</th>
                                     <th>Chave De Acesso</th>
                                     <th>Data de Emissão</th>
                                     <th>Protocolo</th>
+                                    <th>Visualizar NCF-e</th>
                                     <th>Excluir</th>
                                     <th>Cancelar</th>
                                 </tr>
@@ -59,7 +70,8 @@
                 </div>
             </div> <!-- END .row -->
         </div> <!-- END .container --> 
-        <?php require_once '../../Components/Modal.html'; ?> 
+        <?php require_once '../../Components/Modal/Modal.html'; ?> 
+        <?php require_once '../../Components/Modal/ModalQRCode.html'; ?> 
         <?php require_once '../../Components/FormInutilizar.html'; ?>         
         <?php require_once '../../View/Footer.php'; ?>
     </body>

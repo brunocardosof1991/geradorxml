@@ -52,14 +52,13 @@ class Cliente {
         $CNPJ = $request->getParam('CNPJ');
         $endereco = $request->getParam('endereco');
         $numero = $request->getParam('numero');
-        $complemento = $request->getParam('complemento');
         $bairro = $request->getParam('bairro');
         $municipio = $request->getParam('municipio');
         $UF = $request->getParam('UF');
         $CEP = $request->getParam('CEP');
         $fone = $request->getParam('fone');
-        $sql = "INSERT INTO cliente (nome,CNPJ,endereco,numero,complemento,bairro,municipio,UF,CEP,fone) VALUES
-        (:nome,:CNPJ,:endereco,:numero,:complemento,:bairro,:municipio,:UF,:CEP,:fone)";
+        $sql = "INSERT INTO cliente (nome,CNPJ,endereco,numero,bairro,municipio,UF,CEP,fone) VALUES
+        (:nome,:CNPJ,:endereco,:numero,:bairro,:municipio,:UF,:CEP,:fone)";
         try{
             $connection = $this->connection->PDOConnect();
             $stmt = $connection->prepare($sql);
@@ -67,7 +66,6 @@ class Cliente {
             $stmt->bindParam(':CNPJ',      $CNPJ);
             $stmt->bindParam(':endereco',      $endereco);
             $stmt->bindParam(':numero',    $numero);
-            $stmt->bindParam(':complemento',       $complemento);
             $stmt->bindParam(':bairro',      $bairro);
             $stmt->bindParam(':municipio',      $municipio);
             $stmt->bindParam(':UF',      $UF);
@@ -87,20 +85,22 @@ class Cliente {
         $CNPJ = $request->getParam('CNPJ');
         $endereco = $request->getParam('endereco');
         $numero = $request->getParam('numero');
-        $complemento = $request->getParam('complemento');
         $bairro = $request->getParam('bairro');
         $CEP = $request->getParam('CEP');
         $fone = $request->getParam('fone');
+        $municipio = $request->getParam('municipio');
+        $UF = $request->getParam('UF');
         $sql = "UPDATE cliente SET
                     id 	 = :id,
                     nome = :nome,
                     CNPJ = :CNPJ,
                     endereco = :endereco,
                     numero 	= :numero,
-                    complemento = :complemento,
                     bairro = :bairro,
                     CEP	= :CEP,
-                    fone = :fone
+                    fone = :fone,
+                    municipio = :municipio,
+                    UF = :UF
                 WHERE id = $id";
         try{
             $connection = $this->connection->PDOConnect();
@@ -110,10 +110,11 @@ class Cliente {
             $stmt->bindParam(':CNPJ',      $CNPJ);
             $stmt->bindParam(':endereco',      $endereco);
             $stmt->bindParam(':numero',    $numero);
-            $stmt->bindParam(':complemento',       $complemento);
             $stmt->bindParam(':bairro',      $bairro);
             $stmt->bindParam(':CEP',      $CEP);
             $stmt->bindParam(':fone',      $fone);
+            $stmt->bindParam(':municipio',      $municipio);
+            $stmt->bindParam(':UF',      $UF);
             $stmt->execute();
             $connection = null;
             echo json_encode('{"success": "Cliente Atualizado"}');
@@ -135,6 +136,4 @@ class Cliente {
         }        
     }
 }
-
-?>
 

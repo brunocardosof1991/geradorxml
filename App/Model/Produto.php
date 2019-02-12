@@ -31,6 +31,7 @@ class Produto {
     }
     public function get($id)
     {       
+        // 8 Dígitos === Código de Barras 'cEAN8'
         if(strlen($id) === 8)
         {
             $sql = "SELECT * FROM produto WHERE cEAN = {$id}";
@@ -67,8 +68,9 @@ class Produto {
         $ncm = $request->getParam('ncm');
         $preco_custo = $request->getParam('preco_custo');
         $CFOP = $request->getParam('CFOP');
-        $sql = "INSERT INTO produto (descricao,ncm,preco_custo,CFOP) VALUES
-        (:descricao,:ncm,:preco_custo,:CFOP)";
+        $cEAN = $request->getParam('cEAN');
+        $sql = "INSERT INTO produto (descricao,ncm,preco_custo,CFOP,cEAN) VALUES
+        (:descricao,:ncm,:preco_custo,:CFOP,:cEAN)";
         try{
             $connection = $this->connection->PDOConnect();  
             $stmt = $connection->prepare($sql);
@@ -76,6 +78,7 @@ class Produto {
             $stmt->bindParam(':ncm',      $ncm);
             $stmt->bindParam(':preco_custo',    $preco_custo);
             $stmt->bindParam(':CFOP',       $CFOP);
+            $stmt->bindParam(':cEAN',       $cEAN);
             $stmt->execute();
             echo json_encode('{"success": "Produto Adicionado"}');
         } catch(PDOException $e){
@@ -89,12 +92,15 @@ class Produto {
         $ncm = $request->getParam('NCM');       
         $preco_custo = $request->getParam('preco_custo');     
         $CFOP = $request->getParam('CFOP');      
+        $cEAN = $request->getParam('cEAN');      
         $sql = "UPDATE produto SET
         id=:id,
         descricao=:descricao,
         NCM=:NCM,
         preco_custo=:preco_custo,
-        CFOP=:CFOP
+        CFOP=:CFOP,
+        cEAN=:cEAN
+        
                 WHERE id = $id";    
         try{
             $connection = $this->connection->PDOConnect();   
@@ -104,6 +110,7 @@ class Produto {
             $stmt->bindParam(':NCM',      $ncm);    
             $stmt->bindParam(':preco_custo',      $preco_custo); 
             $stmt->bindParam(':CFOP',      $CFOP);     
+            $stmt->bindParam(':cEAN',      $cEAN);     
             $stmt->execute(); 
             $connection = null;  
             echo json_encode('{"success": "Produto Atualizado"}');    

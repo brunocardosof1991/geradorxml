@@ -8,25 +8,28 @@ $(document).ready(function(){
             url: 'http://localhost/geradorXml/App/public/api/emissor/',
             dataType: 'json'
         }).done(function(data) {
-			$("#container").find('#pID').text('ID: '+data[0].id);     
-			$("#container").find('#pCNPJ #spanCNPJ').text(data[0].CNPJ);     
-			$("#container").find('#pRazaoSocial #spanRazaoSocial').text(data[0].xNome);     
-			$("#container").find('#pEndereco #spanEndereco').text(data[0].xLgr);     
-			$("#container").find('#pNomeFantasia #spanNomeFantasia').text(data[0].xFant);     
-			$("#container").find('#pNumero #spanNumero').text(data[0].nro);     
-			$("#container").find('#pBairro #spanBairro').text(data[0].xBairro);     
-			$("#container").find('#pCodigoMunicipio #spanCodigoMunicipio').text(data[0].cMun);     
-			$("#container").find('#pCidade #spanCidade').text(data[0].xMun);     
-			$("#container").find('#pUF #spanUF').text(data[0].UF);     
-			$("#container").find('#pCEP #spanCEP').text(data[0].CEP);     
-			$("#container").find('#pPais #spanPais').text(data[0].xPais);     
-			$("#container").find('#pCPais #spanCPais').text(data[0].cPais);     
-			$("#container").find('#pTelefone #spanTelefone').text(data[0].fone);     
-			$("#container").find('#pIE #spanIE').text(data[0].IE);     
-			$("#container").find('#pIM #spanIM').text(data[0].IM);     
-			$("#container").find('#pCRT #spanCRT').text(data[0].CRT);     
-			$("#container").find('#pCNAE #spanCNAE').text(data[0].CNAE);
-			emissor = ajax.responseJSON;
+				if(data.length !== 0)
+				{
+					$("#container").find('#pID').text('ID: '+data[0].id);     
+					$("#container").find('#pCNPJ #spanCNPJ').text(data[0].CNPJ);     
+					$("#container").find('#pRazaoSocial #spanRazaoSocial').text(data[0].xNome);     
+					$("#container").find('#pEndereco #spanEndereco').text(data[0].xLgr);     
+					$("#container").find('#pNomeFantasia #spanNomeFantasia').text(data[0].xFant);     
+					$("#container").find('#pNumero #spanNumero').text(data[0].nro);     
+					$("#container").find('#pBairro #spanBairro').text(data[0].xBairro);     
+					$("#container").find('#pCodigoMunicipio #spanCodigoMunicipio').text(data[0].cMun);     
+					$("#container").find('#pCidade #spanCidade').text(data[0].xMun);     
+					$("#container").find('#pUF #spanUF').text(data[0].UF);     
+					$("#container").find('#pCEP #spanCEP').text(data[0].CEP);     
+					$("#container").find('#pPais #spanPais').text(data[0].xPais);     
+					$("#container").find('#pCPais #spanCPais').text(data[0].cPais);     
+					$("#container").find('#pTelefone #spanTelefone').text(data[0].fone);     
+					$("#container").find('#pIE #spanIE').text(data[0].IE);     
+					$("#container").find('#pIM #spanIM').text(data[0].IM);     
+					$("#container").find('#pCRT #spanCRT').text(data[0].CRT);     
+					$("#container").find('#pCNAE #spanCNAE').text(data[0].CNAE);
+					emissor = ajax.responseJSON;
+				}
 		});
 		return ajax;
 	}
@@ -35,7 +38,6 @@ $(document).ready(function(){
 		{
 			alert('Só é permitido cadastradrar um emissor!!');
 		} else {
-			e.preventDefault();
 			$("#apiModal .modal-body .chart").remove(); 
 			$("#apiModal .modal-body p").remove(); 
 			$("h1").remove(); 
@@ -52,84 +54,89 @@ $(document).ready(function(){
 			});
 			$("#apiModal .modal-body").append($('#formEmissor').show());
 			$("#apiModal .modal-footer .action").text('Cadastrar').show();        
-			$("#apiModal .modal-footer .action").on('click', function (e){
-				e.preventDefault();
+			$("#apiModal .modal-footer .action").on('click', function (event){
+				let CEP = $('#inputCEP').val();
+				let endereco = $('#inputEndereco').val();
+				let bairro = $('#inputBairro').val();
+				let cidade = $('#inputCidade').val();
+				let UF = $('#inputUF').val();
+				let numero = $('#inputNumero').val();
+				let fone = $('#inputTelefone').val();
 				let CNPJ = $('#inputCNPJ').val();
 				let fantasia = $('#inputFantasia').val();
 				let social = $('#inputSocial').val();
-				let endereco = $('#inputEndereco').val();
-				let numero = $('#inputNumero').val();
-				let bairro = $('#inputBairro').val();
-				let fone = $('#inputTelefone').val();
-				let CEP = $('#inputCEP').val();
-				let cidade = $('#inputCidade').val();
-				let cMun = $('#inputCMunicipio').val();
-				let UF = $('#inputUF').val();
 				let pais = $('#inputPais').val();
 				let cPais = $('#inputCPais').val();
+				let cMun = $('#inputCMunicipio').val();
 				let CNAE = $('#inputCNAE').val();
 				let CRT = $('#inputCRT').val();
 				let IM = $('#inputIM').val();
 				let IE = $('#inputIE').val();
-				$.ajax({
-					method:'post',
-					url:'http://localhost/geradorXml/App/public/api/emissor/add',
-					dataType: 'json',
-					data:{CNPJ:CNPJ, xFant:fantasia, xNome:social, xLgr:endereco, nro:numero,
-						xBairro:bairro, fone:fone, CEP:CEP, xMun:cidade, UF:UF, xPais:pais, cPais:cPais, cMun:cMun,
-						CNAE:CNAE, CRT:CRT, IM:IM, IE:IE}
-				}).done(function(data){
-					if(data == '{"success": "Emissor Adicionado"}') 
-					{
-						alert('Emissor Adicionado com Sucesso!!');
-						window.location.replace("http://localhost/geradorXml/App/View/Emissor/fetchEmit.php");                
-					}
-				});
+				fone = fone.replace(/[^0-9]/g, '');
+		
+				validateCEPField(CEP, event);
+				validateEnderecoField(endereco, event);
+				validateBairroField(bairro, event);
+				validateMunicipioField(cidade, event);
+				validateUFField(UF, event);
+				validateNumeroField(numero, event);
+				validateTelefoneField(fone, event);
+				validateFantasiaField(fantasia, event);
+				validateSocialField(social, event);
+				validatePaisField(pais, event);
+				validatecPaisField(cPais, event); 
+				validatecMunField(cMun, event);
+				validateCNAEField(CNAE, event);
+				validateCRTField(CRT, event);
+				validateIMField(IM, event);
+				validateIEField(IE, event);
+				if(isValidCEP(CEP) !== false && isValidEndereco(endereco) !== false && isValidNumero(numero) !== false && 
+				isValidBairro(bairro) !== false && isValidMunicipio(cidade) !== false && 
+				isValidUF(UF) !== false  && isValidTelefone(fone) !== false && isValidFantasia(fantasia) !== false && 
+				isValidSocial(social) !== false && isValidPais(pais) !== false &&
+				isValidcPais(cPais) !== false && isValidcMun(cMun) !== false && isValidCNAE(CNAE) !== false &&
+				isValidCRT(CRT) !== false && isValidIM(IM) !== false && isValidIE(IE) !== false)
+				{
+					$.ajax({
+						method:'post',
+						url:'http://localhost/geradorXml/App/public/api/emissor/add',
+						dataType: 'json',
+						data:{CNPJ:CNPJ, xFant:fantasia, xNome:social, xLgr:endereco, nro:numero,
+							xBairro:bairro, fone:fone, CEP:CEP, xMun:cidade, UF:UF, xPais:pais, cPais:cPais, cMun:cMun,
+							CNAE:CNAE, CRT:CRT, IM:IM, IE:IE}
+					}).done(function(data){
+						console.log();
+						if(data == '{"success": "Emissor Adicionado"}') 
+						{
+							alert('Emissor Adicionado com Sucesso!!');
+							window.location.replace("http://localhost/geradorXml/App/View/Emissor/fetchEmit.php");                
+						}
+					});					
+				} else {alert ('deu merda')}
 			});
-
 		}
-	});
-	//Função muito grande, diminuir!!!
+	});	
 	$(document).on('click','#editarEmissor',function(e){
-		e.preventDefault();
+		console.log(emissor);
 		// Pegar todos os valores do emissor cadastrado
-		//Poderia pegar os valores fazendo uma requisição ajax na rota http://localhost/geradorXml/App/public/api/emissor/ - Metodo GET
-		var id = $(this).offsetParent().children().find('#rowEmissorBody p#pID').text().replace(/[^0-9\.]/g, '');
-		var CNPJ = $(this).offsetParent().children().find('#rowEmissorBody p #spanCNPJ').text();
-		var fantasia = $(this).offsetParent().children().find('#rowEmissorBody p #spanNomeFantasia').text();
-		var social = $(this).offsetParent().children().find('#rowEmissorBody p #spanRazaoSocial').text();
-		var endereco = $(this).offsetParent().children().find('#rowEmissorBody p #spanEndereco').text();
-		var numero = $(this).offsetParent().children().find('#rowEmissorBody p #spanNumero').text();
-		var bairro = $(this).offsetParent().children().find('#rowEmissorBody p #spanBairro').text();
-		var telefone = $(this).offsetParent().children().find('#rowEmissorBody p #spanTelefone').text();
-		var CEP = $(this).offsetParent().children().find('#rowEmissorBody p #spanCEP').text();
-		var cidade = $(this).offsetParent().children().find('#rowEmissorBody p #spanCidade').text();
-		var UF = $(this).offsetParent().children().find('#rowEmissorBody p #spanUF').text();
-		var pais = $(this).offsetParent().children().find('#rowEmissorBody p #spanPais').text();
-		var cPais = $(this).offsetParent().children().find('#rowEmissorBody p #spanCPais').text();
-		var cMun = $(this).offsetParent().children().find('#rowEmissorBody p #spanCodigoMunicipio').text();
-		var CNAE = $(this).offsetParent().children().find('#rowEmissorBody p #spanCNAE').text();
-		var CRT = $(this).offsetParent().children().find('#rowEmissorBody p #spanCRT').text();
-		var IM = $(this).offsetParent().children().find('#rowEmissorBody p #spanIM').text();
-		var IE = $(this).offsetParent().children().find('#rowEmissorBody p #spanIE').text();
-		//Inserir nos inputs do formulário do emissor todos os valores capturados acima
-		$('#inputCNPJ').val(CNPJ);
-		$('#inputFantasia').val(fantasia);
-		$('#inputSocial').val(social);
-		$('#inputEndereco').val(endereco);
-		$('#inputNumero').val(numero);
-		$('#inputBairro').val(bairro);
-		$('#inputTelefone').val(telefone);
-		$('#inputCEP').val(CEP);
-		$('#inputCidade').val(cidade);
-		$('#inputCMunicipio').val(cMun);
-		$('#inputUF').val(UF);
-		$('#inputPais').val(pais);
-		$('#inputCPais').val(cPais);
-		$('#inputCNAE').val(CNAE);
-		$('#inputCRT').val(CRT);
-		$('#inputIM').val(IM);
-		$('#inputIE').val(IE);
+		let id = emissor[0].id;
+		$('#inputCNPJ').val(emissor[0].CNPJ);
+		$('#inputFantasia').val(emissor[0].xFant);
+		$('#inputSocial').val(emissor[0].xNome);
+		$('#inputEndereco').val(emissor[0].xLgr);
+		$('#inputNumero').val(emissor[0].nro);
+		$('#inputBairro').val(emissor[0].xBairro);
+		$('#inputTelefone').val(emissor[0].fone);
+		$('#inputCEP').val(emissor[0].CEP);
+		$('#inputCidade').val(emissor[0].xMun);
+		$('#inputCMunicipio').val(emissor[0].cMun);
+		$('#inputUF').val(emissor[0].UF);
+		$('#inputPais').val(emissor[0].xPais);
+		$('#inputCPais').val(emissor[0].cPais);
+		$('#inputCNAE').val(emissor[0].CNAE);
+		$('#inputCRT').val(emissor[0].CRT);
+		$('#inputIM').val(emissor[0].IM);
+		$('#inputIE').val(emissor[0].IE);
 		//Remover itens que vem por padrão no modal
 		$("#apiModal .modal-body .chart").remove(); 
 		$("#apiModal .modal-body p").remove(); 
@@ -142,8 +149,7 @@ $(document).ready(function(){
 		//Modificar o texto do botão do modal
 		$("#apiModal .modal-footer .action").text('Atualizar').show(); 
 		//Editar o emissor       
-		$("#apiModal .modal-footer .action").on('click', function (e){
-			e.preventDefault();
+		$("#apiModal .modal-footer .action").on('click', function (){
 			let CNPJup = $('#inputCNPJ').val();
 			let fantasiaup = $('#inputFantasia').val();
 			let socialup = $('#inputSocial').val();
@@ -161,6 +167,7 @@ $(document).ready(function(){
 			let CRTup = $('#inputCRT').val();
 			let IMup = $('#inputIM').val();
 			let IEup = $('#inputIE').val();
+			foneup = foneup.replace(/[^0-9]/g, '');
 			$.ajax({
 				method:'put',
 				url: 'http://localhost/geradorXml/App/public/api/emissor/update/'+id,
@@ -193,9 +200,301 @@ $(document).ready(function(){
                 location = location;        
             });          
         }
+	});	
+	//Buscar Endereço, Bairro, Cidade e UF automaticamente pela API viacep
+	$("#inputCEP").focusout(function(){
+			let cep = $(this).val().replace(/\D/g, '');
+			//Verifica se campo cep possui valor informado.
+			if (cep != "") {
+					//Expressão regular para validar o CEP.
+					let validacep = /^[0-9]{8}$/;
+					//Valida o formato do CEP.
+					if(validacep.test(cep)) {
+							//Preenche os campos com "..." enquanto consulta webservice.
+							$("#inputEndereco").val("...");
+							$("#inputBairro").val("...");
+							$("#inputCidade").val("...");
+							$("#inputUF").val("...");
+							$.ajax({
+									method:'get',
+									dataType: 'json',
+									url:"https://viacep.com.br/ws/"+ cep +"/json/?callback=?"
+							}).done(function(data){
+									//Atualiza os campos com os valores da consulta.
+									$("#inputEndereco").val(data.logradouro);
+									$("#inputBairro").val(data.bairro);
+									$("#inputCidade").val(data.localidade);
+									$("#inputUF").val(data.uf);
+							}).fail(function(data){
+									console.log(data);
+							});
+					}
+			}
 	});
-    //Botao fechar modalNFC-e, redirecionar para vendas.php
-    $(".modalApi_fechar").on('click',function() {
-        location = location;
-    }); 
+	//Validar CEP
+    function isValidCEP(CEP) {
+      //Tamanho 8 somente números - Tamanho 9 com a -
+      return CEP.length === 8 || CEP.length === 9;
+    }
+  
+    function validateCEPField(CEP, event) {
+      if (!isValidCEP(CEP)) {
+        $("#CEP-feedback").text("CEP Inválido").css('color','red');;
+        alert('CEP Inválido!')
+        event.preventDefault();
+      } else {
+        $("#CEP-feedback").text("");
+      }
+    }
+    //Validar Endereço
+    function isValidEndereco(endereco) {
+      //Endereço no mínimo 2 letras e no máximo 100
+      return endereco.length >= 2  && endereco.length <= 100;
+    }
+  
+    function validateEnderecoField(endereco, event) {
+      if (!isValidEndereco(endereco)) {
+        $("#endereco-feedback").text("Endereco Inválido").css('color','red');
+        alert('Endereco Inválido!')
+        event.preventDefault();
+      } else {
+        $("#endereco-feedback").text("");
+      }
+    }
+    //Validar Bairro
+    function isValidBairro(Bairro) {
+      //Bairro no mínimo 2 letras e no máximo 100
+      return Bairro.length >= 2  && Bairro.length <= 100;
+    }
+  
+    function validateBairroField(Bairro, event) {
+      if (!isValidBairro(Bairro)) {
+        $("#bairro-feedback").text("Bairro Inválido").css('color','red');
+        alert('Bairro Inválido!')
+        event.preventDefault();
+      } else {
+        $("#bairro-feedback").text("");
+      }
+    }
+    //Validar Municipio
+    function isValidMunicipio(Municipio) {
+      //Municipio no mínimo 2 letras e no máximo 100
+      return Municipio.length >= 2  && Municipio.length <= 100;
+    }
+  
+    function validateMunicipioField(Municipio, event) {
+      if (!isValidMunicipio(Municipio)) {
+        $("#cidade-feedback").text("Municipio Inválido").css('color','red');
+        alert('Municipio Inválido!')
+        event.preventDefault();
+      } else {
+        $("#cidade-feedback").text("");
+      }
+    }
+    //Validar UF
+    function isValidUF(UF) {
+      //UF tamanho 2 letras
+      return UF !== null;
+    }
+  
+    function validateUFField(UF, event) {
+      if (!isValidUF(UF)) {
+        $("#	-feedback").text("UF Inválido").css('color','red');
+        alert('UF Inválido!')
+        event.preventDefault();
+      } else {
+        $("#UF-feedback").text("");
+      }
+    }
+    //Validar Numero
+    function isValidNumero(numero) {
+      //Municipio no mínimo 2 letras e no máximo 20
+      return numero.length >= 2  && numero.length <= 20;
+    }
+  
+    function validateNumeroField(numero, event) {
+      if (!isValidNumero(numero)) {
+        $("#numero-feedback").text("Numero Inválido").css('color','red');
+        alert('Numero Inválido!')
+        event.preventDefault();
+      } else {
+        $("#numero-feedback").text("");
+      }
+    }
+    //Validar Telefone - mascara para telefone residencial
+    $('#inputTelefone').mask('(00) 0000-0009');
+    $('#inputTelefone').blur(function(event) {
+        if($(this).val().length == 14){ // Celular com 9 dígitos + 2 dígitos DDD e 4 da máscara
+        $('#inputTelefone').mask('(00) 0000-0009');
+        } else {
+        $('#inputTelefone').mask('(00) 0000-0009');
+        }
+    });
+    //Validar Telefone
+    function isValidTelefone(Telefone) {
+      //Tamanho máximo 10, será retirado caracteres especiais
+      return Telefone.length > 2 && Telefone.length < 20;
+    }
+  
+    function validateTelefoneField(Telefone, event) {
+      if (!isValidTelefone(Telefone)) {
+        $("#telefone-feedback").text("Telefone Inválido").css('color','red');
+        alert('Telefone Inválido!')
+        event.preventDefault();
+      } else {
+        $("#telefone-feedback").text("");
+      }
+    }
+   //Validar Nome Fantasia
+    function isValidFantasia(Fantasia) {
+      return Fantasia.length >  2 && 	Fantasia.length < 100;
+    }
+  
+    function validateFantasiaField(Fantasia, event) {
+      if (!isValidFantasia(Fantasia)) {
+        $("#nome_fantasia-feedback").text("Nome Fantasia Inválido").css('color','red');
+        alert('Nome Fantasia Inválido!');
+        event.preventDefault();
+      } else {
+        $("#nome_fantasia-feedback").text("");
+      }
+    }
+   //Validar Razão Social
+    function isValidSocial(Social) {
+      return Social.length >  2 && 	Social.length < 100;
+    }
+  
+    function validateSocialField(Social, event) {
+      if (!isValidSocial(Social)) {
+        $("#razao_social-feedback").text("Razão Social Inválido").css('color','red');
+        alert('Razão Social Inválido!');
+        event.preventDefault();
+      } else {
+        $("#razao_social-feedback").text("");
+      }
+    }
+   //Validar Pais
+    function isValidPais(Pais) {
+      return Pais.length >  2 && 	Pais.length < 100;
+    }
+  
+    function validatePaisField(Pais, event) {
+      if (!isValidPais(Pais)) {
+        $("#pais-feedback").text("Pais Inválido").css('color','red');
+        alert('Nome do Pais Inválido!');
+        event.preventDefault();
+      } else {
+        $("#pais-feedback").text("");
+      }
+    }
+   //Validar Código do Pais
+    function isValidcPais(cPais) {
+      return cPais !== null;
+    }
+  
+    function validatecPaisField(cPais, event) {
+      if (!isValidcPais(cPais)) {
+        $("#cPais-feedback").text("Código do Pais Inválido").css('color','red');
+        alert('Código do Páis Inválido!');
+        event.preventDefault();
+      } else {
+        $("#cPais-feedback").text("");
+      }
+    }
+   //Validar Código do Pais
+    function isValidcMun(cMun) {
+      return cMun.length === 7;
+    }
+  
+    function validatecMunField(cMun, event) {
+      if (!isValidcMun(cMun)) {
+        $("#cMunicipio-feedback").text("Código do Município Inválido").css('color','red');
+        alert('Código do Município Inválido!');
+        event.preventDefault();
+      } else {
+        $("#cMunicipio-feedback").text("");
+      }
+    }
+   //Validar CNAE
+    function isValidCNAE(CNAE) {
+      return CNAE.length === 7;
+    }
+  
+    function validateCNAEField(CNAE, event) {
+      if (!isValidCNAE(CNAE)) {
+        $("#CNAE-feedback").text("CNAE Inválido").css('color','red');
+        alert('CNAE Inválido!');
+        event.preventDefault();
+      } else {
+        $("#CNAE-feedback").text("");
+      }
+    }
+    //Validar CNPJ - Código encontrado na internet
+    $('#inputCNPJ').focusout(function(event){
+        let CNPJ = $(this).cpfcnpj({
+        mask: false,
+        validate: 'cpfcnpj',
+        event: 'focusout',
+        // validateOnlyFocus: true,
+        handler: '#inputCNPJ',
+        ifValid: function (input) { input.removeClass("error"); input.addClass("success");},
+        ifInvalid: function (input){  input.removeClass("success"); input.addClass("error");}
+    });
+    });
+		//Validar CNAE
+		 function isValidCNAE(CNAE) {
+			 return CNAE.length === 7;
+		 }
+	 
+		 function validateCNAEField(CNAE, event) {
+			 if (!isValidCNAE(CNAE)) {
+				 $("#CNAE-feedback").text("CNAE Inválido").css('color','red');
+				 alert('CNAE Inválido!');
+				 event.preventDefault();
+			 } else {
+				 $("#CNAE-feedback").text("");
+			 }
+		 }
+		//Validar CRT
+		 function isValidCRT(CRT) {
+			 return CRT !== null;
+		 }
+	 
+		 function validateCRTField(CRT, event) {
+			 if (!isValidCRT(CRT)) {
+				 $("#CRT-feedback").text("CRT Inválido").css('color','red');
+				 alert('CRT Inválido!');
+				 event.preventDefault();
+			 } else {
+				 $("#CRT-feedback").text("");
+			 }
+		 }
+		//Validar IM
+		 function isValidIM(IM) {
+			 return IM.length > 0 && IM.length < 50;
+		 }
+	 
+		 function validateIMField(IM, event) {
+			 if (!isValidIM(IM)) {
+				 $("#IM-feedback").text("IM Inválido").css('color','red');
+				 alert('IM Inválido!');
+				 event.preventDefault();
+			 } else {
+				 $("#IM-feedback").text("");
+			 }
+		 }
+		//Validar IM
+		 function isValidIE(IE) {
+			 return IE.length > 0 && IE.length < 50;
+		 }
+	 
+		 function validateIEField(IE, event) {
+			 if (!isValidIE(IE)) {
+				 $("#IE-feedback").text("IE Inválido").css('color','red');
+				 alert('IE Inválido!');
+				 event.preventDefault();
+			 } else {
+				 $("#IE-feedback").text("");
+			 }
+		 }
 });

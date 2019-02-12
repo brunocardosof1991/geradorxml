@@ -12,8 +12,6 @@ use ArrayIterator;
 use PDO;
 class Xml 
 {
-    private $tpEvento = 110111;
-    private $nSeqEvento = 1;
     //<ide>
     public $ide = array
     (
@@ -65,9 +63,9 @@ class Xml
     //<dest>
     public $dest = array
     (
-        'ID' => NULL,
         'CNPJ' => NULL,
         'xNome' => NULL,
+        //9=Não Contribuinte, que pode ou não possuir Inscrição Estadual no Cadastro de Contribuintes do ICMS.
         'indIEDest' => 9
     );
         //<enderDest>
@@ -75,7 +73,7 @@ class Xml
     (
         'xLgr' => NULL,
         'nro' => NULL,
-        'xCpl' => NULL,
+        'xCpl' => 'Complemento',
         'xBairro' => NULL,
         'cMun' => 4314902,
         'xMun' => NULL,
@@ -97,6 +95,8 @@ class Xml
         'tBand' => NULL,
         'cAut' => NULL
     );
+    private $tpEvento = 110111;
+    private $nSeqEvento = 1;
     private $connection = '';
     public $ICMSSN102 = array();
     public $PIS = array ();
@@ -127,7 +127,7 @@ class Xml
         //Startar Identificação da NFC-e com o cadastrado no Banco de Dados
         $this->ide['cUF'] = $this->gerarIde()[0]['cUF'];
         $this->ide['natOp'] = $this->gerarIde()[0]['natOp'];
-        $this->ide['mod'] = $this->gerarIde()[0]['mod'];
+        $this->ide['mod'] = $this->gerarIde()[0]['modelo'];
         $this->ide['serie'] = $this->gerarIde()[0]['serie'];
         $this->ide['tpNF'] = $this->gerarIde()[0]['tpNF'];
         $this->ide['idDest'] = $this->gerarIde()[0]['idDest'];
@@ -312,8 +312,9 @@ class Xml
 
     }
     */
-    function autorizarXML($informacoesAdicionais, $arrayProduto) 
+    function autorizarXML($informacoesAdicionais, $arrayProduto,$dest,$pagamentos,$valorTotal) 
     {
+        session_start();
         $dom = new DOMDocument('1.0', 'utf-8');
         $NFe = $dom->appendChild($dom->createElement('NFe'));
         $NFe->setAttributeNode(new DOMAttr('xmlns', 'http://www.portalfiscal.inf.br/nfe'));
@@ -386,21 +387,24 @@ class Xml
             $CRT = $emit->appendChild($dom->createElement('CRT'));
             $CRT->appendChild($dom->createTextNode($this->emit['CRT']));
         //Tag <dest>
-        $destinatario = $infNFe->appendChild($dom->createElement('dest'));
-            $CNPJDEST = $destinatario->appendChild($dom->createElement('CNPJ'));
-            $CNPJDEST->appendChild($dom->createTextNode($this->dest['CNPJ']));
-            $xNomeDEST = $destinatario->appendChild($dom->createElement('xNome'));
-            $xNomeDEST->appendChild($dom->createTextNode('NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL'));
-            //Tag <enderDest>
-            $enderDestinatario = $destinatario->appendChild($dom->createElement('enderDest'));
-            foreach ($this->enderDest as $key => $value) 
-            {
-                $tag = $enderDestinatario->appendChild($dom->createElement($key));
-                $tag->appendChild($dom->createTextNode($value));
-            }
-        //Tag <dest>
-            $indIEDest = $destinatario->appendChild($dom->createElement('indIEDest'));
-            $indIEDest->appendChild($dom->createTextNode($this->dest['indIEDest']));
+        if($dest === true)
+        {
+            $destinatario = $infNFe->appendChild($dom->createElement('dest'));
+                $CNPJDEST = $destinatario->appendChild($dom->createElement('CNPJ'));
+                $CNPJDEST->appendChild($dom->createTextNode($this->dest['CNPJ']));
+                $xNomeDEST = $destinatario->appendChild($dom->createElement('xNome'));
+                $xNomeDEST->appendChild($dom->createTextNode('NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL'));
+                //Tag <enderDest>
+                $enderDestinatario = $destinatario->appendChild($dom->createElement('enderDest'));
+                foreach ($this->enderDest as $key => $value) 
+                {
+                    $tag = $enderDestinatario->appendChild($dom->createElement($key));
+                    $tag->appendChild($dom->createTextNode($value));
+                }
+            //Tag <dest>
+                $indIEDest = $destinatario->appendChild($dom->createElement('indIEDest'));
+                $indIEDest->appendChild($dom->createTextNode($this->dest['indIEDest']));
+        }
         //Tag <det>
         if (count($arrayProduto) !== 0) 
         {
@@ -492,7 +496,7 @@ class Xml
                 $vFCPSTRet = $ICMSTot->appendChild($dom->createElement('vFCPSTRet'));
                 $vFCPSTRet->appendChild($dom->createTextNode('0.00'));
                 $vProd = $ICMSTot->appendChild($dom->createElement('vProd'));
-                $vProd->appendChild($dom->createTextNode(sprintf('%.2f', round($this->detPag['vPag'],2))));
+                $vProd->appendChild($dom->createTextNode(sprintf('%.2f', round($valorTotal,2))));
                 $vFrete = $ICMSTot->appendChild($dom->createElement('vFrete'));
                 $vFrete->appendChild($dom->createTextNode('0.00'));
                 $vSeg = $ICMSTot->appendChild($dom->createElement('vSeg'));
@@ -512,44 +516,66 @@ class Xml
                 $vOutro = $ICMSTot->appendChild($dom->createElement('vOutro'));
                 $vOutro->appendChild($dom->createTextNode('0.00'));
                 $vNF = $ICMSTot->appendChild($dom->createElement('vNF'));
-                $vNF->appendChild($dom->createTextNode(sprintf('%.2f', round($this->detPag['vPag'],2))));
+                $vNF->appendChild($dom->createTextNode(sprintf('%.2f', round($valorTotal,2))));
         //Trans
         $transporte = $infNFe->appendChild($dom->createElement('transp'));
             $modFrete = $transporte->appendChild($dom->createElement('modFrete'));
             $modFrete->appendChild($dom->createTextNode(9));
-        //Tag <pag> SE FOR DINHEIRO                        
-        if ($this->detPag['tPag'] == 01 || $this->detPag['tPag'] == 02) 
+        //Tag <pag> Se for somente no dinheiro
+        //Poderia se escolhido qualquer um dos arrays dentro de card
+        if(empty($pagamentos))
+        {
+            if(empty($this->card['tpIntegra']))
+            {   
+                //Tag <pag>
+                $pag = $infNFe->appendChild($dom->createElement('pag'));
+                    $tagDetPag = $pag->appendChild($dom->createElement('detPag'));
+                    $tPag = $tagDetPag->appendChild($dom->createElement('tPag'));
+                    $tPag->appendChild($dom->createTextNode($this->detPag['tPag']));
+                    $vPag = $tagDetPag->appendChild($dom->createElement('vPag'));
+                    $vPag->appendChild($dom->createTextNode(sprintf('%.2f', round($this->detPag['vPag'],2))));
+            } else if(!empty($this->card['tpIntegra'])) //Se for somente no cartão
+            {
+                //Tag <pag> SE FOR CARTÃO
+                $pag = $infNFe->appendChild($dom->createElement('pag'));
+                    $tagDetPag = $pag->appendChild($dom->createElement('detPag'));
+                        $tPag = $tagDetPag->appendChild($dom->createElement('tPag'));
+                        $tPag->appendChild($dom->createTextNode($this->detPag['tPag']));
+                        $vPag = $tagDetPag->appendChild($dom->createElement('vPag'));
+                        $vPag->appendChild($dom->createTextNode(sprintf('%.2f', round($this->detPag['vPag'],2))));
+                        //Tag <card>
+                        $cardInfo = $tagDetPag->appendChild($dom->createElement('card'));
+                        foreach ($this->card as $key => $value) 
+                        {
+                            $tag = $cardInfo->appendChild($dom->createElement($key));
+                            $tag->appendChild($dom->createTextNode($value));
+                        }
+            }
+        }
+        /*
+        Duas Formas de Pagamentos:
+        array $Pagamentos vem da rota /uninfe/autorizar contendo as duas formas de pagamentos
+        */ 
+        if(!empty($pagamentos))
         {
             //Tag <pag>
             $pag = $infNFe->appendChild($dom->createElement('pag'));
                 $tagDetPag = $pag->appendChild($dom->createElement('detPag'));
                 $tPag = $tagDetPag->appendChild($dom->createElement('tPag'));
-                $tPag->appendChild($dom->createTextNode($this->detPag['tPag']));
+                $tPag->appendChild($dom->createTextNode(99));
                 $vPag = $tagDetPag->appendChild($dom->createElement('vPag'));
-                $vPag->appendChild($dom->createTextNode(sprintf('%.2f', round($this->detPag['vPag'],2))));
-        } 
-        else 
-        {
-            //Tag <pag> SE FOR CARTÃO
-            $pag = $infNFe->appendChild($dom->createElement('pag'));
-                $tagDetPag = $pag->appendChild($dom->createElement('detPag'));
-                    $tPag = $tagDetPag->appendChild($dom->createElement('tPag'));
-                    $tPag->appendChild($dom->createTextNode($this->detPag['tPag']));
-                    $vPag = $tagDetPag->appendChild($dom->createElement('vPag'));
-                    $vPag->appendChild($dom->createTextNode(sprintf('%.2f', round($this->detPag['vPag'],2))));
-                    //Tag <card>
-                    $cardInfo = $tagDetPag->appendChild($dom->createElement('card'));
-                    foreach ($this->card as $key => $value) 
-                    {
-                        $tag = $cardInfo->appendChild($dom->createElement($key));
-                        $tag->appendChild($dom->createTextNode($value));
-                    }
-        }// END <pag>
+                $vPag->appendChild($dom->createTextNode(sprintf('%.2f', round($valorTotal,2)))); 
+        }
+        // END <pag>
         //<infAdic>
         $infAdic = $infNFe->appendChild($dom->createElement('infAdic'));
         $infCpl = $infAdic->appendChild($dom->createElement('infCpl'));
-        $infCpl->appendChild($dom->createTextNode($informacoesAdicionais));
-        
+        if(!empty($informacoesAdicionais))
+        {
+            $infCpl->appendChild($dom->createTextNode($informacoesAdicionais = trim(preg_replace('/\s+/', ' ', $informacoesAdicionais))));
+        }else{
+            $infCpl->appendChild($dom->createTextNode('Informações da Empresa, caso seja venda com uma forma de pagamento'));
+        }
         $dom->save($this->gerarChaveDeAcesso() . '-nfe.xml');
     }
     function cancelarXml($protocolo, $chave) 
@@ -589,7 +615,7 @@ class Xml
                     $nProt = $detEvento->appendChild($dom->createElement('nProt'));
                     $nProt->appendChild($dom->createTextNode($protocolo));
                     $xJust = $detEvento->appendChild($dom->createElement('xJust'));
-                    $xJust->appendChild($dom->createTextNode('NFC-e enviado em duplicidade'));
+                    $xJust->appendChild($dom->createTextNode('Colocar Algum Motivo Escrito Pelo Usuario'));
         $dom->save($chave.'-ped-eve.xml');        
     }
     public function inutilizarXml($inicio,$fim,$just)

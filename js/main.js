@@ -1,11 +1,10 @@
 $(document).ready(function(){
-    //Verificar se existe chaveDeAcesso.txt
-    let verify = true;
+    //Deletar Arquivos Temporários
+    let deleteFile = true
     $.ajax({
-        method:'post',
-        url:'http://localhost/geradorxml/app/public/api/verifyFiles',
-        dataType:'json',
-        data:{verify:verify}
+        method:'get',
+        url:'http://localhost/geradorxml/App/Controller/DeleteFiles.php',
+        dataType: 'json',
+        data:{deleteFile:deleteFile}
     });
-    //Validação
 });

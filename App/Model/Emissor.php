@@ -46,7 +46,7 @@ class Emissor {
     {       
         $cUF = $request->getParam('cUF');
         $natOp = $request->getParam('natOp');
-        $mod = $request->getParam('mod');
+        $modelo = $request->getParam('modelo');
         $serie = $request->getParam('serie');
         $tpNF = $request->getParam('tpNF');
         $idDest = $request->getParam('idDest');
@@ -58,14 +58,14 @@ class Emissor {
         $indFinal = $request->getParam('indFinal');
         $indPres = $request->getParam('indPres');
         $procEmi = $request->getParam('procEmi');      
-        $sql = "INSERT INTO ide (cUF,natOp,`mod`,serie,tpNF,idDest,cMunFG,tpImp,tpEmis,tpAmb,finNFe,indFinal,indPres,procEmi) VALUES 
-        (:cUF,:natOp,:mod,:serie,:tpNF,:idDest,:cMunFG,:tpImp,:tpEmis,:tpAmb,:finNFe,:indFinal,:indPres,:procEmi)";
+        $sql = 'INSERT INTO ide (cUF,natOp,modelo,serie,tpNF,idDest,cMunFG,tpImp,tpEmis,tpAmb,finNFe,indFinal,indPres,procEmi) VALUES 
+        (:cUF,:natOp,:modelo,:serie,:tpNF,:idDest,:cMunFG,:tpImp,:tpEmis,:tpAmb,:finNFe,:indFinal,:indPres,:procEmi)';
         try{
             $connection = $this->connection->PDOConnect();
             $stmt = $connection->prepare($sql);
             $stmt->bindParam(':cUF',  $cUF);
             $stmt->bindParam(':natOp',      $natOp);
-            $stmt->bindParam(':mod',      $mod);
+            $stmt->bindParam(':modelo',      $modelo);
             $stmt->bindParam(':serie',    $serie);
             $stmt->bindParam(':tpNF',       $tpNF);
             $stmt->bindParam(':idDest',      $idDest);
@@ -79,7 +79,51 @@ class Emissor {
             $stmt->bindParam(':procEmi',      $procEmi);
             $stmt->execute();
             $connection = null;
-            echo json_encode('{"success": "Ide Adicionado"}');
+            echo json_encode('Success');
+        } catch(PDOException $e){
+            echo '{"Error": '.$e->getMessage().'}';
+        }
+    }
+    public function updateIde($request)
+    {       
+        $cUF = $request->getParam('cUF');
+        $natOp = $request->getParam('natOp');
+        $modelo = $request->getParam('modelo');
+        $serie = $request->getParam('serie');
+        $tpNF = $request->getParam('tpNF');
+        $idDest = $request->getParam('idDest');
+        $cMunFG = $request->getParam('cMunFG');
+        $tpImp = $request->getParam('tpImp');
+        $tpEmis = $request->getParam('tpEmis');
+        $tpAmb = $request->getParam('tpAmb');
+        $finNFe = $request->getParam('finNFe');
+        $indFinal = $request->getParam('indFinal');
+        $indPres = $request->getParam('indPres');
+        $procEmi = $request->getParam('procEmi');      
+        $sql = "UPDATE ide SET
+        cUF=:cUF,natOp=:natOp,modelo=:modelo,serie=:serie,tpNF=:tpNF,idDest=:idDest,cMunFG=:cMunFG,tpImp=:tpImp,tpEmis=:tpEmis,tpAmb=:tpAmb,
+        finNFe=:finNFe,indFinal=:indFinal,indPres=:indPres,procEmi=:procEmi WHERE cUF = $cUF";
+        
+        try{
+            $connection = $this->connection->PDOConnect();
+            $stmt = $connection->prepare($sql);
+            $stmt->bindParam(':cUF',  $cUF);
+            $stmt->bindParam(':natOp',      $natOp);
+            $stmt->bindParam(':modelo',      $modelo);
+            $stmt->bindParam(':serie',    $serie);
+            $stmt->bindParam(':tpNF',       $tpNF);
+            $stmt->bindParam(':idDest',      $idDest);
+            $stmt->bindParam(':cMunFG',      $cMunFG);
+            $stmt->bindParam(':tpImp',      $tpImp);
+            $stmt->bindParam(':tpEmis',      $tpEmis);
+            $stmt->bindParam(':tpAmb',      $tpAmb);
+            $stmt->bindParam(':finNFe',      $finNFe);
+            $stmt->bindParam(':indFinal',      $indFinal);
+            $stmt->bindParam(':indPres',      $indPres);
+            $stmt->bindParam(':procEmi',      $procEmi);
+            $stmt->execute();
+            $connection = null;
+            echo json_encode('{"success": "Ide Atualizado"}');
         } catch(PDOException $e){
             echo '{"error": '.$e->getMessage().'}';
         }
