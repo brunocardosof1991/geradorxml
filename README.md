@@ -1,29 +1,24 @@
-##Gerador XML
+##Gerador XML <br/>
 Esse é um gerador XML para autorizar NFC-e em ambiente de homologação com o sefaz, usando o software UniNFe da Unimake para assinatura digital do XML e o uniDANFE para geração do DANFE.
 
-Esse projeto esta usando:
-
-Arquitetura Restfull Api; 
-
+Esse projeto esta usando: <br />
+Arquitetura Restfull Api;
 Backend PHP; 
-
 SGBD MySQL; 
-
 Frontend JavaScript, jQuery
 
-##Versão
-1.0.0
+##Versão<br />
+$ 1.0.0
 
-##Instalação
-Instalar o software da Unimake para assinatura do XML- UniNFe
-Instalar o software da Unimake para geração do DANFE- UniDANFE
-http://www.unimake.com.br/uninfe/
+##Instalação<br />
+$ Instalar o software da Unimake para assinatura do XML- UniNFe<br />
+$ Instalar o software da Unimake para geração do DANFE- UniDANFE<br />
+$ http://www.unimake.com.br/uninfe/
 
-Criar o CSC e o ID Token no site do Sefaz
+##Criar o CSC e o ID Token no site do Sefaz:<br />
+Passo a passo das configurações em - http://wiki.unimake.com.br/index.php/Manuais:UniNFe<br />
 
-Passo a passo das configurações em - http://wiki.unimake.com.br/index.php/Manuais:UniNFe
-
-##API Endpoints
+##API Endpoints<br />
 Grupo: Cliente 
 
     $ GET /api/cliente/
