@@ -8,12 +8,12 @@ SGBD MySQL;
 Frontend JavaScript, jQuery
 
 ##Versão<br />
-$ 1.0.0
+1.0.0
 
 ##Instalação<br />
-$ Instalar o software da Unimake para assinatura do XML- UniNFe<br />
-$ Instalar o software da Unimake para geração do DANFE- UniDANFE<br />
-$ http://www.unimake.com.br/uninfe/
+Instalar o software da Unimake para assinatura do XML- UniNFe<br />
+Instalar o software da Unimake para geração do DANFE- UniDANFE<br />
+http://www.unimake.com.br/uninfe/
 
 ##Criar o CSC e o ID Token no site do Sefaz:<br />
 Passo a passo das configurações em - http://wiki.unimake.com.br/index.php/Manuais:UniNFe<br />
