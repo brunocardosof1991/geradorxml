@@ -314,7 +314,6 @@ class Xml
     */
     function autorizarXML($informacoesAdicionais, $arrayProduto,$dest,$pagamentos,$valorTotal) 
     {
-        session_start();
         $dom = new DOMDocument('1.0', 'utf-8');
         $NFe = $dom->appendChild($dom->createElement('NFe'));
         $NFe->setAttributeNode(new DOMAttr('xmlns', 'http://www.portalfiscal.inf.br/nfe'));
