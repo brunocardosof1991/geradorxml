@@ -1,26 +1,25 @@
-##Gerador XML
-Esse é um gerador XML para autorizar NFC-e em ambiente de homologação com o sefaz, usando o software UniNFe da Unimake para assinatura digital do XML.
-Esse projeto esta usando:
+##Gerador XML <br/>
+Esse é um gerador XML para autorizar NFC-e em ambiente de homologação com o sefaz, usando o software UniNFe da Unimake para assinatura digital do XML e o uniDANFE para geração do DANFE.
 
-Arquitetura Restfull Api; 
-
+Esse projeto esta usando: <br />
+Arquitetura Restfull Api;
 Backend PHP; 
-
 SGBD MySQL; 
-
 Frontend JavaScript, jQuery
 
-##Versão
+##Versão<br />
 1.0.0
 
-##Instalação
-Instalar o software da Unimake - UniNFe
+##Instalação<br />
+Instalar o software da Unimake para assinatura do XML- UniNFe<br />
+Instalar o software da Unimake para geração do DANFE- UniDANFE<br />
+http://www.unimake.com.br/uninfe/<br />
+Certificado Digital A1<br />
 
-Criar o CSC e o ID Token no site do Sefaz
+##Criar o CSC e o ID Token no site do Sefaz:<br />
+Passo a passo das configurações em - http://wiki.unimake.com.br/index.php/Manuais:UniNFe<br />
 
-Passo a passo da configuração em - http://wiki.unimake.com.br/index.php/Manuais:UniNFe
-
-##API Endpoints
+##API Endpoints<br />
 Grupo: Cliente 
 
     $ GET /api/cliente/
@@ -53,18 +52,6 @@ Grupo: NF
 
     $ DELETE /api/nf/delete/{id}
 
-    $ POST /api/uninfe/cancelar
-
-    $ POST /api/uninfe/cancelar/confirmar
-
-    $ POST /api/uninfe/cancelar/confirmar/salvar
-
-    $ POST api/uninfe/inutilizar
-
-    $ POST api/uninfe/inutilizar/confirmar
-
-    $ POST api/uninfe/inutilizar/confirmar/salvar
-
 Grupo: Produto 
 
     $ GET /api/produto/
@@ -76,17 +63,3 @@ Grupo: Produto
     $ PUT /api/produto/update/{id}
 
     $ DELETE /api/produto/delete/{id}
-
-Grupo: Venda 
-
-    $ GET /api/cliente/{id}
-
-    $ GET /api/produto/{id}
-
-    $ GET /api/emissor/
-
-    $ POST /api/uninfe/autorizar
-
-    $ POST /api/uninfe/autorizar/confirmar
-
-    $ POST /api/uninfe/autorizar/salvar
