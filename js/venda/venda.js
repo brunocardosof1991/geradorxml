@@ -1,8 +1,6 @@
 $(document).ready(function(){  
     let ls; //localStorage
-    //Verificar na pasta /Enviado/Autorizado da UniNFe se foi autorizado a NF
     //Função chamada na promise done do click no botao Finalizar Venda
-    //Essa função contêm a criação da DANFE. Motivo: Só sera criado a DANFE se tudo ocorrer bem na autorização
     function confirmarAutorizacao() 
     {
         let chaveDeAcesso = true;
@@ -290,7 +288,6 @@ $(document).ready(function(){
         array[3] = valorTotal;
         array[4] = emissor[0];
         var json = JSON.stringify(array);
-        //Enviar JSON para rota de criação da DANFE
         // Alimentar o XML para autorização
         $.ajax({
             method:'post',
